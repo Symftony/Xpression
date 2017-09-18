@@ -1,0 +1,40 @@
+{
+  "name": "symftony/Xpression",
+  "authors": [
+    {
+      "name": "Anthony",
+      "email": "symftony@gmail.com"
+    }
+  ],
+  "type": "library",
+  "description": "A php expression",
+  "keywords": [
+    "expression",
+    "parser"
+  ],
+  "homepage": "https://github.com/symftony/Xpression",
+  "require": {
+    "php": ">=5.5.9"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.0",
+    "doctrine/orm": "^2.5",
+    "doctrine/mongodb-odm": "^1.1"
+  },
+  "suggest": {
+    "doctrine/orm": "If you want filter an ORM query builder",
+    "doctrine/mongodb-odm": "If you want filter an ODM query builder"
+  },
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Symftony\\Xpression\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\Symftony\\Xpression\\": "tests/"
+    }
+  }
+}
