@@ -1,8 +1,6 @@
 <?php
 
-namespace Symftony\Xpression\Exception;
-
-use Symftony\Xpression\Token;
+namespace Symftony\Xpression\Exception\Parser;
 
 class UnexpectedTokenException extends SyntaxErrorException
 {
@@ -14,27 +12,27 @@ class UnexpectedTokenException extends SyntaxErrorException
     /**
      * @var string
      */
-    private $expectedToken;
+    private $expectedTokenTypes;
 
     /**
-     * @param Token $token
-     * @param string $expectedToken
+     * @param array $token
+     * @param array $expectedTokenTypes
      * @param int $message
      * @param int $code
      * @param \Exception|null $previous
      */
-    public function __construct(Token $token, $expectedToken, $message = null, $code = 0, \Exception $previous = null)
+    public function __construct(array $token, $expectedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
     {
         $defaultMessage = sprintf(
             'Unexpected token "%s". Expected %s.',
-            $token->getValue(),
-            $expectedToken
+            $token['value'],
+            implode(', ', $expectedTokenTypes)
         );
 
         parent::__construct($message ?: $defaultMessage, $code, $previous);
 
         $this->token = $token;
-        $this->expectedToken = $expectedToken;
+        $this->expectedTokenTypes = $expectedTokenTypes;
     }
 
     /**
@@ -48,8 +46,8 @@ class UnexpectedTokenException extends SyntaxErrorException
     /**
      * @return string
      */
-    public function getExpectedToken()
+    public function getExpectedTokenTypes()
     {
-        return $this->expectedToken;
+        return $this->expectedTokenTypes;
     }
 }

@@ -4,7 +4,6 @@ namespace Tests\Symftony\Xpression;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Lexer;
-use Symftony\Xpression\Token;
 
 class LexerTest extends TestCase
 {
@@ -20,94 +19,134 @@ class LexerTest extends TestCase
 
     public function setInputSuccessDataProvider()
     {
-        return [
-            [
+        return array(
+            array(
                 'a=1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '=', Lexer::T_EQUALS, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 2),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 2),
+                ),
+            ),
+            array(
+                'a≠1',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≠', 'type' => Lexer::T_NOT_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                ),
+            ),
+            array(
+                'a!=1',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≠', 'type' => Lexer::T_NOT_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                ),
+            ),
+            array(
+                'a="value"',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1),
+                    array('value' => 'value', 'type' => Lexer::T_STRING, 'position' => 2),
+                ),
+            ),
+            array(
+                "a='value'",
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1),
+                    array('value' => 'value', 'type' => Lexer::T_STRING, 'position' => 2),
+                ),
+            ),
+            array(
                 'a>1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '>', Lexer::T_GREATER_THAN, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 2),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '>', 'type' => Lexer::T_GREATER_THAN, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 2),
+                ),
+            ),
+            array(
                 'a>=1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '≥', Lexer::T_GREATER_THAN_EQUALS, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 3),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≥', 'type' => Lexer::T_GREATER_THAN_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                ),
+            ),
+            array(
                 'a≥1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '≥', Lexer::T_GREATER_THAN_EQUALS, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 4),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≥', 'type' => Lexer::T_GREATER_THAN_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                ),
+            ),
+            array(
                 'a<1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '<', Lexer::T_LOWER_THAN, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 2),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '<', 'type' => Lexer::T_LOWER_THAN, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 2),
+                ),
+            ),
+            array(
                 'a<=1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '≤', Lexer::T_LOWER_THAN_EQUALS, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 3),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≤', 'type' => Lexer::T_LOWER_THAN_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                ),
+            ),
+            array(
                 'a≤1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '≤', Lexer::T_LOWER_THAN_EQUALS, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 4),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '≤', 'type' => Lexer::T_LOWER_THAN_EQUALS, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                ),
+            ),
+            array(
                 'a|1',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '|', Lexer::T_OR, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 2),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '|', 'type' => Lexer::T_OR, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 2),
+                ),
+            ),
+            array(
+                'a!|1',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '!|', 'type' => Lexer::T_NOT_OR, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                ),
+            ),
+            array(
                 'a[1,2]',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '[', Lexer::T_OPEN_SQUARE_BRACKET, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 2),
-                    new Token(3, ',', Lexer::T_COMMA, 3),
-                    new Token(4, '2', Lexer::T_INTEGER, 4),
-                    new Token(5, ']', Lexer::T_CLOSE_SQUARE_BRACKET, 5),
-                ],
-            ],
-            [
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '[', 'type' => Lexer::T_OPEN_SQUARE_BRACKET, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 2),
+                    array('value' => ',', 'type' => Lexer::T_COMMA, 'position' => 3),
+                    array('value' => '2', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                    array('value' => ']', 'type' => Lexer::T_CLOSE_SQUARE_BRACKET, 'position' => 5),
+                ),
+            ),
+            array(
                 'a![1,2]',
-                [
-                    new Token(0, 'a', Lexer::T_INPUT_PARAMETER, 0),
-                    new Token(1, '![', Lexer::T_NOT_OPEN_SQUARE_BRACKET, 1),
-                    new Token(2, '1', Lexer::T_INTEGER, 3),
-                    new Token(3, ',', Lexer::T_COMMA, 4),
-                    new Token(4, '2', Lexer::T_INTEGER, 5),
-                    new Token(5, ']', Lexer::T_CLOSE_SQUARE_BRACKET, 6),
-                ],
-            ],
-        ];
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '![', 'type' => Lexer::T_NOT_OPEN_SQUARE_BRACKET, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                    array('value' => ',', 'type' => Lexer::T_COMMA, 'position' => 4),
+                    array('value' => '2', 'type' => Lexer::T_INTEGER, 'position' => 5),
+                    array('value' => ']', 'type' => Lexer::T_CLOSE_SQUARE_BRACKET, 'position' => 6),
+                ),
+            ),
+        );
     }
 
     /**
@@ -119,38 +158,45 @@ class LexerTest extends TestCase
     public function testSetInputSuccess($input, $expectedTokens)
     {
         $this->lexer->setInput($input);
-        $this->assertEquals($expectedTokens, $this->lexer->tokens);
+        $this->lexer->moveNext();
+        $this->lexer->moveNext();
+        $i = 0;
+        while ($currentToken = $this->lexer->token) {
+            $this->assertEquals($expectedTokens[$i], $currentToken);
+            $this->lexer->moveNext();
+            $i++;
+        }
     }
 
     public function unexpectedValueExceptionProvider()
     {
-        return [
-            [
+        return array(
+            array(
                 '!',
-            ],
-            [
+            ),
+            array(
                 '§',
-            ],
-            [
+            ),
+            array(
                 '^',
-            ],
-            [
+            ),
+            array(
                 ';',
-            ],
-            [
+            ),
+            array(
                 ':',
-            ],
-            [
+            ),
+            array(
                 '/',
-            ],
-        ];
+            ),
+        );
     }
 
     /**
      * @dataProvider unexpectedValueExceptionProvider
      *
-     * @expectedException \Symftony\Xpression\Exception\LexerException
-     * @expectedExceptionMessageRegExp /Unexpected token ".+"./
+     * @expectedException \Symftony\Xpression\Exception\Lexer\UnknownTokenTypeException
+     * @expectedExceptionMessageRegExp /Unknown token type ".+"\./
      *
      * @param $input
      */

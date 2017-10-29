@@ -1,8 +1,8 @@
 <?php
 
-namespace Symftony\Xpression\Exception;
+namespace Symftony\Xpression\Exception\Parser;
 
-class SyntaxErrorException extends \Exception
+class SyntaxErrorException extends ParserException
 {
     /**
      * @param string $message

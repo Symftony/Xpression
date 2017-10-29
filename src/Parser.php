@@ -2,23 +2,34 @@
 
 namespace Symftony\Xpression;
 
-use Symftony\Xpression\Exception\ExpectedCloseParenthesisException;
-use Symftony\Xpression\Exception\ExpectedCompositeOperatorException;
-use Symftony\Xpression\Exception\ExpectedOperandeException;
-use Symftony\Xpression\Exception\ExpectedSimpleOperatorException;
-use Symftony\Xpression\Exception\ParserException;
-use Symftony\Xpression\Exception\SyntaxErrorException;
-use Symftony\Xpression\Exception\UnexpectedTokenException;
+use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
+use Symftony\Xpression\Exception\Parser\UnexpectedTokenException;
+use Symftony\Xpression\Exception\Parser\UnknowCompositeTypeException;
+use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 
 class Parser
 {
-    protected $precedence = [
+    /**
+     * @var array
+     */
+    protected $precedence = array(
         Lexer::T_AND => 15,
-//        Lexer::T_NOT_AND => 80,
+        Lexer::T_NOT_AND => 14,
         Lexer::T_OR => 10,
-//        Lexer::T_XOR => 60,
-//        Lexer::T_NOT_OR => 50,
-    ];
+        Lexer::T_XOR => 9,
+        Lexer::T_NOT_OR => 8,
+    );
+
+    /**
+     * @var int Keep the lexer current index
+     */
+    public $lexerIndex = 0;
+
+    /**
+     * @var Lexer
+     */
+    private $lexer;
+
     /**
      * @var ExpressionBuilderInterface
      */
@@ -38,359 +49,210 @@ class Parser
      *
      * @return mixed
      *
-     * @throws ParserException
+     * @throws InvalidExpressionException
      */
     public function parse($input)
     {
         try {
             $this->lexer->setInput($input);
+            $this->lexer->moveNext();
 
-            return $this->getExpression2();
             return $this->getExpression();
-        } catch (SyntaxErrorException $exception) {
-            throw new ParserException($input, 'Parse error.', 0, $exception);
+        } catch (\Exception $exception) {
+            throw new InvalidExpressionException($input, '', 0, $exception);
         }
     }
 
-    private function getExpression2($previousSimple = null)
+    /**
+     * @param null $previousExpression
+     *
+     * @return mixed
+     *
+     * @throws UnexpectedTokenException
+     */
+    private function getExpression($previousExpression = null)
     {
-
-        $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
-        $expr = null;
-        $simpleExpression = null;
-        $combo = [];
-        if (null !== $previousSimple) {
-            $simpleExpression = $previousSimple;
-            $expectedTokenType = Lexer::T_AND | Lexer::T_NOT_AND | Lexer::T_OR | Lexer::T_NOT_OR | Lexer::T_XOR;
-        }
-        $comboOperator = null;
-        $hasOpen = false;
-
-        $firstOperande = null;
-        $operator = null;
-        $isGroup = false;
+        $expression = $previousExpression ?: null;
+        $expectedTokenType = null !== $previousExpression ? Lexer::T_COMPOSITE : Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER;
+        $expressions = array();
         $tokenPrecedence = null;
 
-        while ($this->lexer->moveNext()) {
-            $currentToken = $this->lexer->lookahead;
-            $currentTokenType = $currentToken->getType();
-            $currentTokenIndex = $currentToken->getIndex();
-            $currentTokenPrecedence = array_key_exists($currentTokenType, $this->precedence) ? $this->precedence[$currentTokenType] : null;
+        $hasOpenParenthesis = false;
+
+        $compositeOperator = null;
+
+        $comparisonFirstOperande = null;
+        $comparisonMultipleOperande = false;
+        $comparisonCallback = null;
+
+        while ($currentToken = $this->getNextToken()) {
+            $currentTokenType = $currentToken['type'];
+            $currentTokenIndex = $this->lexerIndex;
+            $this->lexerIndex++;
+
             if (!($expectedTokenType & $currentTokenType)) {
-                throw new UnexpectedTokenException($currentToken, $expectedTokenType);
+                throw new UnexpectedTokenException($currentToken, $this->lexer->getTokenSyntax($expectedTokenType));
             }
+
             switch ($currentTokenType) {
                 case Lexer::T_OPEN_PARENTHESIS:
+                    $expression = $this->getExpression();
+                    $hasOpenParenthesis = true;
                     $expectedTokenType = Lexer::T_CLOSE_PARENTHESIS;
-                    $hasOpen = true;
-                    $simpleExpression = $this->getExpression2();
-                    var_dump($simpleExpression);die;
                     break;
                 case Lexer::T_CLOSE_PARENTHESIS:
-                    if (!$hasOpen) {
+                    if (!$hasOpenParenthesis) {
                         $this->lexer->resetPosition($currentTokenIndex);
+                        $this->lexer->moveNext();
+
                         break 2;
                     }
+                    $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
+                    break;
+                case Lexer::T_COMMA:
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_INPUT_PARAMETER:
                 case Lexer::T_INTEGER:
                 case Lexer::T_STRING:
                 case Lexer::T_FLOAT:
-                    if (null !== $firstOperande) {
-                        $simpleExpression = call_user_func_array($operator, [$firstOperande, $currentToken->getValue()]);
-                        $firstOperande = null;
-                        $operator = null;
-                        $expectedTokenType = Lexer::T_AND | Lexer::T_NOT_AND | Lexer::T_OR | Lexer::T_NOT_OR | Lexer::T_XOR;
+                    if (null === $comparisonFirstOperande) {
+                        $comparisonFirstOperande = $currentToken['value'];
+                        $expectedTokenType = Lexer::T_COMPARISON | Lexer::T_OPEN_SQUARE_BRACKET | Lexer::T_NOT_OPEN_SQUARE_BRACKET;
                         break;
                     }
-                    $firstOperande = $currentToken->getValue();
-                    $expectedTokenType = Lexer::T_EQUALS | Lexer::T_NOT_EQUALS | Lexer::T_GREATER_THAN | Lexer::T_GREATER_THAN_EQUALS | Lexer::T_LOWER_THAN | Lexer::T_LOWER_THAN_EQUALS;
-                    break;
 
+                    if (is_array($comparisonMultipleOperande)) {
+                        $comparisonMultipleOperande[] = $currentToken['value'];
+                        $expectedTokenType = Lexer::T_COMMA | Lexer::T_CLOSE_SQUARE_BRACKET;
+                        break;
+                    }
+
+                    $expression = call_user_func_array($comparisonCallback, array($comparisonFirstOperande, $currentToken['value']));
+                    $comparisonFirstOperande = null;
+                    $comparisonCallback = null;
+                    $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
+                    break;
                 case Lexer::T_EQUALS:
-                    $operator = [$this->expressionBuilder, 'eq'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'eq');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_NOT_EQUALS:
-                    $operator = [$this->expressionBuilder, 'neq'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'neq');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_GREATER_THAN:
-                    $operator = [$this->expressionBuilder, 'gt'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'gt');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_GREATER_THAN_EQUALS:
-                    $operator = [$this->expressionBuilder, 'gte'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'gte');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_LOWER_THAN:
-                    $operator = [$this->expressionBuilder, 'lt'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'lt');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_LOWER_THAN_EQUALS:
-                    $operator = [$this->expressionBuilder, 'lte'];
-                    $expectedTokenType = Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                    $comparisonCallback = array($this->expressionBuilder, 'lte');
+                    $expectedTokenType = Lexer::T_OPERANDE;
                     break;
-//                case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
-//                    return $this->expressionBuilder->notIn($firstOperande, $this->getCollectionValues(Lexer::T_CLOSE_SQUARE_BRACKET));
-//                case Lexer::T_OPEN_SQUARE_BRACKET:
-//                    return $this->expressionBuilder->in($firstOperande, $this->getCollectionValues(Lexer::T_CLOSE_SQUARE_BRACKET));
+                case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
+                    $comparisonCallback = array($this->expressionBuilder, 'notIn');
+                    $comparisonMultipleOperande = array();
+                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
+                    break;
+                case Lexer::T_OPEN_SQUARE_BRACKET:
+                    $comparisonCallback = array($this->expressionBuilder, 'in');
+                    $comparisonMultipleOperande = array();
+                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
+                    break;
+                case Lexer::T_CLOSE_SQUARE_BRACKET:
+                    $expression = call_user_func_array($comparisonCallback, array($comparisonFirstOperande, $comparisonMultipleOperande));
+                    $comparisonCallback = null;
+                    $comparisonFirstOperande = null;
+                    $comparisonMultipleOperande = false;
+                    $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
+                    break;
 
                 case Lexer::T_AND:
                 case Lexer::T_NOT_AND:
                 case Lexer::T_OR:
                 case Lexer::T_NOT_OR:
                 case Lexer::T_XOR:
-                    if (null === $comboOperator || $currentTokenType === $comboOperator) {
-                        $combo[] = $simpleExpression;
-                        $simpleExpression = null;
-                        $comboOperator = $currentTokenType;
+                    $currentTokenPrecedence = $this->precedence[$currentTokenType];
+                    if (null === $compositeOperator || $currentTokenType === $compositeOperator) {
+                        $expressions[] = $expression;
+                        $expression = null;
+                        $compositeOperator = $currentTokenType;
                         $tokenPrecedence = $currentTokenPrecedence;
-                        $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                        $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER;
                         break;
                     }
-
 
                     if ($currentTokenPrecedence < $tokenPrecedence) {
-                        $combo[] = $simpleExpression;
-                        $simpleExpression = null;
-                        $combo = [$this->buildComposite($comboOperator, $combo)];
-                        $comboOperator = $currentTokenType;
+                        $expressions[] = $expression;
+                        $expression = null;
+                        $expressions = array($this->buildComposite($compositeOperator, $expressions));
+                        $compositeOperator = $currentTokenType;
                         $tokenPrecedence = $currentTokenPrecedence;
-                        $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER | Lexer::T_STRING | Lexer::T_INTEGER | Lexer::T_FLOAT | Lexer::T_INTEGER;
+                        $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER;
                         break;
                     }
-
 
                     if ($currentTokenPrecedence > $tokenPrecedence) {
                         $this->lexer->resetPosition($currentTokenIndex);
-                        $simpleExpression = $this->getExpression2($simpleExpression);
+                        $this->lexer->moveNext();
+                        $expression = $this->getExpression($expression);
                         break;
                     }
             }
         }
-//        var_dump($simpleExpression, $combo, $comboOperator);die;
-//
-//        if (count($combo) === 1) {
-//            return $combo[0];
-//        }
-        if (null !== $simpleExpression) {
-            $combo[] = $simpleExpression;
+
+        if (null !== $expression) {
+            $expressions[] = $expression;
         }
 
-        if (count($combo) === 1) {
-            return $combo[0];
+        if (count($expressions) === 1) {
+            return $expressions[0];
         }
 
-//        return call_user_func($comboOperator, $combo);
-
-        return $this->buildComposite($comboOperator, $combo);
-
-        return $expr;
+        return $this->buildComposite($compositeOperator, $expressions);
     }
 
     /**
-     * @param $previousToken
-     * @param $previousExpr
+     * @param $type
+     * @param $expressions
      *
      * @return mixed
      *
-     * @throws ExpectedSimpleOperatorException
-     * @throws SyntaxErrorException
+     * @throws UnknowCompositeTypeException
      */
-    private function getExpressionA()
-    {
-        $combo = [];
-        $token = null;
-        $tokenType = null;
-        $tokenPrecedence = null;
-        $simpleExpression = null;
-
-        while ($this->lexer->moveNext()) {
-            $currentToken = $this->lexer->lookahead;
-            $currentTokenType = $currentToken['type'];
-            $currentTokenIndex = $currentToken['index'];
-//            $this->lexer->moveNext();
-            $firstoken = $this->lexer->lookahead;
-            if (Lexer::T_OPEN_PARENTHESIS === $firstoken['type']) {
-                $child = $this->getExpression();
-
-                $this->lexer->moveNext();
-                $token = $this->lexer->lookahead;
-                if ($token === null) {
-                    throw new SyntaxErrorException('Unclosed parenthesis.');
-                }
-                if ($token['type'] !== Lexer::T_CLOSE_PARENTHESIS) {
-                    throw new UnexpectedTokenException($token, ')');
-                };
-                $combo[] = $child;
-            } else {
-//                $this->lexer->resetPosition($firstoken['index']);
-                var_dump('dcdc');
-                die;
-                $combo[] = $this->getSimpleExpression();
-                continue;
-            }
-
-            if ($currentTokenType === Lexer::T_CLOSE_PARENTHESIS) {
-                $this->lexer->resetPosition($currentTokenIndex);
-                break;
-            }
-            $currentTokenPrecedence = $this->precedence[$currentTokenType];
-            if (!in_array($currentTokenType, [
-                Lexer::T_AND,
-                Lexer::T_NOT_AND,
-                Lexer::T_OR,
-                Lexer::T_NOT_OR,
-                Lexer::T_XOR,
-            ])
-            ) {
-                throw new ExpectedCompositeOperatorException($currentToken);
-            }
-
-            if (null === $token) {
-                $token = $currentToken;
-                $tokenType = $currentTokenType;
-                $tokenPrecedence = $currentTokenPrecedence;
-                $simpleExpression = $this->getSimpleExpression();
-                continue;
-            }
-
-            if ($currentTokenType === $tokenType) {
-                $combo[] = $simpleExpression;
-                $simpleExpression = $this->getSimpleExpression();
-                continue;
-            }
-
-            if ($currentTokenPrecedence < $tokenPrecedence) {
-                if (null !== $simpleExpression) {
-                    $combo[] = $simpleExpression;
-                }
-
-                $this->lexer->resetPosition($currentTokenIndex);
-                $expression = $this->buildComposite($tokenType, $combo);
-                if (null === $previousToken) {
-                    return $this->getExpression($token, $expression);
-                }
-
-                die('never append');
-                return $expression;
-            }
-
-            if ($currentTokenPrecedence > $tokenPrecedence) {
-                $this->lexer->resetPosition($currentTokenIndex);
-                $simpleExpression = $this->getExpression($token, $simpleExpression);
-                continue;
-            }
-        }
-
-        if (null !== $simpleExpression) {
-            $combo[] = $simpleExpression;
-        }
-
-        if (count($combo) === 1) {
-            return $combo[0];
-        }
-
-        return $this->buildComposite($tokenType, $combo);
-    }
-
-
-    private function getSimpleExpression()
-    {
-        $operande = $this->getOperande();
-
-        $this->lexer->moveNext();
-
-        $token = $this->lexer->lookahead;
-        switch ($token['type']) {
-            case Lexer::T_EQUALS:
-                return $this->expressionBuilder->eq($operande, $this->getOperande());
-            case Lexer::T_NOT_EQUALS:
-                return $this->expressionBuilder->neq($operande, $this->getOperande());
-            case Lexer::T_GREATER_THAN:
-                return $this->expressionBuilder->gt($operande, $this->getOperande());
-            case Lexer::T_GREATER_THAN_EQUALS:
-                return $this->expressionBuilder->gte($operande, $this->getOperande());
-            case Lexer::T_LOWER_THAN:
-                return $this->expressionBuilder->lt($operande, $this->getOperande());
-            case Lexer::T_LOWER_THAN_EQUALS:
-                return $this->expressionBuilder->lte($operande, $this->getOperande());
-            case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
-                return $this->expressionBuilder->notIn($operande, $this->getCollectionValues(Lexer::T_CLOSE_SQUARE_BRACKET));
-            case Lexer::T_OPEN_SQUARE_BRACKET:
-                return $this->expressionBuilder->in($operande, $this->getCollectionValues(Lexer::T_CLOSE_SQUARE_BRACKET));
-            default:
-                throw new ExpectedSimpleOperatorException($token);
-        }
-    }
-
-    /**
-     * @param $closeTokenType
-     * @return array
-     * @throws ExpectedOperandeException
-     */
-    private function getCollectionValues($closeTokenType)
-    {
-        $values = [$this->getOperande()];
-        while ($this->lexer->moveNext()) {
-            $inToken = $this->lexer->lookahead;
-            if ($inToken['type'] === $closeTokenType) {
-                return $values;
-            }
-            if ($inToken['type'] === Lexer::T_COMMA) {
-                $values[] = $this->getOperande();
-                continue;
-            }
-        }
-
-        return $values;
-    }
-
-    /**
-     * @return mixed
-     *
-     * @throws ExpectedOperandeException
-     */
-    private function getOperande()
-    {
-        while ($this->lexer->moveNext()) {
-            $token = $this->lexer->lookahead;
-            switch ($token['type']) {
-                case Lexer::T_INTEGER:
-                case Lexer::T_STRING:
-                case Lexer::T_FLOAT:
-                case Lexer::T_INPUT_PARAMETER:
-                    return $token['value'];
-                default:
-                    throw new ExpectedOperandeException($token);
-            }
-        }
-    }
-
-    /**
-     * @param int $type
-     * @param array $combo
-     *
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    private function buildComposite($type, array $combo)
+    private function buildComposite($type, $expressions)
     {
         switch ($type) {
             case Lexer::T_AND:
-                return $this->expressionBuilder->andX($combo);
-//            case Lexer::T_NOT_AND:
-//                return $this->expressionBuilder->nandX($combo);
+                return $this->expressionBuilder->andX($expressions);
+            case Lexer::T_NOT_AND:
+                return $this->expressionBuilder->nandX($expressions);
             case Lexer::T_OR:
-                return $this->expressionBuilder->orX($combo);
+                return $this->expressionBuilder->orX($expressions);
             case Lexer::T_NOT_OR:
-                return $this->expressionBuilder->norX($combo);
-//            case Lexer::T_XOR:
-//                return $this->expressionBuilder->xorX($combo);
+                return $this->expressionBuilder->norX($expressions);
+            case Lexer::T_XOR:
+                return $this->expressionBuilder->xorX($expressions);
             default:
-                throw new \Exception('composite not allowed');
+                throw new UnknowCompositeTypeException($type);
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function getNextToken()
+    {
+        $this->lexer->moveNext();
+
+        return $this->lexer->token;
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace Symftony\Xpression\Exception;
+namespace Symftony\Xpression\Exception\Parser;
 
-class ParserException extends \Exception
+class InvalidExpressionException extends \RuntimeException
 {
     /**
      * @var string
@@ -11,13 +11,13 @@ class ParserException extends \Exception
 
     /**
      * @param string $input
-     * @param int $message
+     * @param string $message
      * @param int $code
      * @param \Exception|null $previous
      */
-    public function __construct($input, $message, $code = 0, \Exception $previous = null)
+    public function __construct($input, $message = '', $code = 0, \Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message !== '' ? $message : 'Invalid expression.', $code, $previous);
 
         $this->input = $input;
     }
