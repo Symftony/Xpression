@@ -7,43 +7,44 @@ use Symftony\Xpression\Exception\Lexer\UnknownTokenTypeException;
 
 class Lexer extends AbstractLexer
 {
-    const T_NONE = 1;
+    const T_NONE = 0;
+    const T_ALL = 8388607;
 
     // Punctuation
-    const T_COMMA = 2;
+    const T_COMMA = 1;// 2**0
 
     // Operand
-    const T_OPERANDE = 60;
-    const T_INTEGER = 4;
-    const T_STRING = 8;
-    const T_INPUT_PARAMETER = 16;
-    const T_FLOAT = 32;
+    const T_OPERANDE = 30;// 2**1 + 2**2 + 2**3 + 2**4
+    const T_INTEGER = 2;// 2**1
+    const T_STRING = 4;// 2**2
+    const T_INPUT_PARAMETER = 8;// 2**3
+    const T_FLOAT = 16;// 2**4
 
     // Comparison operator
-    const T_COMPARISON = 4032;
-    const T_EQUALS = 64;
-    const T_NOT_EQUALS = 128;
-    const T_GREATER_THAN = 256;
-    const T_GREATER_THAN_EQUALS = 512;
-    const T_LOWER_THAN = 1024;
-    const T_LOWER_THAN_EQUALS = 2048;
+    const T_COMPARISON = 2016;// 2**5 + 2**6 + 2**7 + 2**8 + 2**9 + 2**10
+    const T_EQUALS = 32;// 2**5
+    const T_NOT_EQUALS = 64;// 2**6
+    const T_GREATER_THAN = 128;// 2**7
+    const T_GREATER_THAN_EQUALS = 256;// 2**8
+    const T_LOWER_THAN = 512;// 2**9
+    const T_LOWER_THAN_EQUALS = 1024;// 2**10
 
     // Composite operator
-    const T_COMPOSITE = 126976;
-    const T_AND = 4096;
-    const T_NOT_AND = 8192;
-    const T_OR = 16384;
-    const T_NOT_OR = 32768;
-    const T_XOR = 65536;
+    const T_COMPOSITE = 63488;// 2**11 + 2**12 + 2**13 + 2**14 + 2**15
+    const T_AND = 2048;// 2**11
+    const T_NOT_AND = 4096;// 2**12
+    const T_OR = 8192;// 2**13
+    const T_NOT_OR = 16384;// 2**14
+    const T_XOR = 32768;// 2**15
 
     // Brace
-    const T_OPEN_PARENTHESIS = 131072;
-    const T_CLOSE_PARENTHESIS = 262144;
-    const T_OPEN_SQUARE_BRACKET = 524288;
-    const T_NOT_OPEN_SQUARE_BRACKET = 1048576;
-    const T_CLOSE_SQUARE_BRACKET = 2097152;
-    const T_OPEN_CURLY_BRACKET = 4194304;
-    const T_CLOSE_CURLY_BRACKET = 8388608;
+    const T_OPEN_PARENTHESIS = 65536;// 2**16
+    const T_CLOSE_PARENTHESIS = 131072;// 2**17
+    const T_OPEN_SQUARE_BRACKET = 262144;// 2**18
+    const T_NOT_OPEN_SQUARE_BRACKET = 524288;// 2**19
+    const T_CLOSE_SQUARE_BRACKET = 1048576;// 2**20
+    const T_OPEN_CURLY_BRACKET = 2097152;// 2**21
+    const T_CLOSE_CURLY_BRACKET = 4194304;// 2**22
 
     /**
      * @return array
@@ -89,12 +90,12 @@ class Lexer extends AbstractLexer
             // Recognize numeric values
             case (is_numeric($value)):
                 if (strpos($value, '.') !== false || stripos($value, 'e') !== false) {
-                    $value = (float) $value;
+                    $value = (float)$value;
                     $type = self::T_FLOAT;
                     break;
                 }
 
-                $value = (int) $value;
+                $value = (int)$value;
                 $type = self::T_INTEGER;
                 break;
 

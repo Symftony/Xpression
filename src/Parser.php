@@ -2,6 +2,7 @@
 
 namespace Symftony\Xpression;
 
+use Symftony\Xpression\Exception\Parser\ForbiddenTokenException;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Exception\Parser\UnexpectedTokenException;
 use Symftony\Xpression\Exception\Parser\UnknowCompositeTypeException;
@@ -36,6 +37,11 @@ class Parser
     private $expressionBuilder;
 
     /**
+     * @var int Bitwise of all allowed operator. Default was Lexer::T_ALL
+     */
+    private $allowedTokenType;
+
+    /**
      * @param ExpressionBuilderInterface $expressionBuilder
      */
     public function __construct(ExpressionBuilderInterface $expressionBuilder)
@@ -46,13 +52,20 @@ class Parser
 
     /**
      * @param $input
+     * @param null $allowedTokenType
      *
      * @return mixed
      *
      * @throws InvalidExpressionException
      */
-    public function parse($input)
+    public function parse($input, $allowedTokenType = null)
     {
+        if (null !== $allowedTokenType && !is_integer($allowedTokenType)) {
+            throw new \InvalidArgumentException('Allowed operator must be an integer.');
+        }
+
+        $this->allowedTokenType = $allowedTokenType ?: Lexer::T_ALL;
+
         try {
             $this->lexer->setInput($input);
             $this->lexer->moveNext();
@@ -68,6 +81,7 @@ class Parser
      *
      * @return mixed
      *
+     * @throws ForbiddenTokenException
      * @throws UnexpectedTokenException
      */
     private function getExpression($previousExpression = null)
@@ -89,6 +103,10 @@ class Parser
             $currentTokenType = $currentToken['type'];
             $currentTokenIndex = $this->lexerIndex;
             $this->lexerIndex++;
+
+            if (!($this->allowedTokenType & $currentTokenType)) {
+                throw new ForbiddenTokenException($currentToken, $this->lexer->getTokenSyntax($this->allowedTokenType));
+            }
 
             if (!($expectedTokenType & $currentTokenType)) {
                 throw new UnexpectedTokenException($currentToken, $this->lexer->getTokenSyntax($expectedTokenType));

@@ -5,6 +5,7 @@ namespace Tests\Symftony\Xpression;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
+use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
 
 class ParserTest extends TestCase
@@ -337,5 +338,47 @@ class ParserTest extends TestCase
         }
 
         $this->assertEquals($expectedResult, $this->parser->parse($input));
+    }
+
+    public function forbiddenTokenDataProvider()
+    {
+        return array(
+            array(','),
+            array('9'),
+            array('"string"'),
+            array("'string'"),
+            array('param'),
+            array('4.5'),
+            array('='),
+            array('≠'),
+            array('>'),
+            array('≥'),
+            array('<'),
+            array('≤'),
+            array('&'),
+            array('!&'),
+            array('|'),
+            array('!|'),
+            array('^|'),
+            array('⊕'),
+            array('('),
+            array(')'),
+            array('['),
+            array('!['),
+            array(']'),
+            array('{'),
+            array('}'),
+        );
+    }
+
+    /**
+     * @dataProvider forbiddenTokenDataProvider
+     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+     *
+     * @param $input
+     */
+    public function testForbiddenToken($input)
+    {
+        $this->parser->parse($input, Lexer::T_NONE);
     }
 }
