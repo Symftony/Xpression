@@ -15,15 +15,14 @@
   "homepage": "https://github.com/symftony/Xpression",
   "require": {
     "php": ">=5.3",
-    "doctrine/collections": ">=1.1",
     "doctrine/lexer": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": ">=4.8.35"
   },
   "suggest": {
-    "doctrine/orm": "If you want filter an ORM query builder",
-    "doctrine/mongodb-odm": "If you want filter an ODM query builder"
+    "doctrine/collections": "If you want filter an ArrayCollection",
+    "doctrine/orm": "If you want filter an ORM query builder"
   },
   "license": "MIT",
   "autoload": {

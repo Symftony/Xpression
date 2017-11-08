@@ -5,7 +5,7 @@ namespace Symftony\Xpression\Exception\Parser;
 class UnexpectedTokenException extends SyntaxErrorException
 {
     /**
-     * @var Token
+     * @var array
      */
     private $token;
 

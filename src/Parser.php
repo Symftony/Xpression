@@ -224,6 +224,18 @@ class Parser
                         $expression = $this->getExpression($expression);
                         break;
                     }
+
+                    throw new \LogicException(sprintf(
+                        'Token precedence error. Current token precedence %s must be different than %s',
+                        $currentTokenPrecedence,
+                        $tokenPrecedence
+                    ));
+                default:
+                    throw new \LogicException(sprintf(
+                        'Token mismatch. Expected token %s given %s',
+                        $this->lexer->getLiteral($expectedTokenType),
+                        $currentTokenType
+                    ));
             }
         }
 

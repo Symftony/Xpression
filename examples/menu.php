@@ -1,8 +1,9 @@
 <div class="head">
     <div class="container">
         <a href="basic.php">Basic</a>
-        <a href="collection.php">Collection filter</a>
         <a href="constraint.php">Disable operator</a>
+        <a href="collection.php">Doctrine ArrayCollection filter</a>
+        <a href="orm.php">Doctrine ORM</a>
     </div>
 </div>
 <style>
@@ -91,5 +92,13 @@
     }
     th, td {
         border-bottom: 1px solid grey;
+    }
+    fieldset {
+        border: 1px dotted #1b6d85;
+        border-radius: 5px;
+    }
+    fieldset legend {
+        background-color: #d1f1f5;
+        border-radius: 5px;
     }
 </style>

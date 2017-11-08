@@ -1,11 +1,12 @@
 <?php
 
-namespace Symftony\Xpression\Expr;
+namespace Symftony\Xpression\Bridge\Doctrine\Common;
 
-use Symftony\Xpression\Expr as Xpression;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use Symftony\Xpression\Expr\ExpressionBuilderInterface;
+use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 {
@@ -17,6 +18,16 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
     public function __construct(ExpressionBuilder $expressionBuilder)
     {
         $this->expressionBuilder = $expressionBuilder;
+    }
+
+    /**
+     * @param string $field
+     *
+     * @return Comparison
+     */
+    public function isNull($field)
+    {
+        return $this->expressionBuilder->isNull($field);
     }
 
     /**
@@ -87,16 +98,6 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 
     /**
      * @param string $field
-     *
-     * @return Comparison
-     */
-    public function isNull($field)
-    {
-        return $this->expressionBuilder->isNull($field, null);
-    }
-
-    /**
-     * @param string $field
      * @param mixed $values
      *
      * @return Comparison
@@ -131,7 +132,7 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
     /**
      * @param array $expressions
      *
-     * @return Comparison
+     * @return CompositeExpression
      */
     public function andX(array $expressions)
     {
@@ -140,12 +141,10 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 
     /**
      * @param array $expressions
-     *
-     * @return CompositeExpression
      */
     public function nandX(array $expressions)
     {
-        return new CompositeExpression(Xpression\CompositeExpression::TYPE_NAND, $expressions);
+        throw new UnsupportedExpressionTypeException('nandX');
     }
 
     /**
@@ -160,21 +159,17 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 
     /**
      * @param array $expressions
-     *
-     * @return CompositeExpression
      */
     public function norX(array $expressions)
     {
-        return new CompositeExpression(Xpression\CompositeExpression::TYPE_NOR, $expressions);
+        throw new UnsupportedExpressionTypeException('norX');
     }
 
     /**
      * @param array $expressions
-     *
-     * @return CompositeExpression
      */
     public function xorX(array $expressions)
     {
-        return new CompositeExpression(Xpression\CompositeExpression::TYPE_XOR, $expressions);
+        throw new UnsupportedExpressionTypeException('xorX');
     }
 }

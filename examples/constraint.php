@@ -2,9 +2,8 @@
 
 namespace Example;
 
-use Doctrine\Common\Collections\ExpressionBuilder;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
-use Symftony\Xpression\Expr\ExpressionBuilderAdapter;
+use Symftony\Xpression\Expr\HtmlExpressionBuilder;
 use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
 
@@ -18,7 +17,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
     $query = urldecode($_SERVER['QUERY_STRING']);
     if ('' !== $query) {
         try {
-            $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
+            $parser = new Parser(new HtmlExpressionBuilder());
             $expression = $parser->parse($query, $allowedTokenType);
         } catch (InvalidExpressionException $e) {
             $exception = $e;
@@ -35,7 +34,8 @@ if (isset($_SERVER['QUERY_STRING'])) {
 <div class="container">
     <h1>Disable operator expression</h1>
     <div class="content">
-        <p class="important">/!\ In this example the operator "≥" and "≠" was not allowed and the parser must throw InvalidExpression with ForbiddenTokenException</p>
+        <p class="important">/!\ In this example the operator "≥" and "≠" was not allowed.</p>
+        <p>If forbidden token type is use the parser throw InvalidExpression with ForbiddenTokenException</p>
     </div>
     <div class="content">
         <ul>
@@ -52,14 +52,34 @@ if (isset($_SERVER['QUERY_STRING'])) {
         </ul>
         <div class="debug">
             <?php if (null !== $exception): ?>
-                <div class="exception"><span class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
+                <div class="exception"><span
+                            class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
                     <?php if (null !== $previousException = $exception->getPrevious()): ?>
-                        <div class="exception"><span class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span></div>
+                        <div class="exception"><span
+                                    class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span>
+                        </div>
                     <?php endif ?>
                 </div>
             <?php endif ?>
             <code>
-                <pre><?php print_r($expression); ?></pre>
+                <pre><fieldset><legend>Expression: </legend><?php print_r($expression); ?></fieldset></pre>
+            </code>
+        </div>
+    </div>
+    <div class="content">
+        <div class="debug">
+            <code>
+                <pre>
+    &lt;?php
+
+    use Symftony\Xpression\Parser;
+    use Symftony\Xpression\Expr\HtmlExpressionBuilder;
+    use Symftony\Xpression\Lexer;
+
+    // I allow all token type except "≥" and "≠"
+    $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
+    $parser = new Parser(new HtmlExpressionBuilder());
+    $expression = $parser->parse($query, $allowedTokenType);</pre>
             </code>
         </div>
     </div>
