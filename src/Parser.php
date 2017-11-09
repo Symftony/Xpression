@@ -51,6 +51,14 @@ class Parser
     }
 
     /**
+     * @return int
+     */
+    public function getAllowedTokenType()
+    {
+        return $this->allowedTokenType;
+    }
+
+    /**
      * @param $input
      * @param null $allowedTokenType
      *
@@ -120,11 +128,13 @@ class Parser
                     break;
                 case Lexer::T_CLOSE_PARENTHESIS:
                     if (!$hasOpenParenthesis) {
+                        $this->lexerIndex = $currentTokenIndex;
                         $this->lexer->resetPosition($currentTokenIndex);
                         $this->lexer->moveNext();
 
                         break 2;
                     }
+                    $hasOpenParenthesis = false;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;
                 case Lexer::T_COMMA:
@@ -219,6 +229,7 @@ class Parser
                     }
 
                     if ($currentTokenPrecedence > $tokenPrecedence) {
+                        $this->lexerIndex = $currentTokenIndex;
                         $this->lexer->resetPosition($currentTokenIndex);
                         $this->lexer->moveNext();
                         $expression = $this->getExpression($expression);
