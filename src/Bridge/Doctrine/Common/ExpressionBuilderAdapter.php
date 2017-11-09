@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
+use Symftony\Xpression\Lexer;
 
 class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 {
@@ -18,6 +19,14 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
     public function __construct(ExpressionBuilder $expressionBuilder)
     {
         $this->expressionBuilder = $expressionBuilder;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSupportedTokenType()
+    {
+        return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_NOT_OR - Lexer::T_XOR;
     }
 
     /**

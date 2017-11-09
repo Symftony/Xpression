@@ -5,6 +5,13 @@ namespace Symftony\Xpression\Expr;
 interface ExpressionBuilderInterface
 {
     /**
+     * Must return all supported token type
+     *
+     * @return int
+     */
+    public function getSupportedTokenType();
+
+    /**
      * @param string $field
      */
     public function isNull($field);

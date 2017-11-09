@@ -2,8 +2,18 @@
 
 namespace Symftony\Xpression\Expr;
 
+use Symftony\Xpression\Lexer;
+
 class HtmlExpressionBuilder implements ExpressionBuilderInterface
 {
+    /**
+     * @return int
+     */
+    public function getSupportedTokenType()
+    {
+        return Lexer::T_ALL;
+    }
+
     /**
      * This callable is use to delegate the html generation to a third party
      * eg: $comparisonHtmlBuilder($field, $operator, $value)

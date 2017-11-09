@@ -23,6 +23,7 @@ class ParserTest extends TestCase
     public function setUp()
     {
         $this->expressionBuilderMock = $this->prophesize('Symftony\Xpression\Expr\ExpressionBuilderInterface');
+        $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL);
 
         $this->parser = new Parser($this->expressionBuilderMock->reveal());
     }

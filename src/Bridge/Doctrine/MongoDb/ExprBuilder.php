@@ -5,6 +5,7 @@ namespace Symftony\Xpression\Bridge\Doctrine\MongoDb;
 use Doctrine\MongoDB\Query\Expr;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
+use Symftony\Xpression\Lexer;
 
 class ExprBuilder implements ExpressionBuilderInterface
 {
@@ -14,6 +15,14 @@ class ExprBuilder implements ExpressionBuilderInterface
     private function createExpr()
     {
         return new Expr();
+    }
+
+    /**
+     * @return int
+     */
+    public function getSupportedTokenType()
+    {
+        return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_XOR;
     }
 
     /**

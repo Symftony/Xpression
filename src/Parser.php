@@ -64,7 +64,7 @@ class Parser
             throw new \InvalidArgumentException('Allowed operator must be an integer.');
         }
 
-        $this->allowedTokenType = $allowedTokenType ?: Lexer::T_ALL;
+        $this->allowedTokenType = ($allowedTokenType ?: Lexer::T_ALL) & $this->expressionBuilder->getSupportedTokenType();
 
         try {
             $this->lexer->setInput($input);
