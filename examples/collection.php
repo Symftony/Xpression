@@ -45,7 +45,7 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
     <title>Xpression examples</title>
 </head>
 <body>
-<?php include 'menu.php'; ?>
+<?php include 'includes/menu.php'; ?>
 <div class="container">
     <h1>Xpression filter ArrayCollection with criteria</h1>
     <?php if (!$hasCollection): ?>
@@ -54,66 +54,38 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
                                                                   href="https://github.com/doctrine/collections">doctrine/collections</a>"
                     to work
                 </p></h2>
-        </div><?php endif ?>
+        </div>
+    <?php endif ?>
+    <?php include 'includes/examples.php'; ?>
+    <?php include 'includes/query.php'; ?>
     <div class="content">
-        <ul>
-            <li><a href="?title='banana'">title = 'banana'</a></li>
-            <li><a href="?price=5">price = 5</a></li>
-            <li><a href="?price>2">price > 2</a></li>
-            <li><a href="?price≥2">price ≥ 2</a></li>
-            <li><a href="?price≠2">price ≠ 2</a></li>
-            <li><a href="?price>1&price<10">price > 1 & price < 10</a></li>
-            <li><a href="?category[food]">category[food]</a></li>
-            <li><a href="?price<5&category[food]">price < 5 & category[food]</a></li>
-            <li><a href="?pr$ice">Lexer error</a></li>
-            <li><a href="?price]">Parser error</a></li>
-        </ul>
-        <fieldset class="debug">
-            <?php if (null !== $exception): ?>
-                <div class="exception"><span
-                            class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
-                    <?php if (null !== $previousException = $exception->getPrevious()): ?>
-                        <div class="exception"><span
-                                    class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span>
-                        </div>
-                    <?php endif ?>
-                </div>
-            <?php endif ?>
-            <fieldset>
-                <legend>Table data:</legend>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>title</th>
-                        <th>category</th>
-                        <th>quantity</th>
-                        <th>price</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($products as $product): ?>
-                        <tr style="<?php if (in_array($product['id'], $filteredIds)) echo 'background-color: #ffb566;'; ?>">
-                            <td><?php echo $product['id']; ?></td>
-                            <td><?php echo $product['title']; ?></td>
-                            <td><?php echo $product['category']; ?></td>
-                            <td><?php echo $product['quantity']; ?></td>
-                            <td><?php echo $product['price']; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </fieldset>
-            <fieldset>
-                <legend>Expression:</legend>
-                <pre><code><?php print_r($expression); ?></code></pre>
-            </fieldset>
-            <fieldset>
-                <legend>Filtered ArrayCollection:</legend>
-                <pre><code><?php print_r($filteredProducts); ?></code></pre>
-            </fieldset>
+        <table class="data">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>title</th>
+                <th>category</th>
+                <th>quantity</th>
+                <th>price</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($products as $product): ?>
+                <tr style="<?php if (in_array($product['id'], $filteredIds)) echo 'background-color: #ffb566;'; ?>">
+                    <td><?php echo $product['id']; ?></td>
+                    <td><?php echo $product['title']; ?></td>
+                    <td><?php echo $product['category']; ?></td>
+                    <td><?php echo $product['quantity']; ?></td>
+                    <td><?php echo $product['price']; ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
-</div>
+    <div class="content info">
+        <pre><code><?php print_r($filteredProducts); ?></code></pre>
+    </div>
+    <?php include 'includes/debug.php'; ?>
 </div>
 </body>
 </html>

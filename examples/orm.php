@@ -31,19 +31,22 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
     <title>Xpression examples</title>
 </head>
 <body>
-<?php include 'menu.php'; ?>
+<?php include 'includes/menu.php'; ?>
 <div class="container">
     <h1>Xpression doctrine/orm example</h1>
-    <div class="content">
-        <?php if (!$hasORM): ?>
+    <?php if (!$hasORM): ?>
+        <div class="content">
             <div>
                 <h2><p class="error">/!\ Error: This example need "<a target="_blank"
                                                                       href="https://github.com/doctrine/doctrine2">doctrine/orm</a>"
                         to work</p></h2>
-            </div><?php endif ?>
-        <div class="debug">
-            <code>
-                <pre>
+            </div>
+        </div>
+    <?php endif ?>
+    <?php include 'includes/examples.php'; ?>
+    <?php include 'includes/query.php'; ?>
+    <?php include 'includes/debug.php'; ?>
+    <div class="content code"><pre><code>
     &lt;?php
 
     use Symftony\Xpression\Parser;
@@ -52,41 +55,7 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
 
     $parser = new Parser(new ExprAdapter(new Expr()));
     $expression = $parser->parse($query);
-    $expression = $parser->parse($query, $allowedTokenType);</pre>
-            </code>
-        </div>
-    </div>
-    <div class="content">
-        <ul>
-            <li><a href="?title='foo'">title = 'foo'</a></li>
-            <li><a href="?price=10">price = 10</a></li>
-            <li><a href="?price>10">price > 10</a></li>
-            <li><a href="?price≥10">price ≥ 10</a></li>
-            <li><a href="?price≠10">price ≠ 10</a></li>
-            <li><a href="?price>10&price<20">price > 10 & price < 20</a></li>
-            <li><a href="?category[1,5,7]">category[1,5,7]</a></li>
-            <li><a href="?price>10&category[1,5,7]">price > 10 & category[1,5,7]</a></li>
-            <li><a href="?title=foo|price>3&price<5">title = foo | price > 3 & price < 5</a></li>
-            <li><a href="?(title=foo|price>3)&price<5">( title = foo | price > 3 ) & price < 5</a></li>
-            <li><a href="?pr$ice">Lexer error</a></li>
-            <li><a href="?price]">Parser error</a></li>
-        </ul>
-        <div class="debug">
-            <?php if (null !== $exception): ?>
-                <div class="exception"><span
-                            class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
-                    <?php if (null !== $previousException = $exception->getPrevious()): ?>
-                        <div class="exception"><span
-                                    class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span>
-                        </div>
-                    <?php endif ?>
-                </div>
-            <?php endif ?>
-            <fieldset>
-                <legend>Expression:</legend>
-                <pre><code><?php print_r($expression); ?></code></pre>
-            </fieldset>
-        </div>
+    $expression = $parser->parse($query, $allowedTokenType);</code></pre>
     </div>
 </div>
 </body>

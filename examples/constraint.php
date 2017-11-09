@@ -27,50 +27,23 @@ if (isset($_SERVER['QUERY_STRING'])) {
 ?>
 <html>
 <head>
-    <title>Xpression examples</title>
+    <title>Xpression : Disable token type</title>
 </head>
 <body>
-<?php include 'menu.php'; ?>
+<?php include 'includes/menu.php'; ?>
 <div class="container">
-    <h1>Disable operator expression</h1>
-    <div class="content">
-        <p class="important">/!\ In this example the operator "≥" and "≠" was not allowed.</p>
+    <h1>Xpression : Disable token type</h1>
+    <div class="content warning">
+        <p>/!\ In this example the operator "≥" and "≠" was not allowed.</p>
         <p>If forbidden token type is use the parser throw InvalidExpression with ForbiddenTokenException</p>
     </div>
-    <div class="content">
-        <ul>
-            <li><a href="?title='banana'">title = 'banana'</a></li>
-            <li><a href="?price=5">price = 5</a></li>
-            <li><a href="?price>2">price > 2</a></li>
-            <li><a href="?price≥2">price ≥ 2 (≥ not allowed)</a></li>
-            <li><a href="?price≠2">price ≠ 2 (≠ not allowed)</a></li>
-            <li><a href="?price>1&price<10">price > 1 & price < 10</a></li>
-            <li><a href="?category[food]">category[food]</a></li>
-            <li><a href="?price<5&category[food]">price < 5 & category[food]</a></li>
-            <li><a href="?pr$ice">Lexer error</a></li>
-            <li><a href="?price]">Parser error</a></li>
-        </ul>
-        <div class="debug">
-            <?php if (null !== $exception): ?>
-                <div class="exception"><span
-                            class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
-                    <?php if (null !== $previousException = $exception->getPrevious()): ?>
-                        <div class="exception"><span
-                                    class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span>
-                        </div>
-                    <?php endif ?>
-                </div>
-            <?php endif ?>
-            <fieldset>
-                <legend>Expression:</legend>
-                <pre><code><?php print_r($expression); ?></code></pre>
-            </fieldset>
-        </div>
+    <?php include 'includes/examples.php'; ?>
+    <?php include 'includes/query.php'; ?>
+    <?php include 'includes/debug.php'; ?>
+    <div class="content info">
+        <p>If forbidden token type is use the parser throw InvalidExpression with ForbiddenTokenException</p>
     </div>
-    <div class="content">
-        <div class="debug">
-            <code>
-                <pre>
+    <div class="content code"><pre><code>
     &lt;?php
 
     use Symftony\Xpression\Parser;
@@ -80,9 +53,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
     // I allow all token type except "≥" and "≠"
     $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
     $parser = new Parser(new HtmlExpressionBuilder());
-    $expression = $parser->parse($query, $allowedTokenType);</pre>
-            </code>
-        </div>
+    $expression = $parser->parse($query, $allowedTokenType);</code></pre>
     </div>
 </div>
 </body>

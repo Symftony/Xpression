@@ -8,10 +8,8 @@
     </div>
 </div>
 <style>
-    .container {
-        margin-left: auto;
-        margin-right: auto;
-        width: 980px;
+    body {
+        margin: 0;
     }
 
     code {
@@ -36,17 +34,40 @@
         border-radius: 5px 5px 0 0;
     }
 
+    .container {
+        margin-left: auto;
+        margin-right: auto;
+        width: 980px;
+    }
+
     .content {
-        margin-top: 20px;
         border: 1px solid rgb(207, 216, 230);
-        border-radius: 5px;
-        background-color: rgb(237, 243, 250);
         padding: 0 20px;
+    }
+
+    .content:first-of-type {
+        border-radius: 5px 5px 0 0;
+    }
+
+    .content:last-of-type {
+        border-radius: 0 0 5px 5px;
+        margin-bottom: 10px;
     }
 
     .content > * {
         margin-top: 20px;
         margin-bottom: 20px;
+    }
+
+    .code {
+        border: 1px solid rgb(43, 43, 43);
+        background-color: rgb(0, 0, 0);
+        color: #bababa;
+    }
+
+    .info {
+        border: 1px solid rgb(207, 216, 230);
+        background-color: rgb(237, 243, 250);
     }
 
     .important {
@@ -84,22 +105,51 @@
         border-radius: 5px;
         padding: 1px 6px;
     }
-    table {
+    table.data {
         width: 100%;
         border-collapse: collapse;
     }
-    th {
+    table.example {
+        width: 100%;
+        text-align: center;
+    }
+    table.example a {
+        text-decoration: none;
+        background-color: rgb(237, 243, 250);
+        border-radius: 3px;
+        padding:  0 5px;
+    }
+    table.data th {
         border-top: 1px solid grey;
     }
-    th, td {
+    table.data th, table.data td {
         border-bottom: 1px solid grey;
     }
     fieldset {
         border: 1px dotted #1b6d85;
         border-radius: 5px;
     }
+    .query {
+        font-size: 40px;
+    }
     fieldset legend {
         background-color: #d1f1f5;
         border-radius: 5px;
+    }
+    ul.example {
+        overflow: hidden;
+        list-style: none;
+        padding: 0;
+    }
+    ul.example li {
+        float: left;
+        background-color: #dedede;
+        border-radius: 5px;
+        margin: 2px 5px;
+        padding: 3px;
+    }
+    ul.example a {
+        color: #000000;
+        text-decoration: none;
     }
 </style>
