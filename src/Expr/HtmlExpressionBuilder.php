@@ -195,6 +195,6 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
      */
     public function xorX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'exclusiv-or'));
+        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'exclusive-or'));
     }
 }
