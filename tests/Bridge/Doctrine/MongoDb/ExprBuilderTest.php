@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Symftony\Xpression\Bridge\Doctrine\Common;
+namespace Tests\Symftony\Xpression\Bridge\Doctrine\MongoDb;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;

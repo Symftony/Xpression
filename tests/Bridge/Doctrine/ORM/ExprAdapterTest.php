@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Symftony\Xpression\Bridge\Doctrine;
+namespace Tests\Symftony\Xpression\Bridge\Doctrine\ORM;
 
 use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Query\Expr;
