@@ -35,7 +35,12 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
 <div class="container">
     <h1>Xpression doctrine/orm example</h1>
     <div class="content">
-        <?php if (!$hasORM):?><div><h2><p class="error">/!\ Error: This example need "<a target="_blank" href="https://github.com/doctrine/doctrine2">doctrine/orm</a>" to work</p></h2></div><?php endif ?>
+        <?php if (!$hasORM): ?>
+            <div>
+                <h2><p class="error">/!\ Error: This example need "<a target="_blank"
+                                                                      href="https://github.com/doctrine/doctrine2">doctrine/orm</a>"
+                        to work</p></h2>
+            </div><?php endif ?>
         <div class="debug">
             <code>
                 <pre>
@@ -68,15 +73,19 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
         </ul>
         <div class="debug">
             <?php if (null !== $exception): ?>
-                <div class="exception"><span class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
+                <div class="exception"><span
+                            class="error">throw <?php echo get_class($exception) . ' : ' . $exception->getMessage() ?></span>
                     <?php if (null !== $previousException = $exception->getPrevious()): ?>
-                        <div class="exception"><span class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span></div>
+                        <div class="exception"><span
+                                    class="error">throw <?php echo get_class($previousException) . ' : ' . $previousException->getMessage() ?></span>
+                        </div>
                     <?php endif ?>
                 </div>
             <?php endif ?>
-            <code>
-                <pre><fieldset><legend>Expression: </legend><?php print_r($expression); ?></fieldset></pre>
-            </code>
+            <fieldset>
+                <legend>Expression:</legend>
+                <pre><code><?php print_r($expression); ?></code></pre>
+            </fieldset>
         </div>
     </div>
 </div>

@@ -50,7 +50,9 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
     <h1>Xpression filter ArrayCollection with criteria</h1>
     <?php if (!$hasCollection): ?>
         <div>
-            <h2><p class="error">/!\ Error: This example need "<a target="_blank" href="https://github.com/doctrine/collections">doctrine/collections</a>" to work
+            <h2><p class="error">/!\ Error: This example need "<a target="_blank"
+                                                                  href="https://github.com/doctrine/collections">doctrine/collections</a>"
+                    to work
                 </p></h2>
         </div><?php endif ?>
     <div class="content">
@@ -102,10 +104,14 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
                     </tbody>
                 </table>
             </fieldset>
-            <code>
-                <pre><fieldset><legend>Expression: </legend><?php print_r($expression); ?></fieldset></pre>
-                <pre><fieldset><legend>Filtered ArrayCollection: </legend><?php print_r($filteredProducts); ?></fieldset></pre>
-            </code>
+            <fieldset>
+                <legend>Expression:</legend>
+                <pre><code><?php print_r($expression); ?></code></pre>
+            </fieldset>
+            <fieldset>
+                <legend>Filtered ArrayCollection:</legend>
+                <pre><code><?php print_r($filteredProducts); ?></code></pre>
+            </fieldset>
     </div>
 </div>
 </div>

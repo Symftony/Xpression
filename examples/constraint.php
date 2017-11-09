@@ -61,9 +61,10 @@ if (isset($_SERVER['QUERY_STRING'])) {
                     <?php endif ?>
                 </div>
             <?php endif ?>
-            <code>
-                <pre><fieldset><legend>Expression: </legend><?php print_r($expression); ?></fieldset></pre>
-            </code>
+            <fieldset>
+                <legend>Expression:</legend>
+                <pre><code><?php print_r($expression); ?></code></pre>
+            </fieldset>
         </div>
     </div>
     <div class="content">
