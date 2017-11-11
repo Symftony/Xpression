@@ -14,7 +14,8 @@ header('Content-Type: text/html; charset=utf-8');
 
 $hasCollection = class_exists('Doctrine\Common\Collections\ExpressionBuilder');
 
-$filteredProducts = $products = array(
+$filteredProducts = array();
+$products = array(
     array('id' => 1, 'title' => 'banana', 'price' => 2, 'quantity' => 5, 'category' => 'food'),
     array('id' => 2, 'title' => 'banana', 'price' => 5, 'quantity' => 15, 'category' => 'food'),
     array('id' => 3, 'title' => 'apple', 'price' => 1, 'quantity' => 1, 'category' => 'food'),
@@ -86,6 +87,28 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
         <pre><code><?php print_r($filteredProducts); ?></code></pre>
     </div>
     <?php include 'includes/debug.php'; ?>
-</div>
+    <div class="content code"><pre><code>
+    &lt;?php
+
+    use Doctrine\Common\Collections\ArrayCollection;
+    use Doctrine\Common\Collections\Criteria;
+    use Doctrine\Common\Collections\ExpressionBuilder;
+    use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
+    use Symftony\Xpression\Parser;
+
+    $products = array(
+        array('id' => 1, 'title' => 'banana', 'price' => 2, 'quantity' => 5, 'category' => 'food'),
+        array('id' => 2, 'title' => 'banana', 'price' => 5, 'quantity' => 15, 'category' => 'food'),
+        array('id' => 3, 'title' => 'apple', 'price' => 1, 'quantity' => 1, 'category' => 'food'),
+        array('id' => 4, 'title' => 'TV', 'price' => 399, 'quantity' => 1, 'category' => 'multimedia'),
+    );
+
+    $query = urldecode($_SERVER['QUERY_STRING']);
+    $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
+    $expression = $parser->parse($query);
+    $products = new ArrayCollection($products);
+    $filteredProducts = $products->matching(new Criteria($expression));
+
+    </div>
 </body>
 </html>

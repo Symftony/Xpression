@@ -57,7 +57,7 @@ class Lexer extends AbstractLexer
             '\^\||⊕|!&|&|!\||\|', // Composite operator
             '≤|≥|≠|<=|>=|!=|<|>|=|\[|!\[|\]', // Comparison operator
             '[a-z_][a-z0-9_]*', // identifier or qualified name
-            '(?:[+-]?[0-9]*(?:[\.][0-9]+)*)(?:e[+-]?[0-9]+)?', // numbers
+            '(?:[+-]?[0-9]*(?:[\.][0-9]+)*)', // numbers
         );
     }
 
@@ -206,10 +206,10 @@ class Lexer extends AbstractLexer
 
         // Recognize numeric values
         if ($tokenType & self::T_FLOAT) {
-            $tokenSyntax[] = 'all float format';
+            $tokenSyntax[] = 'simple float';
         }
         if ($tokenType & self::T_INTEGER) {
-            $tokenSyntax[] = 'all numeric format';
+            $tokenSyntax[] = 'simple integer';
         }
         if ($tokenType & self::T_INPUT_PARAMETER) {
             $tokenSyntax[] = '/[a-z_][a-z0-9_]*/';

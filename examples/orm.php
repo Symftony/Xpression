@@ -53,6 +53,7 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
     use Doctrine\ORM\Query\Expr;
     use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
 
+    $query = urldecode($_SERVER['QUERY_STRING']);
     $parser = new Parser(new ExprAdapter(new Expr()));
     $expression = $parser->parse($query);
     $expression = $parser->parse($query, $allowedTokenType);</code></pre>

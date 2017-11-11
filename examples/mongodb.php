@@ -51,6 +51,7 @@ if ($hasMongoDb && isset($_SERVER['QUERY_STRING'])) {
     use Symftony\Xpression\Parser;
     use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;
 
+    $query = urldecode($_SERVER['QUERY_STRING']);
     $parser = new Parser(new ExprBuilder());
     $expression = $parser->parse($query);</code></pre>
     </div>

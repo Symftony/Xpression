@@ -50,6 +50,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
     use Symftony\Xpression\Expr\HtmlExpressionBuilder;
     use Symftony\Xpression\Lexer;
 
+    $query = urldecode($_SERVER['QUERY_STRING']);
     // I allow all token type except "≥" and "≠"
     $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
     $parser = new Parser(new HtmlExpressionBuilder());
