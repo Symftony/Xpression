@@ -22,7 +22,8 @@
   },
   "suggest": {
     "doctrine/collections": "If you want filter an ArrayCollection",
-    "doctrine/orm": "If you want filter an ORM query builder"
+    "doctrine/orm": "If you want filter an ORM query builder",
+    "doctrine/mongodb": "If you want filter an Mongodb query builder"
   },
   "license": "MIT",
   "autoload": {
