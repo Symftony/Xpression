@@ -5,16 +5,18 @@ namespace Example;
 use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
+use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
+$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
 
 $hasMongoDb = class_exists('Doctrine\MongoDB\Query\Expr');
 
 $expression = '';
 $exception = null;
-if ($hasMongoDb && isset($_SERVER['QUERY_STRING'])) {
-    $query = urldecode($_SERVER['QUERY_STRING']);
+if ($hasMongoDb && isset($_GET['query'])) {
+    $query = urldecode($_GET['query']);
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprBuilder());
@@ -50,10 +52,12 @@ if ($hasMongoDb && isset($_SERVER['QUERY_STRING'])) {
 
     use Symftony\Xpression\Parser;
     use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;
+    use Symftony\Xpression\QueryStringParser;
 
-    $query = urldecode($_SERVER['QUERY_STRING']);
+    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+
     $parser = new Parser(new ExprBuilder());
-    $expression = $parser->parse($query);</code></pre>
+    $expression = $parser->parse($_GET['query']);</code></pre>
     </div>
 </div>
 </body>

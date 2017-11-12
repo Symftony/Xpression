@@ -6,15 +6,17 @@ use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Expr\HtmlExpressionBuilder;
 use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
+use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
+$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
 
 $expression = null;
 $exception = null;
 $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
-if (isset($_SERVER['QUERY_STRING'])) {
-    $query = urldecode($_SERVER['QUERY_STRING']);
+if (isset($_GET['query'])) {
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new HtmlExpressionBuilder());
@@ -49,12 +51,14 @@ if (isset($_SERVER['QUERY_STRING'])) {
     use Symftony\Xpression\Parser;
     use Symftony\Xpression\Expr\HtmlExpressionBuilder;
     use Symftony\Xpression\Lexer;
+    use Symftony\Xpression\QueryStringParser;
 
-    $query = urldecode($_SERVER['QUERY_STRING']);
+    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+
     // I allow all token type except "≥" and "≠"
     $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
     $parser = new Parser(new HtmlExpressionBuilder());
-    $expression = $parser->parse($query, $allowedTokenType);</code></pre>
+    $expression = $parser->parse($_GET['query'], $allowedTokenType);</code></pre>
     </div>
 </div>
 </body>

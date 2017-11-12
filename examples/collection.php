@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\ExpressionBuilder;
 use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
+use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
+$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
 
 $hasCollection = class_exists('Doctrine\Common\Collections\ExpressionBuilder');
 
@@ -24,8 +26,8 @@ $products = array(
 $filteredIds = array();
 $expression = null;
 $exception = null;
-if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
-    $query = urldecode($_SERVER['QUERY_STRING']);
+if ($hasCollection && isset($_GET['query'])) {
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
@@ -95,6 +97,9 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
     use Doctrine\Common\Collections\ExpressionBuilder;
     use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
     use Symftony\Xpression\Parser;
+    use Symftony\Xpression\QueryStringParser;
+
+    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
 
     $products = array(
         array('id' => 1, 'title' => 'banana', 'price' => 2, 'quantity' => 5, 'category' => 'food'),
@@ -103,12 +108,10 @@ if ($hasCollection && isset($_SERVER['QUERY_STRING'])) {
         array('id' => 4, 'title' => 'TV', 'price' => 399, 'quantity' => 1, 'category' => 'multimedia'),
     );
 
-    $query = urldecode($_SERVER['QUERY_STRING']);
     $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
-    $expression = $parser->parse($query);
+    $expression = $parser->parse($_GET['query']);
     $products = new ArrayCollection($products);
-    $filteredProducts = $products->matching(new Criteria($expression));
-
+    $filteredProducts = $products->matching(new Criteria($expression));</code></pre>
     </div>
 </body>
 </html>

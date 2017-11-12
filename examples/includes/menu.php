@@ -1,6 +1,7 @@
 <div class="head">
     <div class="container">
         <a href="basic.php">Basic</a>
+        <a href="querystring.php">Query string</a>
         <a href="constraint.php">Disable operator</a>
         <a href="collection.php">Doctrine ArrayCollection filter</a>
         <a href="orm.php">Doctrine ORM</a>
@@ -90,9 +91,11 @@
         padding: 10px;
         margin-bottom: 0;
     }
-    div.exception>div.exception {
+
+    div.exception > div.exception {
         margin-left: 20px;
     }
+
     .debug {
         background-color: #ffffff;
         border: 1px dashed #e48706;
@@ -105,42 +108,52 @@
         border-radius: 5px;
         padding: 1px 6px;
     }
+
     table.data {
         width: 100%;
         border-collapse: collapse;
     }
+
     table.example {
         width: 100%;
         text-align: center;
     }
+
     table.example a {
         text-decoration: none;
         background-color: rgb(237, 243, 250);
         border-radius: 3px;
-        padding:  0 5px;
+        padding: 0 5px;
     }
+
     table.data th {
         border-top: 1px solid grey;
     }
+
     table.data th, table.data td {
         border-bottom: 1px solid grey;
     }
+
     fieldset {
         border: 1px dotted #1b6d85;
         border-radius: 5px;
     }
+
     .query {
         font-size: 40px;
     }
+
     fieldset legend {
         background-color: #d1f1f5;
         border-radius: 5px;
     }
+
     ul.example {
         overflow: hidden;
         list-style: none;
         padding: 0;
     }
+
     ul.example li {
         float: left;
         background-color: #dedede;
@@ -148,6 +161,7 @@
         margin: 2px 5px;
         padding: 3px;
     }
+
     ul.example a {
         color: #000000;
         text-decoration: none;

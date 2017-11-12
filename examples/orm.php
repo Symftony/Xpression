@@ -6,16 +6,18 @@ use Doctrine\ORM\Query\Expr;
 use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
+use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
+$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
 
 $hasORM = class_exists('Doctrine\ORM\Query\Expr');
 
 $expression = '';
 $exception = null;
-if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
-    $query = urldecode($_SERVER['QUERY_STRING']);
+if ($hasORM && isset($_GET['query'])) {
+    $query = urldecode($_GET['query']);
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprAdapter(new Expr()));
@@ -52,11 +54,12 @@ if ($hasORM && isset($_SERVER['QUERY_STRING'])) {
     use Symftony\Xpression\Parser;
     use Doctrine\ORM\Query\Expr;
     use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
+    use Symftony\Xpression\QueryStringParser;
 
-    $query = urldecode($_SERVER['QUERY_STRING']);
+    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+
     $parser = new Parser(new ExprAdapter(new Expr()));
-    $expression = $parser->parse($query);
-    $expression = $parser->parse($query, $allowedTokenType);</code></pre>
+    $expression = $parser->parse($_GET['query']);</code></pre>
     </div>
 </div>
 </body>
