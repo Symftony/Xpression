@@ -161,6 +161,10 @@ class ExprBuilderTest extends TestCase
      */
     public function testContains($field, $value)
     {
+        if (!class_exists('\MongoRegex')) {
+            $this->markTestSkipped('This test need "\MongoRegex" installed.');
+        }
+
         $this->assertEquals(
             array('field' => new \MongoRegex('/.*value.*/')),
             $this->exprBuilder->contains($field, $value)

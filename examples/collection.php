@@ -12,7 +12,7 @@ use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
-$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+QueryStringParser::correctServerQueryString();
 
 $hasCollection = class_exists('Doctrine\Common\Collections\ExpressionBuilder');
 
@@ -27,7 +27,7 @@ $filteredIds = array();
 $expression = null;
 $exception = null;
 if ($hasCollection && isset($_GET['query'])) {
-    $query = $_GET['query'];
+    $query = QueryStringParser::unwrap($_GET['query']);
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
@@ -99,7 +99,7 @@ if ($hasCollection && isset($_GET['query'])) {
     use Symftony\Xpression\Parser;
     use Symftony\Xpression\QueryStringParser;
 
-    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+    QueryStringParser::correctServerQueryString();
 
     $products = array(
         array('id' => 1, 'title' => 'banana', 'price' => 2, 'quantity' => 5, 'category' => 'food'),
@@ -109,7 +109,7 @@ if ($hasCollection && isset($_GET['query'])) {
     );
 
     $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
-    $expression = $parser->parse($_GET['query']);
+    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));
     $products = new ArrayCollection($products);
     $filteredProducts = $products->matching(new Criteria($expression));</code></pre>
     </div>

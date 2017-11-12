@@ -9,14 +9,14 @@ use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
-$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+QueryStringParser::correctServerQueryString();
 
 $hasMongoDb = class_exists('Doctrine\MongoDB\Query\Expr');
 
 $expression = '';
 $exception = null;
 if ($hasMongoDb && isset($_GET['query'])) {
-    $query = urldecode($_GET['query']);
+    $query = QueryStringParser::unwrap($_GET['query']);
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprBuilder());
@@ -54,10 +54,10 @@ if ($hasMongoDb && isset($_GET['query'])) {
     use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;
     use Symftony\Xpression\QueryStringParser;
 
-    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+    QueryStringParser::correctServerQueryString();
 
     $parser = new Parser(new ExprBuilder());
-    $expression = $parser->parse($_GET['query']);</code></pre>
+    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));</code></pre>
     </div>
 </div>
 </body>

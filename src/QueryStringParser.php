@@ -4,17 +4,31 @@ namespace Symftony\Xpression;
 
 class QueryStringParser
 {
+    static public function correctServerQueryString()
+    {
+        $_SERVER['QUERY_STRING'] = self::encodeXpression($_SERVER['QUERY_STRING']);
+        parse_str($_SERVER['QUERY_STRING'], $_GET);
+    }
+
     /**
      * @param $queryString
      *
-     * @return array
+     * @return string
      */
-    static public function parse($queryString)
+    static public function encodeXpression($queryString)
     {
-        parse_str(preg_replace_callback('/\{(\S*)\}/U', function ($matches) {
+        return preg_replace_callback('/(\{\S*\})/U', function ($matches) {
             return urlencode($matches[1]);
-        }, $queryString), $GET);
+        }, urldecode($queryString));
+    }
 
-        return $GET;
+    /**
+     * @param $expression
+     *
+     * @return string
+     */
+    static public function unwrap($expression)
+    {
+        return preg_replace('/\{(\S*)\}/U', '$1', $expression);
     }
 }

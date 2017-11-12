@@ -12,11 +12,13 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             // Default querystring
             array(
                 'param-A',
+                'param-A',
                 array(
                     'param-A' => '',
                 )
             ),
             array(
+                'param-A=',
                 'param-A=',
                 array(
                     'param-A' => '',
@@ -24,11 +26,13 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'param-A=valueA',
+                'param-A=valueA',
                 array(
                     'param-A' => 'valueA',
                 )
             ),
             array(
+                'param-A[]=valueA',
                 'param-A[]=valueA',
                 array(
                     'param-A' => array('valueA'),
@@ -36,11 +40,13 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'param-A[subA]=valueA',
+                'param-A[subA]=valueA',
                 array(
                     'param-A' => array('subA' => 'valueA'),
                 )
             ),
             array(
+                'param-A&param-B',
                 'param-A&param-B',
                 array(
                     'param-A' => '',
@@ -49,12 +55,14 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'param-A=&param-B',
+                'param-A=&param-B',
                 array(
                     'param-A' => '',
                     'param-B' => '',
                 )
             ),
             array(
+                'param-A=valueA&param-B',
                 'param-A=valueA&param-B',
                 array(
                     'param-A' => 'valueA',
@@ -63,12 +71,14 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'param-A[]=valueA&param-B',
+                'param-A[]=valueA&param-B',
                 array(
                     'param-A' => array('valueA'),
                     'param-B' => '',
                 )
             ),
             array(
+                'param-A[subA]=valueA&param-B',
                 'param-A[subA]=valueA&param-B',
                 array(
                     'param-A' => array('subA' => 'valueA'),
@@ -79,46 +89,53 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             // With Xpression
             array(
                 'query={valueA}',
+                'query=%7BvalueA%7D',
                 array(
-                    'query' => 'valueA',
+                    'query' => '{valueA}',
                 )
             ),
             array(
                 'query[]={valueA}',
+                'query[]=%7BvalueA%7D',
                 array(
-                    'query' => array('valueA'),
+                    'query' => array('{valueA}'),
                 )
             ),
             array(
                 'query[subA]={valueA}',
+                'query[subA]=%7BvalueA%7D',
                 array(
-                    'query' => array('subA' => 'valueA'),
+                    'query' => array('subA' => '{valueA}'),
                 )
             ),
             array(
                 'query-A={valueA}&query-B={valueB}',
+                'query-A=%7BvalueA%7D&query-B=%7BvalueB%7D',
                 array(
-                    'query-A' => 'valueA',
-                    'query-B' => 'valueB',
+                    'query-A' => '{valueA}',
+                    'query-B' => '{valueB}',
                 )
             ),
             array(
                 'query-A[]={valueA1}&query-A[]={valueA2}&query-B={valueB}',
+                'query-A[]=%7BvalueA1%7D&query-A[]=%7BvalueA2%7D&query-B=%7BvalueB%7D',
                 array(
-                    'query-A' => array('valueA1', 'valueA2'),
-                    'query-B' => 'valueB',
+                    'query-A' => array('{valueA1}', '{valueA2}'),
+                    'query-B' => '{valueB}',
                 )
             ),
             array(
                 'query-A[subA]={valueA}&query-B={valueB}',
+                'query-A[subA]=%7BvalueA%7D&query-B=%7BvalueB%7D',
                 array(
-                    'query-A' => array('subA' => 'valueA'),
-                    'query-B' => 'valueB',
+                    'query-A' => array('subA' => '{valueA}'),
+                    'query-B' => '{valueB}',
                 )
             ),
 
             // Fail
             array(
+                'query-A=valueA}',
                 'query-A=valueA}',
                 array(
                     'query-A' => 'valueA}',
@@ -126,20 +143,23 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'query-A={valueA',
+                'query-A={valueA',
                 array(
                     'query-A' => '{valueA',
                 )
             ),
             array(
                 'query-A={}valueA',
+                'query-A=%7B%7DvalueA',
                 array(
-                    'query-A' => 'valueA',
+                    'query-A' => '{}valueA',
                 )
             ),
             array(
                 'query-A={{valueA}}',
+                'query-A=%7B%7BvalueA%7D}',
                 array(
-                    'query-A' => '{valueA}',
+                    'query-A' => '{{valueA}}',
                 )
             ),
         );
@@ -149,10 +169,15 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
      * @dataProvider parseDataProvider
      *
      * @param $queryString
+     * @param $expectedQueryString
      * @param $expectedGET
      */
-    public function testParse($queryString, $expectedGET)
+    public function testParse($queryString, $expectedQueryString, $expectedGET)
     {
-        $this->assertEquals($expectedGET, QueryStringParser::parse($queryString));
+        $_SERVER['QUERY_STRING'] = $queryString;
+        QueryStringParser::correctServerQueryString();
+
+        $this->assertEquals($expectedQueryString, $_SERVER['QUERY_STRING']);
+        $this->assertEquals($expectedGET, $_GET);
     }
 }

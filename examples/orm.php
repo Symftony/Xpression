@@ -10,14 +10,14 @@ use Symftony\Xpression\QueryStringParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 header('Content-Type: text/html; charset=utf-8');
-$_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+QueryStringParser::correctServerQueryString();
 
 $hasORM = class_exists('Doctrine\ORM\Query\Expr');
 
 $expression = '';
 $exception = null;
 if ($hasORM && isset($_GET['query'])) {
-    $query = urldecode($_GET['query']);
+    $query = QueryStringParser::unwrap($_GET['query']);
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprAdapter(new Expr()));
@@ -56,10 +56,10 @@ if ($hasORM && isset($_GET['query'])) {
     use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
     use Symftony\Xpression\QueryStringParser;
 
-    $_GET = QueryStringParser::parse(urldecode($_SERVER['QUERY_STRING']));
+    QueryStringParser::correctServerQueryString();
 
     $parser = new Parser(new ExprAdapter(new Expr()));
-    $expression = $parser->parse($_GET['query']);</code></pre>
+    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));</code></pre>
     </div>
 </div>
 </body>
