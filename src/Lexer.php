@@ -56,7 +56,7 @@ class Lexer extends AbstractLexer
             '"(?:[^"]|"")*"', // quoted strings
             '\^\||⊕|!&|&|!\||\|', // Composite operator
             '≤|≥|≠|<=|>=|!=|<|>|=|\[|!\[|\]', // Comparison operator
-            '[a-z_][a-z0-9_]*', // identifier or qualified name
+            '[a-z_][a-z0-9_\.]*', // identifier or qualified name
             '(?:[+-]?[0-9]*(?:[\.][0-9]+)*)', // numbers
         );
     }
