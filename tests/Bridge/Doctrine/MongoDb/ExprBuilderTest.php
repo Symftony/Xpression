@@ -2,6 +2,7 @@
 
 namespace Tests\Symftony\Xpression\Bridge\Doctrine\MongoDb;
 
+use Doctrine\MongoDB\Query\Expr;
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Bridge\Doctrine\MongoDb\ExprBuilder;
 
@@ -25,7 +26,7 @@ class ExprBuilderTest extends TestCase
     {
         $field = 'fake_field';
         $this->assertEquals(
-            array('fake_field' => null),
+            $this->createExpr()->field('fake_field')->equals(null),
             $this->exprBuilder->isNull($field)
         );
     }
@@ -50,7 +51,7 @@ class ExprBuilderTest extends TestCase
     public function testEq($field, $value)
     {
         $this->assertEquals(
-            array('field' => 'value'),
+            $this->createExpr()->field('field')->equals('value'),
             $this->exprBuilder->eq($field, $value)
         );
     }
@@ -64,7 +65,7 @@ class ExprBuilderTest extends TestCase
     public function testNeq($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$ne' => 'value')),
+            $this->createExpr()->field('field')->notEqual('value'),
             $this->exprBuilder->neq($field, $value)
         );
     }
@@ -78,7 +79,7 @@ class ExprBuilderTest extends TestCase
     public function testGt($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$gt' => 'value')),
+            $this->createExpr()->field('field')->gt('value'),
             $this->exprBuilder->gt($field, $value)
         );
     }
@@ -92,7 +93,7 @@ class ExprBuilderTest extends TestCase
     public function testGte($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$gte' => 'value')),
+            $this->createExpr()->field('field')->gte('value'),
             $this->exprBuilder->gte($field, $value)
         );
     }
@@ -106,7 +107,7 @@ class ExprBuilderTest extends TestCase
     public function testLt($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$lt' => 'value')),
+            $this->createExpr()->field('field')->lt('value'),
             $this->exprBuilder->lt($field, $value)
         );
     }
@@ -120,7 +121,7 @@ class ExprBuilderTest extends TestCase
     public function testLte($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$lte' => 'value')),
+            $this->createExpr()->field('field')->lte('value'),
             $this->exprBuilder->lte($field, $value)
         );
     }
@@ -134,7 +135,7 @@ class ExprBuilderTest extends TestCase
     public function testIn($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$in' => array('value'))),
+            $this->createExpr()->field('field')->in(['value']),
             $this->exprBuilder->in($field, array($value))
         );
     }
@@ -148,7 +149,7 @@ class ExprBuilderTest extends TestCase
     public function testNotIn($field, $value)
     {
         $this->assertEquals(
-            array('field' => array('$nin' => array('value'))),
+            $this->createExpr()->field('field')->notIn(['value']),
             $this->exprBuilder->notIn($field, array($value))
         );
     }
@@ -166,7 +167,7 @@ class ExprBuilderTest extends TestCase
         }
 
         $this->assertEquals(
-            array('field' => new \MongoRegex('/.*value.*/')),
+            $this->createExpr()->field('field')->equals(new \MongoRegex('/.*value.*/')),
             $this->exprBuilder->contains($field, $value)
         );
     }
@@ -195,10 +196,9 @@ class ExprBuilderTest extends TestCase
     public function testAndX(array $expressions)
     {
         $this->assertEquals(
-            array('$and' => array(
-                array('fieldA' => 'value'),
-                array('fieldB' => array('$gt' => 2)),
-            )),
+            $this->createExpr()
+                ->addAnd($this->createExpr()->field('fieldA')->equals('value'))
+                ->addAnd($this->createExpr()->field('fieldB')->gt(2)),
             $this->exprBuilder->andX($expressions)
         );
     }
@@ -222,10 +222,9 @@ class ExprBuilderTest extends TestCase
     public function testOrX(array $expressions)
     {
         $this->assertEquals(
-            array('$or' => array(
-                array('fieldA' => 'value'),
-                array('fieldB' => array('$gt' => 2)),
-            )),
+            $this->createExpr()
+                ->addOr($this->createExpr()->field('fieldA')->equals('value'))
+                ->addOr($this->createExpr()->field('fieldB')->gt(2)),
             $this->exprBuilder->orX($expressions)
         );
     }
@@ -238,10 +237,9 @@ class ExprBuilderTest extends TestCase
     public function testNorX(array $expressions)
     {
         $this->assertEquals(
-            array('$nor' => array(
-                array('fieldA' => 'value'),
-                array('fieldB' => array('$gt' => 2)),
-            )),
+            $this->createExpr()
+                ->addNor($this->createExpr()->field('fieldA')->equals('value'))
+                ->addNor($this->createExpr()->field('fieldB')->gt(2)),
             $this->exprBuilder->norX($expressions)
         );
     }
@@ -255,5 +253,10 @@ class ExprBuilderTest extends TestCase
     public function testXorX(array $expressions)
     {
         $this->exprBuilder->xorX($expressions);
+    }
+
+    private function createExpr()
+    {
+        return new Expr();
     }
 }

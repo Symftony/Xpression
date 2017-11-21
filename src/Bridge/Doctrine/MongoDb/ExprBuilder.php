@@ -32,7 +32,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function isNull($field)
     {
-        return $this->createExpr()->field($field)->equals(null)->getQuery();
+        return $this->createExpr()->field($field)->equals(null);
     }
 
     /**
@@ -43,7 +43,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function eq($field, $value)
     {
-        return $this->createExpr()->field($field)->equals($value)->getQuery();
+        return $this->createExpr()->field($field)->equals($value);
     }
 
     /**
@@ -54,7 +54,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function neq($field, $value)
     {
-        return $this->createExpr()->field($field)->notEqual($value)->getQuery();
+        return $this->createExpr()->field($field)->notEqual($value);
     }
 
     /**
@@ -65,7 +65,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function gt($field, $value)
     {
-        return $this->createExpr()->field($field)->gt($value)->getQuery();
+        return $this->createExpr()->field($field)->gt($value);
     }
 
     /**
@@ -76,7 +76,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function gte($field, $value)
     {
-        return $this->createExpr()->field($field)->gte($value)->getQuery();
+        return $this->createExpr()->field($field)->gte($value);
     }
 
     /**
@@ -87,7 +87,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function lt($field, $value)
     {
-        return $this->createExpr()->field($field)->lt($value)->getQuery();
+        return $this->createExpr()->field($field)->lt($value);
     }
 
     /**
@@ -98,7 +98,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function lte($field, $value)
     {
-        return $this->createExpr()->field($field)->lte($value)->getQuery();
+        return $this->createExpr()->field($field)->lte($value);
     }
 
     /**
@@ -109,7 +109,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function in($field, array $values)
     {
-        return $this->createExpr()->field($field)->in($values)->getQuery();
+        return $this->createExpr()->field($field)->in($values);
     }
 
     /**
@@ -120,7 +120,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function notIn($field, array $values)
     {
-        return $this->createExpr()->field($field)->notIn($values)->getQuery();
+        return $this->createExpr()->field($field)->notIn($values);
     }
 
     /**
@@ -131,7 +131,7 @@ class ExprBuilder implements ExpressionBuilderInterface
      */
     public function contains($field, $value)
     {
-        return $this->createExpr()->field($field)->equals(new \MongoRegex(sprintf('/.*%s.*/', $value)))->getQuery();
+        return $this->createExpr()->field($field)->equals(new \MongoRegex(sprintf('/.*%s.*/', $value)));
     }
 
     /**
@@ -143,10 +143,10 @@ class ExprBuilder implements ExpressionBuilderInterface
     {
         $expr = $this->createExpr();
         foreach ($expressions as $expression) {
-            $expr->addAnd($expression)->getQuery();
+            $expr->addAnd($expression);
         }
 
-        return $expr->getQuery();
+        return $expr;
     }
 
     /**
@@ -166,10 +166,10 @@ class ExprBuilder implements ExpressionBuilderInterface
     {
         $expr = $this->createExpr();
         foreach ($expressions as $expression) {
-            $expr->addOr($expression)->getQuery();
+            $expr->addOr($expression);
         }
 
-        return $expr->getQuery();
+        return $expr;
     }
 
     /**
@@ -181,10 +181,10 @@ class ExprBuilder implements ExpressionBuilderInterface
     {
         $expr = $this->createExpr();
         foreach ($expressions as $expression) {
-            $expr->addNor($expression)->getQuery();
+            $expr->addNor($expression);
         }
 
-        return $expr->getQuery();
+        return $expr;
     }
 
     /**
