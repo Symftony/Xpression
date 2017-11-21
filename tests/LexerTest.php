@@ -37,6 +37,14 @@ class LexerTest extends TestCase
                 ),
             ),
             array(
+                'a-b=1',
+                array(
+                    array('value' => 'a-b', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 3),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                ),
+            ),
+            array(
                 'a≠1',
                 array(
                     array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
