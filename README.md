@@ -2,6 +2,10 @@
 
 **Xpression** is a simple PHP implementation of **Specification pattern**.   
 
+## Demo
+
+You can try this library on [Demo Xpression](http://symftony-xpression.herokuapp.com/)
+
 ## Installation
 
 The recommended way to install **Xpression** is through
