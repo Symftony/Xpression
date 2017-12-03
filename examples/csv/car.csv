@@ -1,0 +1,18 @@
+id,constructor,model,year,price
+1,'Volkswagen','Golf',1990,11
+2,'Volkswagen','Rabbit',2009,7
+3,'Volkswagen','Rabbit',2006,12
+4,'Cadillac','Catera',1999,5
+5,'Cadillac','STS',2006,14
+6,'Ford','Mustang',1970,4
+7,'Ford','Laser',1989,2
+8,'Ford','model' II',1990,13
+9,'Lexus','LS',2007,18
+10,'Lexus','LS',2000,17
+11,'Lexus','LX',1999,4
+12,'Hyundai','Sonata',1996,13
+13,'Hyundai','XG350',2002,5
+14,'Land Rover','model' SeriesII',2000,17
+15,'Land Rover','Discovery',2002,20
+16,'Oldsmobile Cutlass','Supreme',1992,5
+17,'Mitsubishi','Eclipse',2001,8
