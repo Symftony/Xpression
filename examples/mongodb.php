@@ -38,9 +38,7 @@ if ($hasMongoDb && isset($_GET['query'])) {
     <?php if (!$hasMongoDb): ?>
         <div class="content">
             <div>
-                <h2><p class="error">/!\ Error: This example need "<a target="_blank"
-                                                                      href="https://github.com/doctrine/mongodb">doctrine/mongodb</a>"
-                        to work</p></h2>
+                <h2><p class="error">/!\ Error: This example need "<a target="_blank" href="https://github.com/doctrine/mongodb">doctrine/mongodb</a>"to work</p></h2>
             </div>
         </div>
     <?php endif ?>

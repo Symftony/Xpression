@@ -25,15 +25,15 @@ if (isset($_SERVER['QUERY_STRING'])) {
 ?>
 <html>
 <head>
-    <title>Xpression : Basic example</title>
+    <title>Xpression : Query string</title>
 </head>
 <body>
 <?php include 'includes/menu.php'; ?>
 <div class="container">
-    <h1>Xpression Visualisation</h1>
+    <h1>Xpression : Query string</h1>
     <div class="content warning">
         <p>If you want to use Xpression syntax without another query string parameter</p>
-        <p>scheme://authority/path?<strong>title='foo'&price>2</strong></p>
+        <p>scheme://authority/path?<strong>price>5&price<14</strong></p>
         <p></p>
     </div>
     <div class="content code"><pre><code>
@@ -47,21 +47,18 @@ if (isset($_SERVER['QUERY_STRING'])) {
     </div>
     <div class="content">
         <ul class="example">
-            <li><a href="?">title is null</a></li>
-            <li><a href="?title='foo'">title = 'foo'</a></li>
-            <li><a href="?price=10">price = 10</a></li>
-            <li><a href="?price≠10">price ≠ 10</a></li>
-            <li><a href="?price>10">price > 10</a></li>
-            <li><a href="?price≥10">price ≥ 10</a></li>
-            <li><a href="?price<10">price < 10</a></li>
-            <li><a href="?price≤10">price ≤ 10</a></li>
-            <li><a href="?price>10&price<20">price > 10 & price < 20</a></li>
-            <li><a href="?price=2|category='food'">price=2 | category = 'food'</a></li>
-            <li><a href="?price>10&category[1,5,7]">price > 10 & category[1,5,7]</a></li>
-            <li><a href="?title=foo|price>3&price<5">title = foo | price > 3 & price < 5</a></li>
-            <li><a href="?(title=foo|price>3)&price<5">( title = foo | price > 3 ) & price < 5</a></li>
-            <li><a href="?category[1,5,7]">category[1,5,7]</a></li>
-            <li><a href="?category![1,5,7]">category![1,5,7]</a></li>
+            <li><a href="?constructor='Lexus'">constructor = 'Lexus'</a></li>
+            <li><a href="?price=13">price = 13</a></li>
+            <li><a href="?price≠5">price ≠ 5</a></li>
+            <li><a href="?price>5">price > 5</a></li>
+            <li><a href="?price≥5">price ≥ 5</a></li>
+            <li><a href="?price<5">price < 5</a></li>
+            <li><a href="?price≤5">price ≤ 5</a></li>
+            <li><a href="?price>5&price<14">price > 5 & price < 14</a></li>
+            <li><a href="?price>5&price<14|constructor='Lexus'">price > 5 & price < 14 | constructor = 'Lexus'</a></li>
+            <li><a href="?year[1990,1996,2006]">year [1990,1996,2006]</a></li>
+            <li><a href="?constructor='Lexus'&price≥4|price≤17">constructor = 'Lexus' & price ≥ 4 | price ≤ 17</a></li>
+            <li><a href="?constructor='Lexus'&(price≥4|price≤17)">constructor = 'Lexus' & (price ≥ 4 | price ≤ 17)</a></li>
             <li class="error"><a href="?pr$ice">Lexer error</a></li>
             <li class="error"><a href="?price]">Parser error</a></li>
         </ul>
