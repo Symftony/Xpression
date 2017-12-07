@@ -17,7 +17,7 @@ class QueryStringParser
      */
     static public function encodeXpression($queryString)
     {
-        return preg_replace_callback('/(\{\S*\})/U', function ($matches) {
+        return preg_replace_callback('/\{(\S*)\}/U', function ($matches) {
             return urlencode($matches[1]);
         }, urldecode($queryString));
     }

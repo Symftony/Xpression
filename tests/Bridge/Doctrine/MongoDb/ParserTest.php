@@ -169,7 +169,7 @@ class ParserTest extends TestCase
      */
     public function testParser($input, $expectedExpression)
     {
-        $this->assertEquals($expectedExpression, $this->parser->parse($input));
+        $this->assertEquals($expectedExpression, $this->parser->parse($input)->getQuery());
     }
 
     public function unsupportedExpressionTypeDataProvider()

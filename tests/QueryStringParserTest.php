@@ -2,9 +2,10 @@
 
 namespace Tests\Symftony\Xpression;
 
+use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\QueryStringParser;
 
-class QueryStringParserTest extends \PHPUnit_Framework_TestCase
+class QueryStringParserTest extends TestCase
 {
     public function parseDataProvider()
     {
@@ -89,47 +90,47 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             // With Xpression
             array(
                 'query={valueA}',
-                'query=%7BvalueA%7D',
+                'query=valueA',
                 array(
-                    'query' => '{valueA}',
+                    'query' => 'valueA',
                 )
             ),
             array(
                 'query[]={valueA}',
-                'query[]=%7BvalueA%7D',
+                'query[]=valueA',
                 array(
-                    'query' => array('{valueA}'),
+                    'query' => array('valueA'),
                 )
             ),
             array(
                 'query[subA]={valueA}',
-                'query[subA]=%7BvalueA%7D',
+                'query[subA]=valueA',
                 array(
-                    'query' => array('subA' => '{valueA}'),
+                    'query' => array('subA' => 'valueA'),
                 )
             ),
             array(
                 'query-A={valueA}&query-B={valueB}',
-                'query-A=%7BvalueA%7D&query-B=%7BvalueB%7D',
+                'query-A=valueA&query-B=valueB',
                 array(
-                    'query-A' => '{valueA}',
-                    'query-B' => '{valueB}',
+                    'query-A' => 'valueA',
+                    'query-B' => 'valueB',
                 )
             ),
             array(
                 'query-A[]={valueA1}&query-A[]={valueA2}&query-B={valueB}',
-                'query-A[]=%7BvalueA1%7D&query-A[]=%7BvalueA2%7D&query-B=%7BvalueB%7D',
+                'query-A[]=valueA1&query-A[]=valueA2&query-B=valueB',
                 array(
-                    'query-A' => array('{valueA1}', '{valueA2}'),
-                    'query-B' => '{valueB}',
+                    'query-A' => array('valueA1', 'valueA2'),
+                    'query-B' => 'valueB',
                 )
             ),
             array(
                 'query-A[subA]={valueA}&query-B={valueB}',
-                'query-A[subA]=%7BvalueA%7D&query-B=%7BvalueB%7D',
+                'query-A[subA]=valueA&query-B=valueB',
                 array(
-                    'query-A' => array('subA' => '{valueA}'),
-                    'query-B' => '{valueB}',
+                    'query-A' => array('subA' => 'valueA'),
+                    'query-B' => 'valueB',
                 )
             ),
 
@@ -150,16 +151,16 @@ class QueryStringParserTest extends \PHPUnit_Framework_TestCase
             ),
             array(
                 'query-A={}valueA',
-                'query-A=%7B%7DvalueA',
+                'query-A=valueA',
                 array(
-                    'query-A' => '{}valueA',
+                    'query-A' => 'valueA',
                 )
             ),
             array(
                 'query-A={{valueA}}',
-                'query-A=%7B%7BvalueA%7D}',
+                'query-A=%7BvalueA}',
                 array(
-                    'query-A' => '{{valueA}}',
+                    'query-A' => '{valueA}',
                 )
             ),
         );

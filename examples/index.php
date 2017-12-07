@@ -17,7 +17,7 @@ $exception = null;
 $htmlExpressionBuilder = new HtmlExpressionBuilder();
 $parser = new Parser($htmlExpressionBuilder);
 if (isset($_GET['query'])) {
-    $query = QueryStringParser::unwrap($_GET['query']);
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $expression = $parser->parse($query);
@@ -57,7 +57,7 @@ if (isset($_GET['query'])) {
     QueryStringParser::correctServerQueryString();
 
     $parser = new Parser(new HtmlExpressionBuilder());
-    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));</code></pre>
+    $expression = $parser->parse($_GET['query']);</code></pre>
     </div>
 </div>
 </body>
