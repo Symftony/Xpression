@@ -40,7 +40,7 @@ $filteredIds = array();
 $expression = null;
 $exception = null;
 if ($hasCollection && isset($_GET['query'])) {
-    $query = QueryStringParser::unwrap($_GET['query']);
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
@@ -132,7 +132,7 @@ if ($hasCollection && isset($_GET['query'])) {
     );
 
     $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
-    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));
+    $expression = $parser->parse($_GET['query']);
     $products = new ArrayCollection($products);
     $filteredProducts = $products->matching(new Criteria($expression));</code></pre>
     </div>

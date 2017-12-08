@@ -16,7 +16,7 @@ $expression = null;
 $exception = null;
 $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
 if (isset($_GET['query'])) {
-    $query = QueryStringParser::unwrap($_GET['query']);
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new HtmlExpressionBuilder());
@@ -58,7 +58,7 @@ if (isset($_GET['query'])) {
     // I allow all token type except "≥" and "≠"
     $allowedTokenType = Lexer::T_ALL - Lexer::T_GREATER_THAN_EQUALS - Lexer::T_NOT_EQUALS;
     $parser = new Parser(new HtmlExpressionBuilder());
-    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']), $allowedTokenType);</code></pre>
+    $expression = $parser->parse($_GET['query'], $allowedTokenType);</code></pre>
     </div>
 </div>
 </body>

@@ -21,14 +21,4 @@ class QueryStringParser
             return urlencode($matches[1]);
         }, urldecode($queryString));
     }
-
-    /**
-     * @param $expression
-     *
-     * @return string
-     */
-    static public function unwrap($expression)
-    {
-        return preg_replace('/\{(\S*)\}/U', '$1', $expression);
-    }
 }

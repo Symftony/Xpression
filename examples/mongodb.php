@@ -16,7 +16,7 @@ $hasMongoDb = class_exists('Doctrine\MongoDB\Query\Expr');
 $expression = '';
 $exception = null;
 if ($hasMongoDb && isset($_GET['query'])) {
-    $query = QueryStringParser::unwrap($_GET['query']);
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprBuilder());
@@ -55,7 +55,7 @@ if ($hasMongoDb && isset($_GET['query'])) {
     QueryStringParser::correctServerQueryString();
 
     $parser = new Parser(new ExprBuilder());
-    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));</code></pre>
+    $expression = $parser->parse($_GET['query']);</code></pre>
     </div>
 </div>
 </body>

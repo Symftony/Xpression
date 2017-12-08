@@ -17,7 +17,7 @@ $hasORM = class_exists('Doctrine\ORM\Query\Expr');
 $expression = '';
 $exception = null;
 if ($hasORM && isset($_GET['query'])) {
-    $query = QueryStringParser::unwrap($_GET['query']);
+    $query = $_GET['query'];
     if ('' !== $query) {
         try {
             $parser = new Parser(new ExprAdapter(new Expr()));
@@ -57,7 +57,7 @@ if ($hasORM && isset($_GET['query'])) {
     QueryStringParser::correctServerQueryString();
 
     $parser = new Parser(new ExprAdapter(new Expr()));
-    $expression = $parser->parse(QueryStringParser::unwrap($_GET['query']));</code></pre>
+    $expression = $parser->parse($_GET['query']);</code></pre>
     </div>
 </div>
 </body>
