@@ -115,6 +115,22 @@ class ParserTest extends TestCase
                 array(),
                 'my_fake_comparison_A'
             ),
+            array(
+                'fieldA{{1}}',
+                array(
+                    array('contains', 'fieldA', 1, 'my_fake_comparison_A')
+                ),
+                array(),
+                'my_fake_comparison_A',
+            ),
+            array(
+                'fieldA!{{1}}',
+                array(
+                    array('notContains', 'fieldA', 1, 'my_fake_comparison_A')
+                ),
+                array(),
+                'my_fake_comparison_A'
+            ),
 
             // Composite
             array(
@@ -367,8 +383,9 @@ class ParserTest extends TestCase
             array('['),
             array('!['),
             array(']'),
-            array('{'),
-            array('}'),
+            array('{{'),
+            array('!{{'),
+            array('}}'),
         );
     }
 

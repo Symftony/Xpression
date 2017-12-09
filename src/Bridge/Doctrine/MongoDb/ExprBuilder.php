@@ -135,6 +135,17 @@ class ExprBuilder implements ExpressionBuilderInterface
     }
 
     /**
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return array
+     */
+    public function notContains($field, $value)
+    {
+        return $this->createExpr()->field($field)->equals(new \MongoRegex(sprintf('/^((?!%s).)*$/', $value)));
+    }
+
+    /**
      * @param array $expressions
      *
      * @return array

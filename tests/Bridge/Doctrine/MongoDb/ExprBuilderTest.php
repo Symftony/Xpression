@@ -172,6 +172,24 @@ class ExprBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider comparisonDataProvider
+     *
+     * @param $field
+     * @param $value
+     */
+    public function testNotContains($field, $value)
+    {
+        if (!class_exists('\MongoRegex')) {
+            $this->markTestSkipped('This test need "\MongoRegex" installed.');
+        }
+
+        $this->assertEquals(
+            $this->createExpr()->field('field')->equals(new \MongoRegex('/^((?!value).)*$/')),
+            $this->exprBuilder->notContains($field, $value)
+        );
+    }
+
     public function compositeDataProvider()
     {
         if (!class_exists('Doctrine\MongoDB\Query\Expr')) {

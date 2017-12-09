@@ -181,6 +181,7 @@ class ParserTest extends TestCase
             array('fieldA=1!&fieldB=2!&fieldC=3'),
             array('fieldA=1&fieldB=2&fieldC=3!&fieldD=4'),
             array('fieldA=1|fieldB=2|fieldC=3!|fieldD=4'),
+            array('fieldA!{{1}}'),
         );
     }
 

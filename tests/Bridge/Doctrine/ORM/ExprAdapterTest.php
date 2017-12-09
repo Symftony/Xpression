@@ -165,6 +165,20 @@ class ExprAdapterTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider comparisonDataProvider
+     *
+     * @param $field
+     * @param $value
+     */
+    public function testNotContains($field, $value)
+    {
+        $this->assertEquals(
+            new Expr\Comparison('field', 'NOT LIKE', $value),
+            $this->exprAdapter->notContains($field, $value)
+        );
+    }
+
     public function compositeDataProvider()
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {

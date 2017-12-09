@@ -159,6 +159,17 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
     }
 
     /**
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function notContains($field, $value)
+    {
+        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'notContains', $value));
+    }
+
+    /**
      * @param array $expressions
      *
      * @return string

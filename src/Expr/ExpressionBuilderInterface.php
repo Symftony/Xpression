@@ -71,6 +71,12 @@ interface ExpressionBuilderInterface
     public function contains($field, $value);
 
     /**
+     * @param string $field
+     * @param mixed $value
+     */
+    public function notContains($field, $value);
+
+    /**
      * @param array $expressions
      */
     public function andX(array $expressions);

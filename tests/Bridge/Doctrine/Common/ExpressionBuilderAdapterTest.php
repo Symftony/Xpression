@@ -170,6 +170,18 @@ class ExpressionBuilderAdapterTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider comparisonDataProvider
+     * @expectedException \Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException
+     *
+     * @param $field
+     * @param $value
+     */
+    public function testNotContains($field, $value)
+    {
+        $this->expressionBuilderAdapter->notContains($field, $value);
+    }
+
     public function compositeDataProvider()
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {

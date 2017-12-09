@@ -72,6 +72,14 @@ class ParserTest extends TestCase
                 new Expr\Func('fieldA NOT IN', array(1, 2)),
             ),
             array(
+                'fieldA{{1}}',
+                new Expr\Comparison('fieldA', 'LIKE', 1),
+            ),
+            array(
+                'fieldA!{{1}}',
+                new Expr\Comparison('fieldA', 'NOT LIKE', 1),
+            ),
+            array(
                 'fieldA=1|fieldB=2|fieldC=3',
                 new Expr\Orx(array(
                     new Expr\Comparison('fieldA', '=', 1),

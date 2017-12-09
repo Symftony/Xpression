@@ -8,7 +8,7 @@ use Symftony\Xpression\Exception\Lexer\UnknownTokenTypeException;
 class Lexer extends AbstractLexer
 {
     const T_NONE = 0;
-    const T_ALL = 8388607;
+    const T_ALL = 16777215;
 
     // Punctuation
     const T_COMMA = 1;// 2**0
@@ -21,7 +21,7 @@ class Lexer extends AbstractLexer
     const T_FLOAT = 16;// 2**4
 
     // Comparison operator
-    const T_COMPARISON = 2016;// 2**5 + 2**6 + 2**7 + 2**8 + 2**9 + 2**10
+    const T_COMPARISON = 7079904;// 2**5 + 2**6 + 2**7 + 2**8 + 2**9 + 2**10 + 2**18 + 2**19 + 2**21 + 2**22
     const T_EQUALS = 32;// 2**5
     const T_NOT_EQUALS = 64;// 2**6
     const T_GREATER_THAN = 128;// 2**7
@@ -43,8 +43,9 @@ class Lexer extends AbstractLexer
     const T_OPEN_SQUARE_BRACKET = 262144;// 2**18
     const T_NOT_OPEN_SQUARE_BRACKET = 524288;// 2**19
     const T_CLOSE_SQUARE_BRACKET = 1048576;// 2**20
-    const T_OPEN_CURLY_BRACKET = 2097152;// 2**21
-    const T_CLOSE_CURLY_BRACKET = 4194304;// 2**22
+    const T_DOUBLE_OPEN_CURLY_BRACKET = 2097152;// 2**21
+    const T_NOT_DOUBLE_OPEN_CURLY_BRACKET = 4194304;// 2**22
+    const T_DOUBLE_CLOSE_CURLY_BRACKET = 8388608;// 2**23
 
     /**
      * @return array
@@ -55,7 +56,7 @@ class Lexer extends AbstractLexer
             "'(?:[^']|'')*'", // quoted strings
             '"(?:[^"]|"")*"', // quoted strings
             '\^\||⊕|!&|&|!\||\|', // Composite operator
-            '≤|≥|≠|<=|>=|!=|<|>|=|\[|!\[|\]', // Comparison operator
+            '≤|≥|≠|<=|>=|!=|<|>|=|\[|!\[|\]|!{{|{{|}}', // Comparison operator
             '[a-z_][a-z0-9_\.\-]*', // identifier or qualified name
             '(?:[+-]?[0-9]*(?:[\.][0-9]+)*)', // numbers
         );
@@ -176,11 +177,14 @@ class Lexer extends AbstractLexer
             case ($value === ']'):
                 $type = self::T_CLOSE_SQUARE_BRACKET;
                 break;
-            case ($value === '{'):
-                $type = self::T_OPEN_CURLY_BRACKET;
+            case ($value === '{{'):
+                $type = self::T_DOUBLE_OPEN_CURLY_BRACKET;
                 break;
-            case ($value === '}'):
-                $type = self::T_CLOSE_CURLY_BRACKET;
+            case ($value === '!{{'):
+                $type = self::T_NOT_DOUBLE_OPEN_CURLY_BRACKET;
+                break;
+            case ($value === '}}'):
+                $type = self::T_DOUBLE_CLOSE_CURLY_BRACKET;
                 break;
 
             // Default
@@ -273,11 +277,14 @@ class Lexer extends AbstractLexer
         if ($tokenType & self::T_CLOSE_SQUARE_BRACKET) {
             $tokenSyntax[] = ']';
         }
-        if ($tokenType & self::T_OPEN_CURLY_BRACKET) {
-            $tokenSyntax[] = '{';
+        if ($tokenType & self::T_DOUBLE_OPEN_CURLY_BRACKET) {
+            $tokenSyntax[] = '{{';
         }
-        if ($tokenType & self::T_CLOSE_CURLY_BRACKET) {
-            $tokenSyntax[] = '}';
+        if ($tokenType & self::T_NOT_DOUBLE_OPEN_CURLY_BRACKET) {
+            $tokenSyntax[] = '!{{';
+        }
+        if ($tokenType & self::T_DOUBLE_CLOSE_CURLY_BRACKET) {
+            $tokenSyntax[] = '}}';
         }
 
         return $tokenSyntax;

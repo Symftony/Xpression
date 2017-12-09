@@ -26,7 +26,7 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
      */
     public function getSupportedTokenType()
     {
-        return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_NOT_OR - Lexer::T_XOR;
+        return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_NOT_OR - Lexer::T_XOR - Lexer::T_NOT_DOUBLE_OPEN_CURLY_BRACKET;
     }
 
     /**
@@ -136,6 +136,17 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
     public function contains($field, $value)
     {
         return $this->expressionBuilder->contains($field, $value);
+    }
+
+    /**
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Comparison
+     */
+    public function notContains($field, $value)
+    {
+        throw new UnsupportedExpressionTypeException('notContains');
     }
 
     /**

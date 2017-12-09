@@ -80,6 +80,14 @@ class ParserTest extends TestCase
                 array('fieldA' => array('$nin' => array(1, 2))),
             ),
             array(
+                'fieldA{{1}}',
+                array('fieldA' => new \MongoRegex('/.*1.*/')),
+            ),
+            array(
+                'fieldA!{{1}}',
+                array('fieldA' => new \MongoRegex('/^((?!1).)*$/')),
+            ),
+            array(
                 'fieldA=1|fieldB=2|fieldC=3',
                 array('$or' => array(
                     array('fieldA' => 1),

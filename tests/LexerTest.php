@@ -162,6 +162,24 @@ class LexerTest extends TestCase
                     array('value' => ']', 'type' => Lexer::T_CLOSE_SQUARE_BRACKET, 'position' => 6),
                 ),
             ),
+            array(
+                'a{{1}}',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '{{', 'type' => Lexer::T_DOUBLE_OPEN_CURLY_BRACKET, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 3),
+                    array('value' => '}}', 'type' => Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET, 'position' => 4),
+                ),
+            ),
+            array(
+                'a!{{1}}',
+                array(
+                    array('value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0),
+                    array('value' => '!{{', 'type' => Lexer::T_NOT_DOUBLE_OPEN_CURLY_BRACKET, 'position' => 1),
+                    array('value' => '1', 'type' => Lexer::T_INTEGER, 'position' => 4),
+                    array('value' => '}}', 'type' => Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET, 'position' => 5),
+                ),
+            ),
         );
     }
 

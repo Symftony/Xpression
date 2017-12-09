@@ -255,6 +255,21 @@ class ClosureExpressionBuilderTest extends TestCase
         );
     }
 
+    /**
+     * @dataProvider containsDataProvider
+     *
+     * @param $field
+     * @param $value
+     * @param $expectedResult
+     */
+    public function testNotContains($field, $value, $expectedResult)
+    {
+        $this->assertEquals(
+            !$expectedResult,
+            $this->closureExpressionBuilder->notContains($field, $value)($this->exampleData)
+        );
+    }
+
     public function andXDataProvider()
     {
         return array(

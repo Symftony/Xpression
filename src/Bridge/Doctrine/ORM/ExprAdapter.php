@@ -140,6 +140,17 @@ class ExprAdapter implements ExpressionBuilderInterface
     }
 
     /**
+     * @param string $field
+     * @param mixed $value
+     *
+     * @return Expr\Comparison
+     */
+    public function notContains($field, $value)
+    {
+        return $this->expr->notLike($field, $value);
+    }
+
+    /**
      * @param array $expressions
      *
      * @return Expr\Andx
