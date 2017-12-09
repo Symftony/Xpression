@@ -91,10 +91,7 @@ if (isset($_GET['query'])) {
     <div class="content code"><pre><code>
     &lt;?php
 
-    use Doctrine\Common\Collections\ArrayCollection;
-    use Doctrine\Common\Collections\Criteria;
-    use Doctrine\Common\Collections\ExpressionBuilder;
-    use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
+    use Symftony\Xpression\Expr\ClosureExpressionBuilder;
     use Symftony\Xpression\Parser;
     use Symftony\Xpression\QueryStringParser;
 
@@ -120,7 +117,7 @@ if (isset($_GET['query'])) {
         array('id' => 17, 'constructor' => 'Mitsubishi', 'model' => 'Eclipse', 'year' => 2001, 'price' => 8),
     );
 
-    $parser = new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder()));
+    $parser = new Parser(new ClosureExpressionBuilder());
     $expression = $parser->parse($_GET['query']);
     $filteredProducts = array_filter($products, $expression);</code></pre>
     </div>
