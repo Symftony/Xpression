@@ -3,6 +3,7 @@
         <a href="index.php">Basic</a>
         <a href="querystring.php">Query string</a>
         <a href="constraint.php">Disable operator</a>
+        <a href="closure.php">Closure filter</a>
         <a href="collection.php">Doctrine ArrayCollection filter</a>
         <a href="orm.php">Doctrine ORM</a>
         <a href="mongodb.php">Doctrine MongoDb</a>

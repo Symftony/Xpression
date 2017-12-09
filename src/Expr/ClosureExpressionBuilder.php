@@ -197,7 +197,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
     public function contains($field, $value)
     {
         return function ($object) use ($field, $value) {
-            return strpos(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
+            return false !== strpos(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
         };
     }
 
