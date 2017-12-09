@@ -2,13 +2,8 @@
 
 namespace Symftony\Xpression\Exception\Parser;
 
-class UnexpectedTokenException extends SyntaxErrorException
+class UnexpectedTokenException extends TokenException
 {
-    /**
-     * @var array
-     */
-    private $token;
-
     /**
      * @var string
      */
@@ -24,23 +19,14 @@ class UnexpectedTokenException extends SyntaxErrorException
     public function __construct(array $token, $expectedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
     {
         $defaultMessage = sprintf(
-            'Unexpected token "%s". Expected %s.',
+            'Unexpected token "%s". Expected was %s.',
             $token['value'],
             implode(', ', $expectedTokenTypes)
         );
 
-        parent::__construct($message ?: $defaultMessage, $code, $previous);
+        parent::__construct($token, $message ?: $defaultMessage, $code, $previous);
 
-        $this->token = $token;
         $this->expectedTokenTypes = $expectedTokenTypes;
-    }
-
-    /**
-     * @return Token
-     */
-    public function getToken()
-    {
-        return $this->token;
     }
 
     /**

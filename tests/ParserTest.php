@@ -399,4 +399,24 @@ class ParserTest extends TestCase
     {
         $this->parser->parse($input, Lexer::T_NONE);
     }
+
+    /**
+     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+     */
+    public function testUnexpectedToken()
+    {
+        $this->expressionBuilderMock->eq('fieldA', 'foo')->willReturn('fake_return');
+
+        $this->parser->parse('fieldA=foo=1');
+    }
+
+    /**
+     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+     */
+    public function testUnsupportedToken()
+    {
+        $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_NONE)->shouldBeCalled();
+
+        $this->parser->parse('fieldA=1');
+    }
 }

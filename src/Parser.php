@@ -2,10 +2,13 @@
 
 namespace Symftony\Xpression;
 
+use Symftony\Xpression\Exception\Lexer\LexerException;
 use Symftony\Xpression\Exception\Parser\ForbiddenTokenException;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
+use Symftony\Xpression\Exception\Parser\ParserException;
 use Symftony\Xpression\Exception\Parser\UnexpectedTokenException;
 use Symftony\Xpression\Exception\Parser\UnknowCompositeTypeException;
+use Symftony\Xpression\Exception\Parser\UnsupportedTokenTypeException;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 
 class Parser
@@ -42,6 +45,11 @@ class Parser
     private $allowedTokenType;
 
     /**
+     * @var int Bitwise of ExpressionBuilder supported operator.
+     */
+    private $supportedTokenType;
+
+    /**
      * @param ExpressionBuilderInterface $expressionBuilder
      */
     public function __construct(ExpressionBuilderInterface $expressionBuilder)
@@ -72,14 +80,17 @@ class Parser
             throw new \InvalidArgumentException('Allowed operator must be an integer.');
         }
 
-        $this->allowedTokenType = ($allowedTokenType ?: Lexer::T_ALL) & $this->expressionBuilder->getSupportedTokenType();
+        $this->allowedTokenType = $allowedTokenType ?: Lexer::T_ALL;
+        $this->supportedTokenType = $this->expressionBuilder->getSupportedTokenType();
 
         try {
             $this->lexer->setInput($input);
             $this->lexer->moveNext();
 
             return $this->getExpression();
-        } catch (\Exception $exception) {
+        } catch (LexerException $exception) {
+            throw new InvalidExpressionException($input, '', 0, $exception);
+        } catch (ParserException $exception) {
             throw new InvalidExpressionException($input, '', 0, $exception);
         }
     }
@@ -91,6 +102,7 @@ class Parser
      *
      * @throws ForbiddenTokenException
      * @throws UnexpectedTokenException
+     * @throws UnsupportedTokenTypeException
      */
     private function getExpression($previousExpression = null)
     {
@@ -112,6 +124,10 @@ class Parser
             $currentTokenType = $currentToken['type'];
             $currentTokenIndex = $this->lexerIndex;
             $this->lexerIndex++;
+
+            if (!($this->supportedTokenType & $currentTokenType)) {
+                throw new UnsupportedTokenTypeException($currentToken, $this->lexer->getTokenSyntax($this->supportedTokenType));
+            }
 
             if (!($this->allowedTokenType & $currentTokenType)) {
                 throw new ForbiddenTokenException($currentToken, $this->lexer->getTokenSyntax($this->allowedTokenType));

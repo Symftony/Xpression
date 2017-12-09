@@ -10,6 +10,7 @@ class UnknowCompositeTypeException extends ParserException
     private $unknownType;
 
     /**
+     * @param string $unknownType
      * @param string $message
      * @param int $code
      * @param \Exception|null $previous

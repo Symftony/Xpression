@@ -2,52 +2,38 @@
 
 namespace Symftony\Xpression\Exception\Parser;
 
-class ForbiddenTokenException extends SyntaxErrorException
+class ForbiddenTokenException extends TokenException
 {
-    /**
-     * @var array
-     */
-    private $token;
-
     /**
      * @var string
      */
-    private $expectedTokenTypes;
+    private $allowedTokenTypes;
 
     /**
      * @param array $token
-     * @param array $expectedTokenTypes
+     * @param array $allowedTokenTypes
      * @param int $message
      * @param int $code
      * @param \Exception|null $previous
      */
-    public function __construct(array $token, $expectedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
+    public function __construct(array $token, $allowedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
     {
         $defaultMessage = sprintf(
-            'Forbidden token "%s". Expected %s.',
+            'Forbidden token "%s". Allowed was %s.',
             $token['value'],
-            implode(', ', $expectedTokenTypes)
+            implode(', ', $allowedTokenTypes)
         );
 
-        parent::__construct($message ?: $defaultMessage, $code, $previous);
+        parent::__construct($token, $message ?: $defaultMessage, $code, $previous);
 
-        $this->token = $token;
-        $this->expectedTokenTypes = $expectedTokenTypes;
-    }
-
-    /**
-     * @return Token
-     */
-    public function getToken()
-    {
-        return $this->token;
+        $this->allowedTokenTypes = $allowedTokenTypes;
     }
 
     /**
      * @return string
      */
-    public function getExpectedTokenTypes()
+    public function getAllowedTokenTypes()
     {
-        return $this->expectedTokenTypes;
+        return $this->allowedTokenTypes;
     }
 }
