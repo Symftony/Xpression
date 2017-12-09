@@ -106,7 +106,7 @@ class Parser
         $containsValue = null;
         $comparisonFirstOperande = null;
         $comparisonMultipleOperande = false;
-        $comparisonCallback = null;
+        $comparisonMethod = null;
 
         while ($currentToken = $this->getNextToken()) {
             $currentTokenType = $currentToken['type'];
@@ -163,64 +163,65 @@ class Parser
                         break;
                     }
 
-                    $expression = call_user_func_array($comparisonCallback, array($comparisonFirstOperande, $currentToken['value']));
+                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $currentToken['value']));
                     $comparisonFirstOperande = null;
-                    $comparisonCallback = null;
+                    $comparisonMethod = null;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;
                 case Lexer::T_EQUALS:
-                    $comparisonCallback = array($this->expressionBuilder, 'eq');
+                    $comparisonMethod = 'eq';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_NOT_EQUALS:
-                    $comparisonCallback = array($this->expressionBuilder, 'neq');
+                    $comparisonMethod = 'neq';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_GREATER_THAN:
-                    $comparisonCallback = array($this->expressionBuilder, 'gt');
+                    $comparisonMethod = 'gt';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_GREATER_THAN_EQUALS:
-                    $comparisonCallback = array($this->expressionBuilder, 'gte');
+                    $comparisonMethod = 'gte';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_LOWER_THAN:
-                    $comparisonCallback = array($this->expressionBuilder, 'lt');
+                    $comparisonMethod = 'lt';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_LOWER_THAN_EQUALS:
-                    $comparisonCallback = array($this->expressionBuilder, 'lte');
+                    $comparisonMethod = 'lte';
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
-                    $comparisonCallback = array($this->expressionBuilder, 'notIn');
+                    $comparisonMethod = 'notIn';
                     $comparisonMultipleOperande = array();
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
                     break;
                 case Lexer::T_OPEN_SQUARE_BRACKET:
-                    $comparisonCallback = array($this->expressionBuilder, 'in');
+                    $comparisonMethod = 'in';
                     $comparisonMultipleOperande = array();
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
                     break;
                 case Lexer::T_CLOSE_SQUARE_BRACKET:
-                    $expression = call_user_func_array($comparisonCallback, array($comparisonFirstOperande, $comparisonMultipleOperande));
-                    $comparisonCallback = null;
+                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $comparisonMultipleOperande));
+                    $comparisonMethod = null;
                     $comparisonFirstOperande = null;
                     $comparisonMultipleOperande = false;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;
                 case Lexer::T_DOUBLE_OPEN_CURLY_BRACKET:
-                    $comparisonCallback = array($this->expressionBuilder, 'contains');
+                    $comparisonMethod = 'contains';
                     $contains = true;
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
                     break;
                 case Lexer::T_NOT_DOUBLE_OPEN_CURLY_BRACKET:
-                    $comparisonCallback = array($this->expressionBuilder, 'notContains');
+                    $comparisonMethod = 'notContains';
                     $contains = true;
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
                     break;
                 case Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET:
-                    $expression = call_user_func_array($comparisonCallback, array($comparisonFirstOperande, $containsValue));
+                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $containsValue));
+                    $comparisonMethod = null;
                     $contains = false;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;
