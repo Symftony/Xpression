@@ -1,9 +1,10 @@
 # Xpression
 
-[![Latest Unstable Version](https://poser.pugx.org/symftony/xpression/v/unstable?format=flat-square)](https://packagist.org/packages/symftony/xpression)
-[![Latest Stable Version](https://poser.pugx.org/symftony/xpression/v/stable?format=flat-square)](https://packagist.org/packages/symftony/xpression)
-[![Total Downloads](https://poser.pugx.org/symftony/xpression/downloads?format=flat-square)](https://packagist.org/packages/symftony/xpression)
-[![License](https://poser.pugx.org/symftony/xpression/license?format=flat-square)](https://packagist.org/packages/symftony/xpression)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Symftony/Xpression/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Symftony/Xpression/?branch=master)
+[![Latest Unstable Version](https://poser.pugx.org/symftony/xpression/v/unstable)](https://packagist.org/packages/symftony/xpression)
+[![Latest Stable Version](https://poser.pugx.org/symftony/xpression/v/stable)](https://packagist.org/packages/symftony/xpression)
+[![Total Downloads](https://poser.pugx.org/symftony/xpression/downloads)](https://packagist.org/packages/symftony/xpression)
+[![License](https://poser.pugx.org/symftony/xpression/license)](https://packagist.org/packages/symftony/xpression)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/38d47cff-1abb-4083-a537-5794d9a9b281/mini.png)](https://insight.sensiolabs.com/projects/38d47cff-1abb-4083-a537-5794d9a9b281)
 
 **Xpression** is a simple PHP implementation of **Specification pattern**.   
