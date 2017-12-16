@@ -1,0 +1,62 @@
+language: php
+
+cache:
+  directories:
+    - vendor/
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - echo "extension = ${MONGO_EXT_NAME}.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+
+before_script:
+  - composer require doctrine/collections:">=1.0" doctrine/orm:">=2.0" doctrine/mongodb:">=1.0"
+  - composer install
+
+matrix:
+  include:
+#===== TESTS
+    - php: '5.3'
+      dist: precise
+      env:
+        - MONGO_EXT_NAME=mongo
+    - php: '5.4'
+      env:
+        - MONGO_EXT_NAME=mongo
+    - php: '5.5'
+      env:
+        - MONGO_EXT_NAME=mongo
+    - php: '5.6'
+      env:
+        - MONGO_EXT_NAME=mongo
+    - php: '7.0'
+      env:
+        - MONGO_EXT_NAME=mongodb
+      install:
+        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
+    - php: '7.1'
+      env:
+        - MONGO_EXT_NAME=mongodb
+      install:
+        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
+    - php: '7.2'
+      env:
+        - MONGO_EXT_NAME=mongodb
+      install:
+        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
+
+#===== CODE INSPECTION
+    - stage: 'code-inspection'
+      php: '7.2'
+      before_install: ''
+      before_script:
+        - composer require phpmd/phpmd:"@stable" squizlabs/php_codesniffer:"@stable"
+        - composer install
+      install: skip
+      script:
+        - ./vendor/bin/phpcs --standard=PSR1 src/
+        - ./vendor/bin/phpcs --standard=PSR2 src/
+        - ./vendor/bin/phpmd src/ text codesize,unusedcode,naming,design,cleancode
+
+script:
+  - ./vendor/bin/phpunit
+
