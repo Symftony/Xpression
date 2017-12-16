@@ -46,7 +46,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         }
 
         // camelcase field name to support different variable naming conventions
-        $ccField = preg_replace_callback('/_(.?)/', function($matches) {
+        $ccField = preg_replace_callback('/_(.?)/', function ($matches) {
             return strtoupper($matches[1]);
         }, $field);
 
@@ -79,7 +79,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function isNull($field)
     {
-        return function($object) use ($field) {
+        return function ($object) use ($field) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) === null;
         };
     }
@@ -92,7 +92,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function eq($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) === $value;
         };
     }
@@ -105,7 +105,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function neq($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) !== $value;
         };
     }
@@ -118,7 +118,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function gt($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) > $value;
         };
     }
@@ -131,7 +131,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function gte($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) >= $value;
         };
     }
@@ -144,7 +144,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function lt($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) < $value;
         };
     }
@@ -157,7 +157,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function lte($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) <= $value;
         };
     }
@@ -170,7 +170,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function in($field, array $values)
     {
-        return function($object) use ($field, $values) {
+        return function ($object) use ($field, $values) {
             return in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values);
         };
     }
@@ -183,7 +183,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function notIn($field, array $values)
     {
-        return function($object) use ($field, $values) {
+        return function ($object) use ($field, $values) {
             return !in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values);
         };
     }
@@ -196,7 +196,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function contains($field, $value)
     {
-        return function($object) use ($field, $value) {
+        return function ($object) use ($field, $value) {
             return false !== strpos(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
         };
     }
@@ -210,7 +210,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
     public function notContains($field, $value)
     {
         $self = $this;
-        return function($object) use ($self, $field, $value) {
+        return function ($object) use ($self, $field, $value) {
             $contains = $self->contains($field, $value);
             return !$contains($object);
         };
@@ -223,7 +223,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function andX(array $expressions)
     {
-        return function($object) use ($expressions) {
+        return function ($object) use ($expressions) {
             foreach ($expressions as $expression) {
                 if (!$expression($object)) {
                     return false;
@@ -232,7 +232,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
 
             return true;
         };
-
     }
 
     /**
@@ -243,7 +242,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
     public function nandX(array $expressions)
     {
         $self = $this;
-        return function($object) use ($self, $expressions) {
+        return function ($object) use ($self, $expressions) {
             $andX = $self->andX($expressions);
             return !$andX($object);
         };
@@ -256,7 +255,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function orX(array $expressions)
     {
-        return function($object) use ($expressions) {
+        return function ($object) use ($expressions) {
             foreach ($expressions as $expression) {
                 if ($expression($object)) {
                     return true;
@@ -275,7 +274,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
     public function norX(array $expressions)
     {
         $self = $this;
-        return function($object) use ($self, $expressions) {
+        return function ($object) use ($self, $expressions) {
             $orX = $self->orX($expressions);
             return !$orX($object);
         };
@@ -288,7 +287,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function xorX(array $expressions)
     {
-        return function($object) use ($expressions) {
+        return function ($object) use ($expressions) {
             $result = 0;
             foreach ($expressions as $expression) {
                 if ($expression($object)) {

@@ -200,7 +200,7 @@ class Lexer extends AbstractLexer
      *
      * @return array
      */
-    static public function getTokenSyntax($tokenType)
+    public static function getTokenSyntax($tokenType)
     {
         $tokenSyntax = array();
         // Punctuation
