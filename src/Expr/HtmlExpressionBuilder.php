@@ -38,10 +38,10 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
      */
     public function __construct(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
     {
-        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: function ($field, $operator, $value) {
+        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: function($field, $operator, $value) {
             return sprintf('<div>%s %s %s</div>', $field, $operator, $value);
         };
-        $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: function (array $expressions, $type) {
+        $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: function(array $expressions, $type) {
             return str_replace(
                 array('{type}', '{expressions}'),
                 array($type, implode('', $expressions)),
