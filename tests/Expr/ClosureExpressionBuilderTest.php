@@ -44,9 +44,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testIsNull($field, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->isNull($field);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->isNull($field)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -68,9 +69,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testEq($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->eq($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->eq($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -92,9 +94,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testNeq($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->neq($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->neq($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -116,9 +119,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testGt($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->gt($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->gt($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -140,9 +144,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testGte($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->gte($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->gte($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -164,9 +169,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testLt($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->lt($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->lt($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -188,17 +194,18 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testLte($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->lte($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->lte($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
     public function inDataProvider()
     {
         return array(
-            array('field_number_5', [1], false),
-            array('field_number_5', [1, 2, 3, 4, 5], true),
+            array('field_number_5', array(1), false),
+            array('field_number_5', array(1, 2, 3, 4, 5), true),
         );
     }
 
@@ -211,9 +218,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testIn($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->in($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->in($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -226,9 +234,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testNotIn($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->notIn($field, $value);
         $this->assertEquals(
             !$expectedResult,
-            $this->closureExpressionBuilder->notIn($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -249,9 +258,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testContains($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->contains($field, $value);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->contains($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -264,9 +274,10 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testNotContains($field, $value, $expectedResult)
     {
+        $expression = $this->closureExpressionBuilder->notContains($field, $value);
         $this->assertEquals(
             !$expectedResult,
-            $this->closureExpressionBuilder->notContains($field, $value)($this->exampleData)
+            $expression($this->exampleData)
         );
     }
 
@@ -293,9 +304,10 @@ class ClosureExpressionBuilderTest extends TestCase
                 return $value;
             };
         }, $expressions);
+        $expression = $this->closureExpressionBuilder->andX($expressionsCallable);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->andX($expressionsCallable)('useless_data')
+            $expression('useless_data')
         );
     }
 
@@ -312,9 +324,10 @@ class ClosureExpressionBuilderTest extends TestCase
                 return $value;
             };
         }, $expressions);
+        $expression = $this->closureExpressionBuilder->nandX($expressionsCallable);
         $this->assertEquals(
             !$expectedResult,
-            $this->closureExpressionBuilder->nandX($expressionsCallable)('useless_data')
+            $expression('useless_data')
         );
     }
 
@@ -341,9 +354,10 @@ class ClosureExpressionBuilderTest extends TestCase
                 return $value;
             };
         }, $expressions);
+        $expression = $this->closureExpressionBuilder->orX($expressionsCallable);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->orX($expressionsCallable)('useless_data')
+            $expression('useless_data')
         );
     }
 
@@ -360,9 +374,10 @@ class ClosureExpressionBuilderTest extends TestCase
                 return $value;
             };
         }, $expressions);
+        $expression = $this->closureExpressionBuilder->norX($expressionsCallable);
         $this->assertEquals(
             !$expectedResult,
-            $this->closureExpressionBuilder->norX($expressionsCallable)('useless_data')
+            $expression('useless_data')
         );
     }
 
@@ -398,9 +413,10 @@ class ClosureExpressionBuilderTest extends TestCase
                 return $value;
             };
         }, $expressions);
+        $expression = $this->closureExpressionBuilder->xorX($expressionsCallable);
         $this->assertEquals(
             $expectedResult,
-            $this->closureExpressionBuilder->xorX($expressionsCallable)('useless_data')
+            $expression('useless_data')
         );
     }
 }

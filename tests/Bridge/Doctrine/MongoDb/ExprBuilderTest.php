@@ -135,7 +135,7 @@ class ExprBuilderTest extends TestCase
     public function testIn($field, $value)
     {
         $this->assertEquals(
-            $this->createExpr()->field('field')->in(['value']),
+            $this->createExpr()->field('field')->in(array('value')),
             $this->exprBuilder->in($field, array($value))
         );
     }
@@ -149,7 +149,7 @@ class ExprBuilderTest extends TestCase
     public function testNotIn($field, $value)
     {
         $this->assertEquals(
-            $this->createExpr()->field('field')->notIn(['value']),
+            $this->createExpr()->field('field')->notIn(array('value')),
             $this->exprBuilder->notIn($field, array($value))
         );
     }

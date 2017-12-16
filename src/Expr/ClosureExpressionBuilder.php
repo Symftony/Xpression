@@ -18,7 +18,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
             return $object[$field];
         }
 
-        $accessors = ['get', 'is'];
+        $accessors = array('get', 'is');
 
         foreach ($accessors as $accessor) {
             $accessor .= $field;
@@ -209,8 +209,10 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function notContains($field, $value)
     {
-        return function($object) use ($field, $value) {
-            return !$this->contains($field, $value)($object);
+        $self = $this;
+        return function($object) use ($self, $field, $value) {
+            $contains = $self->contains($field, $value);
+            return !$contains($object);
         };
     }
 
@@ -240,8 +242,10 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function nandX(array $expressions)
     {
-        return function($object) use ($expressions) {
-            return !$this->andX($expressions)($object);
+        $self = $this;
+        return function($object) use ($self, $expressions) {
+            $andX = $self->andX($expressions);
+            return !$andX($object);
         };
     }
 
@@ -270,8 +274,10 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      */
     public function norX(array $expressions)
     {
-        return function($object) use ($expressions) {
-            return !$this->orX($expressions)($object);
+        $self = $this;
+        return function($object) use ($self, $expressions) {
+            $orX = $self->orX($expressions);
+            return !$orX($object);
         };
     }
 
