@@ -5,48 +5,52 @@ cache:
     - vendor/
 
 before_install:
-  - phpenv config-rm xdebug.ini
+  # Disable xdebug if php version != 7.2 (only use xdebug for reports)
+  - if [[ $ENABLE_CODE_COVERAGE == false ]]; then phpenv config-rm xdebug.ini; fi
+  # Enable mongo/mongodb extension regarding php version
   - echo "extension = ${MONGO_EXT_NAME}.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo "php ext-${MONGO_EXT_NAME} extension enabled."
+  # Require alcaeus/mongo-php-adapter for php >= 7 tests
+  - if [[ $TRAVIS_PHP_VERSION == 7.* ]]; then composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter; fi
+  # Require doctine collections/orm/mongodb to launch ALL tests
+  - composer require doctrine/collections:">=1.0" doctrine/orm:">=2.0" doctrine/mongodb:">=1.0"
+
+env:
+  global:
+    - MONGO_EXT_NAME=mongo
+    - ENABLE_CODE_COVERAGE=false
 
 before_script:
-  - composer require doctrine/collections:">=1.0" doctrine/orm:">=2.0" doctrine/mongodb:">=1.0"
   - composer install
+
+script:
+  - ./vendor/bin/phpunit --coverage-clover=coverage.xml
+
+after_success:
+  - if [[ $ENABLE_CODE_COVERAGE ]]; then bash <(curl -s https://codecov.io/bash); fi
 
 matrix:
   include:
 #===== TESTS
     - php: '5.3'
       dist: precise
-      env:
-        - MONGO_EXT_NAME=mongo
     - php: '5.4'
-      env:
-        - MONGO_EXT_NAME=mongo
     - php: '5.5'
-      env:
-        - MONGO_EXT_NAME=mongo
     - php: '5.6'
-      env:
-        - MONGO_EXT_NAME=mongo
     - php: '7.0'
       env:
         - MONGO_EXT_NAME=mongodb
-      install:
-        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
     - php: '7.1'
       env:
         - MONGO_EXT_NAME=mongodb
-      install:
-        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
     - php: '7.2'
       env:
         - MONGO_EXT_NAME=mongodb
-      install:
-        - composer config "platform.ext-mongo" "1.6.16" && composer require alcaeus/mongo-php-adapter
-
+        - ENABLE_CODE_COVERAGE=true
 #===== CODE INSPECTION
     - stage: 'code-inspection'
       php: '7.2'
+      env: ''
       before_install: ''
       before_script:
         - composer require phpmd/phpmd:"@stable" squizlabs/php_codesniffer:"@stable"
@@ -56,7 +60,3 @@ matrix:
         - ./vendor/bin/phpcs --standard=PSR1 src/
         - ./vendor/bin/phpcs --standard=PSR2 src/
         - ./vendor/bin/phpmd src/ text codesize,unusedcode,naming,design,cleancode
-
-script:
-  - ./vendor/bin/phpunit
-
