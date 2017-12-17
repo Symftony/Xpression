@@ -4,6 +4,7 @@ namespace Tests\Symftony\Xpression\Bridge\Doctrine\Common;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Expr\ClosureExpressionBuilder;
+use Symftony\Xpression\Lexer;
 
 class ClosureExpressionBuilderTest extends TestCase
 {
@@ -26,6 +27,73 @@ class ClosureExpressionBuilderTest extends TestCase
             'field_string' => 'my_fake_string',
         );
         $this->closureExpressionBuilder = new ClosureExpressionBuilder();
+    }
+
+    public function getObjectFieldValueDataProvider()
+    {
+        $object = new \stdClass();
+        $object->property = 'fake_property';
+        $object->_property4 = 'fake_property';
+
+        return array(
+            array(
+                array('fake_key' => 'fake_value'),
+                'fake_key',
+                'fake_value'
+            ),
+            array(
+                new FakeClass(),
+                'property1',
+                'fake_is_property'
+            ),
+            array(
+                new FakeClass(),
+                'property2',
+                'fake_get_property'
+            ),
+            array(
+                new FakeClass(),
+                'callProperty',
+                'getcallProperty'
+            ),
+            array(
+                new FakeArrayAccess(),
+                'callProperty',
+                'callProperty'
+            ),
+            array(
+                $object,
+                'property',
+                'fake_property'
+            ),
+            array(
+                new FakeClass2(),
+                '_property4',
+                'property4'
+            ),
+            array(
+                $object,
+                '_property4',
+                'fake_property'
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getObjectFieldValueDataProvider
+     *
+     * @param $object
+     * @param $value
+     * @param $expectedResult
+     */
+    public function testGetObjectFieldValue($object, $value, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ClosureExpressionBuilder::getObjectFieldValue($object, $value));
+    }
+
+    public function testGetSupportedTokenType()
+    {
+        $this->assertEquals(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
     }
 
     public function isNullDataProvider()
@@ -418,5 +486,66 @@ class ClosureExpressionBuilderTest extends TestCase
             $expectedResult,
             $expression('useless_data')
         );
+    }
+}
+
+class FakeClass
+{
+    public function isProperty1()
+    {
+        return 'fake_is_property';
+    }
+
+    public function getProperty2()
+    {
+        return 'fake_get_property';
+    }
+
+    public function isPROPERTY3()
+    {
+        return 'property3';
+    }
+
+    public function getPROPERTY4()
+    {
+        return 'property4';
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $name . implode(', ', $arguments);
+    }
+}
+
+class FakeClass2
+{
+    public function isPROPERTY3()
+    {
+        return 'property3';
+    }
+
+    public function getPROPERTY4()
+    {
+        return 'property4';
+    }
+}
+
+class FakeArrayAccess implements \ArrayAccess
+{
+    public function offsetExists($offset)
+    {
+    }
+
+    public function offsetGet($offset)
+    {
+        return $offset;
+    }
+
+    public function offsetSet($offset, $value)
+    {
+    }
+
+    public function offsetUnset($offset)
+    {
     }
 }
