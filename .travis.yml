@@ -59,4 +59,4 @@ matrix:
       script:
         - ./vendor/bin/phpcs --standard=PSR1 src/
         - ./vendor/bin/phpcs --standard=PSR2 src/
-        - ./vendor/bin/phpmd src/ text codesize,unusedcode,naming,design,cleancode
+#        - ./vendor/bin/phpmd src/ text codesize,unusedcode,naming,design,cleancode
