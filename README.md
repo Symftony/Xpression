@@ -1,8 +1,8 @@
 # Xpression
 
-[![codecov](https://codecov.io/gh/Symftony/Xpression/branch/master/graph/badge.svg)](https://codecov.io/gh/Symftony/Xpression)
-[![Build Status](https://travis-ci.org/Symftony/Xpression.svg?branch=master)](https://travis-ci.org/Symftony/Xpression)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Symftony/Xpression/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Symftony/Xpression/?branch=master)
+[![Codecov](https://img.shields.io/codecov/c/github/Symftony/Xpression.svg?style=flat&maxAge=60)]()
+[![Travis branch](https://img.shields.io/travis/Symftony/Xpression.svg?style=flat&maxAge=60)]()
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/Symftony/Xpression.svg?style=flat&maxAge=60)]()
 [![Latest Unstable Version](https://poser.pugx.org/symftony/xpression/v/unstable)](https://packagist.org/packages/symftony/xpression)
 [![Latest Stable Version](https://poser.pugx.org/symftony/xpression/v/stable)](https://packagist.org/packages/symftony/xpression)
 [![Total Downloads](https://poser.pugx.org/symftony/xpression/downloads)](https://packagist.org/packages/symftony/xpression)
