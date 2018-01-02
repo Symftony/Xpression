@@ -51,11 +51,22 @@ class Parser
 
     /**
      * @param ExpressionBuilderInterface $expressionBuilder
+     * @param Lexer $lexer
      */
-    public function __construct(ExpressionBuilderInterface $expressionBuilder)
+    public function __construct(ExpressionBuilderInterface $expressionBuilder, Lexer $lexer)
     {
-        $this->lexer = new Lexer();
+        $this->lexer = $lexer;
         $this->expressionBuilder = $expressionBuilder;
+    }
+
+    /**
+     * @param ExpressionBuilderInterface $expressionBuilder
+     *
+     * @return Parser
+     */
+    public static function create(ExpressionBuilderInterface $expressionBuilder)
+    {
+        return new self($expressionBuilder, new Lexer());
     }
 
     /**
@@ -80,7 +91,7 @@ class Parser
             throw new \InvalidArgumentException('Allowed operator must be an integer.');
         }
 
-        $this->allowedTokenType = $allowedTokenType ?: Lexer::T_ALL;
+        $this->allowedTokenType = null !== $allowedTokenType ? $allowedTokenType : Lexer::T_ALL;
         $this->supportedTokenType = $this->expressionBuilder->getSupportedTokenType();
 
         try {

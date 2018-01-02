@@ -25,7 +25,7 @@ class ParserTest extends TestCase
         }
 
         $this->exprBuilder = new ExprBuilder();
-        $this->parser = new Parser($this->exprBuilder);
+        $this->parser = Parser::create($this->exprBuilder);
     }
 
     public function parseSuccessDataProvider()

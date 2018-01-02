@@ -25,7 +25,7 @@ class ParserTest extends TestCase
             $this->markTestSkipped('This test is run when you have "doctrine/orm" installed.');
         }
         $this->exprAdapter = new ExprAdapter(new Expr());
-        $this->parser = new Parser($this->exprAdapter);
+        $this->parser = Parser::create($this->exprAdapter);
     }
 
     public function parseSuccessDataProvider()

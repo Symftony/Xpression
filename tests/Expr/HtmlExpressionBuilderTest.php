@@ -16,7 +16,39 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function setUp()
     {
-        $this->closureExpressionBuilder = new HtmlExpressionBuilder();
+        $this->closureExpressionBuilder = HtmlExpressionBuilder::create();
+    }
+
+    public function testCustomComparisonHtmlBuilder()
+    {
+        $closureExpressionBuilder = HtmlExpressionBuilder::create(function($field, $operator, $value){return $field.$operator.$value;});
+
+        $this->assertEquals('field_nullisnull', $closureExpressionBuilder->isNull('field_null'));
+    }
+
+    public function testCustomCompositeHtmlBuilder()
+    {
+        $closureExpressionBuilder = HtmlExpressionBuilder::create(null, function($expressions, $type){return implode('', $expressions).$type;});
+
+        $this->assertEquals('field_nullfield_nulland', $closureExpressionBuilder->andX(array('field_null', 'field_null')));
+    }
+
+    public function testComparisonHtmlBuilder()
+    {
+        $reflectionProperty = new \ReflectionProperty($this->closureExpressionBuilder, 'comparisonHtmlBuilder');
+        $reflectionProperty->setAccessible(true);
+        $comparisonHtmlBuilder = $reflectionProperty->getValue($this->closureExpressionBuilder);
+
+        $this->assertEquals('<div>A B C</div>', $comparisonHtmlBuilder('A', 'B', 'C'));
+    }
+
+    public function testCompositeHtmlBuilder()
+    {
+        $reflectionProperty = new \ReflectionProperty($this->closureExpressionBuilder, 'compositeHtmlBuilder');
+        $reflectionProperty->setAccessible(true);
+        $compositeHtmlBuilder = $reflectionProperty->getValue($this->closureExpressionBuilder);
+
+        $this->assertEquals('<fieldset><legend>C</legend>AB</fieldset>', $compositeHtmlBuilder(array('A', 'B'), 'C'));
     }
 
     public function testGetSupportedTokenType()

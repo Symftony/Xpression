@@ -36,18 +36,26 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
      * @param $comparisonHtmlBuilder
      * @param $compositeHtmlBuilder
      */
-    public function __construct(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
+    public function __construct(callable $comparisonHtmlBuilder, callable $compositeHtmlBuilder)
     {
-        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: function ($field, $operator, $value) {
-            return sprintf('<div>%s %s %s</div>', $field, $operator, $value);
-        };
-        $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: function (array $expressions, $type) {
-            return str_replace(
-                array('{type}', '{expressions}'),
-                array($type, implode('', $expressions)),
-                '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
-            );
-        };
+        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder;
+        $this->compositeHtmlBuilder = $compositeHtmlBuilder;
+    }
+
+    public static function create(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
+    {
+        return new self(
+            $comparisonHtmlBuilder ?: function ($field, $operator, $value) {
+                return sprintf('<div>%s %s %s</div>', $field, $operator, $value);
+            },
+            $compositeHtmlBuilder ?: function (array $expressions, $type) {
+                return str_replace(
+                    array('{type}', '{expressions}'),
+                    array($type, implode('', $expressions)),
+                    '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
+                );
+            }
+        );
     }
 
     /**

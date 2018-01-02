@@ -4,6 +4,7 @@ namespace Tests\Symftony\Xpression;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symftony\Xpression\Exception\Lexer\LexerException;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
@@ -25,7 +26,12 @@ class ParserTest extends TestCase
         $this->expressionBuilderMock = $this->prophesize('Symftony\Xpression\Expr\ExpressionBuilderInterface');
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL);
 
-        $this->parser = new Parser($this->expressionBuilderMock->reveal());
+        $this->parser = Parser::create($this->expressionBuilderMock->reveal());
+    }
+
+    public function testGetAllowedTokenType()
+    {
+        $this->assertNull($this->parser->getAllowedTokenType());
     }
 
     public function parseSuccessDataProvider()
@@ -419,4 +425,70 @@ class ParserTest extends TestCase
 
         $this->parser->parse('fieldA=1');
     }
+
+    public function parseThrowInvalidArgumentExceptionDataProvider()
+    {
+        return array(
+            array('a'),
+            array(array()),
+            array(new \stdClass()),
+        );
+    }
+
+    /**
+     * @dataProvider parseThrowInvalidArgumentExceptionDataProvider
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Allowed operator must be an integer.
+     *
+     * @param $allowedTokenType
+     */
+    public function testParseThrowInvalidArgumentException($allowedTokenType)
+    {
+        $this->parser->parse('fieldA=1', $allowedTokenType);
+    }
+
+    /**
+     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+     */
+    public function testParseThrowInvalidExpressionException()
+    {
+        $lexerMock = $this->prophesize(Lexer::class);
+        $lexerMock->setInput('fieldA=1')->willThrow(new LexerException());
+
+        $parser = new Parser($this->expressionBuilderMock->reveal(), $lexerMock->reveal());
+
+        $parser->parse('fieldA=1');
+    }
+
+    /**
+     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+     */
+    public function testParseThrowForbiddenTokenException()
+    {
+        $this->parser->parse('fieldA=1', 0);
+    }
+//
+//    /**
+//     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
+//     * @expectedExceptionMessage Invalid expression.
+//     */
+//    public function testParseThrowLogicException()
+//    {
+////        $this->expressionBuilderMock->getSupportedTokenType()->willReturn(3);
+//
+//        $lexerMock = $this->prophesize(Lexer::class);
+////        $lexerMock->setInput('fieldA=1')->shouldBeCalled();
+////        $lexerMock->moveNext()->shouldBeCalled(2);
+////        $lexerMock->getTokenSyntax('mmm')->willReturn('PPP')->shouldBeCalled();
+//        $lexerMock->token = array(
+//            'value' => 'fieldA',
+//            'type'  => 2,
+//            'position' => 1,
+//        );
+//
+//        $parser = new Parser($this->expressionBuilderMock->reveal(), $lexerMock->reveal());
+//
+//        $parser->parse('fieldA=1');
+//    }
 }
