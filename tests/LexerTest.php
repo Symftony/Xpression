@@ -4,6 +4,7 @@ namespace Tests\Symftony\Xpression;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Lexer;
+use Symftony\Xpression\LexerFactory;
 
 class LexerTest extends TestCase
 {
@@ -14,32 +15,7 @@ class LexerTest extends TestCase
 
     public function setUp()
     {
-        $this->lexer = new Lexer(array(
-            new Lexer\CommaTokenType(),
-            new Lexer\FloatTokenType(),
-            new Lexer\IntegerTokenType(),
-            new Lexer\StringTokenType(),
-            new Lexer\InputParameterTokenType(),
-            new Lexer\EqualTokenType(),
-            new Lexer\NotEqualTokenType(),
-            new Lexer\GreaterThanTokenType(),
-            new Lexer\GreaterThanEqualTokenType(),
-            new Lexer\LowerThanTokenType(),
-            new Lexer\LowerThanEqualTokenType(),
-            new Lexer\NotAndTokenType(),
-            new Lexer\NotOrTokenType(),
-            new Lexer\AndTokenType(),
-            new Lexer\OrTokenType(),
-            new Lexer\XorTokenType(),
-            new Lexer\OpenParenthesisTokenType(),
-            new Lexer\CloseParenthesisTokenType(),
-            new Lexer\OpenSquareBracketTokenType(),
-            new Lexer\NotOpenSquareBracketTokenType(),
-            new Lexer\CloseSquareBracketTokenType(),
-            new Lexer\DoubleOpenCurlyBracketTokenType(),
-            new Lexer\NotDoubleOpenCurlyBracketTokenType(),
-            new Lexer\DoubleCloseCurlyBracketTokenType(),
-        ));
+        $this->lexer = LexerFactory::getLexer();
     }
 
     public function setInputSuccessDataProvider()

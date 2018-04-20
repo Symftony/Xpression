@@ -3,7 +3,9 @@
 namespace Symftony\Xpression;
 
 use Doctrine\Common\Lexer\AbstractLexer;
+use Symftony\Xpression\Exception\Lexer\InvalidArgumentException;
 use Symftony\Xpression\Exception\Lexer\UnknownTokenTypeException;
+use Symftony\Xpression\Lexer\TokenTypeInterface;
 
 class Lexer extends AbstractLexer
 {
@@ -12,15 +14,35 @@ class Lexer extends AbstractLexer
      */
     private $tokenTypes;
 
-    public function __construct($tokenTypes)
-    {
-//        foreach ($tokenTypes as $tokenType) {
-//            if ($tokenType instan) {
-//
-//            }
-//        }
+    /**
+     * @var array
+     */
+    private $nonCatchablePatterns;
 
-        $this->tokenTypes = $tokenTypes;
+    /**
+     * @param $tokenTypes
+     * @param $nonCatchablePatterns
+     */
+    public function __construct(array $tokenTypes, array $nonCatchablePatterns = null)
+    {
+        $this->tokenTypes = array();
+
+        foreach ($tokenTypes as $tokenType) {
+            if (!($tokenType instanceof TokenTypeInterface)) {
+                throw new InvalidArgumentException('Token type must implement TokenTypeInterface.');
+            }
+            $this->tokenTypes[get_class($tokenType)] = $tokenType;
+        }
+
+        $this->nonCatchablePatterns = $nonCatchablePatterns ?: array('\s+', '(.)',);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTokenTypes()
+    {
+        return $this->tokenTypes;
     }
 
     /**
@@ -28,7 +50,7 @@ class Lexer extends AbstractLexer
      */
     protected function getCatchablePatterns()
     {
-        return array_map(function ($tokenType) {
+        return array_map(function (TokenTypeInterface $tokenType) {
             return implode('|', $tokenType->getCatchablePatterns());
         }, $this->tokenTypes);
     }
@@ -38,10 +60,7 @@ class Lexer extends AbstractLexer
      */
     protected function getNonCatchablePatterns()
     {
-        return array(
-            '\s+',
-            '(.)',
-        );
+        return $this->nonCatchablePatterns;
     }
 
     /**
@@ -62,15 +81,20 @@ class Lexer extends AbstractLexer
         throw new UnknownTokenTypeException($value);
     }
 
+    /**
+     * @param int $token
+     *
+     * @return mixed
+     *
+     * @throws UnknownTokenTypeException
+     */
     public function getLiteral($token)
     {
-        foreach ($this->tokenTypes as $tokenType) {
-            if (get_class($tokenType) === $token) {
-                return $tokenType->getLiteral();
-            }
+        if (!array_key_exists($token, $this->tokenTypes)) {
+            throw new UnknownTokenTypeException($token);
         }
 
-        throw new UnknownTokenTypeException($token);
+        return $this->tokenTypes[$token]->getLiteral();
     }
 
     /**

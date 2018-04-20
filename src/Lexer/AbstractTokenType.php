@@ -2,7 +2,7 @@
 
 namespace Symftony\Xpression\Lexer;
 
-abstract class AbstractTokenType
+abstract class AbstractTokenType implements TokenTypeInterface
 {
     public function getLiteral()
     {
