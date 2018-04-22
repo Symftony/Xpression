@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Symftony\Xpression;
+namespace Symftony\Xpression\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Lexer;
@@ -28,15 +28,87 @@ class LexerTest extends TestCase
                 ),
             ),
             array(
+                '.5',
+                array(
+                    array('value' => .5, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-.5',
+                array(
+                    array('value' => -.5, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
+                ),
+            ),
+            array(
                 '1.5',
                 array(
                     array('value' => 1.5, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
                 ),
             ),
             array(
+                '-1.5',
+                array(
+                    array('value' => -1.5, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '1.2e3',
+                array(
+                    array('value' => 1200.0, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-1.2e3',
+                array(
+                    array('value' => -1200.0, 'type' => 'Symftony\Xpression\Lexer\FloatTokenType', 'position' => 0),
+                ),
+            ),
+            array(
                 '1',
                 array(
                     array('value' => 1, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-1',
+                array(
+                    array('value' => -1, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '014',
+                array(
+                    array('value' => 12, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-014',
+                array(
+                    array('value' => -12, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '0x1A',
+                array(
+                    array('value' => 26, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-0x1A',
+                array(
+                    array('value' => -26, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '0b101',
+                array(
+                    array('value' => 5, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
+                ),
+            ),
+            array(
+                '-0b101',
+                array(
+                    array('value' => -5, 'type' => 'Symftony\Xpression\Lexer\IntegerTokenType', 'position' => 0),
                 ),
             ),
             array(
@@ -113,7 +185,7 @@ class LexerTest extends TestCase
         $this->lexer->moveNext();
         $i = 0;
         while ($currentToken = $this->lexer->token) {
-            $this->assertEquals($expectedTokens[$i], $currentToken);
+            $this->assertSame($expectedTokens[$i], $currentToken);
             $this->lexer->moveNext();
             $i++;
         }
@@ -170,7 +242,7 @@ class LexerTest extends TestCase
             ),
             array(
                 array('Symftony\Xpression\Lexer\IntegerTokenType'),
-                array('all integer (1 / -2 / 03 / 0x1A / Ob101)'),
+                array('signed integer (1 / 0b101 / 0x1A / 03)'),
             ),
             array(
                 array('Symftony\Xpression\Lexer\StringTokenType'),
