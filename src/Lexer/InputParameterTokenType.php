@@ -16,6 +16,6 @@ class InputParameterTokenType extends AbstractTokenType
 
     public function supportValue(&$value)
     {
-        return preg_match('/' . implode('|', $this->getCatchablePatterns()) . '/', $value);
+        return (bool)preg_match('/' . implode('|', $this->getCatchablePatterns()) . '/', $value);
     }
 }

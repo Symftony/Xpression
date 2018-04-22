@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Symftony\Xpression;
+namespace Symftony\Xpression\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
