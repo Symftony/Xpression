@@ -96,6 +96,13 @@ class QueryStringParserTest extends TestCase
                 )
             ),
             array(
+                'query={price{{test}}&price=6}',
+                'query=price%7B%7Btest%7D%7D%26price%3D6',
+                array(
+                    'query' => 'price{{test}}&price=6',
+                )
+            ),
+            array(
                 'query={valueA}',
                 'query=valueA',
                 array(
