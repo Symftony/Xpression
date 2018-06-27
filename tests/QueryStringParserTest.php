@@ -89,6 +89,13 @@ class QueryStringParserTest extends TestCase
 
             // With Xpression
             array(
+                'query{{valueA}}',
+                'query{{valueA}}',
+                array(
+                    'query{{valueA}}' => '',
+                )
+            ),
+            array(
                 'query={valueA}',
                 'query=valueA',
                 array(
@@ -151,16 +158,16 @@ class QueryStringParserTest extends TestCase
             ),
             array(
                 'query-A={}valueA',
-                'query-A=valueA',
+                'query-A={}valueA',
                 array(
-                    'query-A' => 'valueA',
+                    'query-A' => '{}valueA',
                 )
             ),
             array(
                 'query-A={{valueA}}',
-                'query-A=%7BvalueA}',
+                'query-A={{valueA}}',
                 array(
-                    'query-A' => '{valueA}',
+                    'query-A' => '{{valueA}}',
                 )
             ),
         );

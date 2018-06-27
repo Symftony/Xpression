@@ -6,8 +6,10 @@ class QueryStringParser
 {
     public static function correctServerQueryString()
     {
-        $_SERVER['QUERY_STRING'] = self::encodeXpression($_SERVER['QUERY_STRING']);
-        parse_str($_SERVER['QUERY_STRING'], $_GET);
+        if (isset($_SERVER['QUERY_STRING'])) {
+            $_SERVER['QUERY_STRING'] = self::encodeXpression($_SERVER['QUERY_STRING']);
+            parse_str($_SERVER['QUERY_STRING'], $_GET);
+        }
     }
 
     /**
@@ -17,8 +19,11 @@ class QueryStringParser
      */
     public static function encodeXpression($queryString)
     {
-        return preg_replace_callback('/\{(\S*)\}/U', function ($matches) {
-            return urlencode($matches[1]);
-        }, urldecode($queryString));
+        return preg_replace_callback(
+            '/(=)\{([^}\s]*(?:}}[^}\s]*)*)(?:(?:}(&))|(?:}$))/',
+            function ($matches) {
+                return $matches[1] . urlencode($matches[2]) . (isset($matches[3]) ? $matches[3] : '');
+            }, urldecode($queryString)
+        );
     }
 }
