@@ -238,6 +238,7 @@ class Parser
                 case Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET:
                     $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $containsValue));
                     $comparisonMethod = null;
+                    $comparisonFirstOperande = null;
                     $contains = false;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;

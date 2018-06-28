@@ -194,6 +194,17 @@ class ParserTest extends TestCase
                 'my_fake_andX_composite'
             ),
             array(
+                'fieldA{{value}}&fieldB=2',
+                array(
+                    array('contains', 'fieldA', 'value', 'my_fake_comparison_A'),
+                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
+                ),
+                array(
+                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B'), 'my_fake_andX_composite'),
+                ),
+                'my_fake_andX_composite'
+            ),
+            array(
                 'fieldA=1!&fieldB=2!&fieldC=3',
                 array(
                     array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
