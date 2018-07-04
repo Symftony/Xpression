@@ -128,6 +128,8 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
     }
 
     /**
+     * /!\ Contains operator appear only in doctrine/common v1.1 /!\
+     *
      * @param string $field
      * @param mixed $value
      *
@@ -135,14 +137,16 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
      */
     public function contains($field, $value)
     {
+        if (!method_exists($this->expressionBuilder, 'contains')) {
+            throw new UnsupportedExpressionTypeException('contains');
+        }
+
         return $this->expressionBuilder->contains($field, $value);
     }
 
     /**
      * @param string $field
      * @param mixed $value
-     *
-     * @return Comparison
      */
     public function notContains($field, $value)
     {

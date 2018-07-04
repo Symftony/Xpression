@@ -26,9 +26,11 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     public function testIsNull()
     {
+        $isv0 = !defined('Doctrine\Common\Collections\Expr\Comparison::CONTAINS');
+
         $field = 'fake_field';
         $this->assertEquals(
-            new Comparison('fake_field', '=', null),
+            new Comparison('fake_field', $isv0 ? 'IS' : '=', null),
             $this->expressionBuilderAdapter->isNull($field)
         );
     }
@@ -164,6 +166,13 @@ class ExpressionBuilderAdapterTest extends TestCase
      */
     public function testContains($field, $value)
     {
+        if (!method_exists('Doctrine\Common\Collections\ExpressionBuilder', 'contains')) {
+            $this->expectException('\Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException');
+            $this->expectExceptionMessage('Unsupported expression type "contains".');
+
+            $this->assertNull($this->expressionBuilderAdapter->contains($field, $value));
+        }
+
         $this->assertEquals(
             new Comparison('field', 'CONTAINS', 'value'),
             $this->expressionBuilderAdapter->contains($field, $value)
