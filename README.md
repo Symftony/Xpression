@@ -53,7 +53,6 @@ greater than | `>` | `param>value` | X | X | X | X |
 greater than equal | `>=` `≥` | `param>=value` `param≥value` | X | X | X | X |
 less than | `<` | `param<value` | X | X | X | X |
 less than equal | `<=` `≤` | `param<=value` `param≤value` | X | X | X | X |
-less than equal | `<=` `≤` | `param<=value` `param≤value` | X | X | X | X |
 in | `[` `]` | `param[value1,value2]` | X | X | X | X |
 contains | `{{` `}}` | `param{{value}}` | X | X |  | X |
 not contains | `!{{` `}}` | `param!{{value}}` | X | X |  | X |
