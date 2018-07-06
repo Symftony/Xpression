@@ -20,7 +20,7 @@ class QueryStringParser
     public static function encodeXpression($queryString)
     {
         return preg_replace_callback(
-            '/(=)\{([^}\s]*(?:}}[^}\s]*)*)(?:(?:}(&))|(?:}$))/',
+            '/(=)\{([^}]*(?:}}[^}]*)*)(?:(?:}(&))|(?:}$))/',
             function ($matches) {
                 return $matches[1] . urlencode($matches[2]) . (isset($matches[3]) ? $matches[3] : '');
             }, urldecode($queryString)

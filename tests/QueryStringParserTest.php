@@ -103,6 +103,13 @@ class QueryStringParserTest extends TestCase
                 )
             ),
             array(
+                'query={name{{test 2}}}',
+                'query=name%7B%7Btest+2%7D%7D',
+                array(
+                    'query' => 'name{{test 2}}',
+                )
+            ),
+            array(
                 'query={valueA}',
                 'query=valueA',
                 array(
