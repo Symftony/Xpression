@@ -2,6 +2,7 @@
 
 namespace Tests\Symftony\Xpression\Bridge\Doctrine\ORM;
 
+use Doctrine\ORM\Query\AST\Literal;
 use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Query\Expr;
 use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
@@ -38,6 +39,10 @@ class ParserTest extends TestCase
             array(
                 'fieldA=1',
                 new Expr\Comparison('fieldA', '=', 1),
+            ),
+            array(
+                'fieldA="string"',
+                new Expr\Comparison('fieldA', '=', (new Expr())->literal('string')),
             ),
             array(
                 'fieldA≥1',

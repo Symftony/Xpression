@@ -22,6 +22,11 @@ class ExprAdapterTest extends TestCase
         $this->exprAdapter = new ExprAdapter(new Expr());
     }
 
+    public function testValueAsString()
+    {
+        $this->assertEquals((new Expr())->literal('my_fake_data'), $this->exprAdapter->valueAsString('my_fake_data'));
+    }
+
     public function testIsNull()
     {
         $field = 'fake_field';

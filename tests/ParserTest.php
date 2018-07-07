@@ -38,6 +38,12 @@ class ParserTest extends TestCase
                 'my_fake_comparison_A',
             ),
             array(
+                'fieldA="string"',
+                array(array('eq', 'fieldA', 'my_fake_string', 'my_fake_comparison_A')),
+                array(array('valueAsString', 'string', 'my_fake_string')),
+                'my_fake_comparison_A',
+            ),
+            array(
                 'fieldA>1',
                 array(array('gt', 'fieldA', 1, 'my_fake_comparison_A')),
                 array(),
@@ -348,6 +354,7 @@ class ParserTest extends TestCase
      * @param $input
      * @param $comparisonMethods
      * @param $compositeMethods
+     * @param $expectedResult
      */
     public function testParseSuccess($input, $comparisonMethods, $compositeMethods, $expectedResult)
     {

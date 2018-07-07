@@ -31,6 +31,15 @@ class ExprAdapter implements ExpressionBuilderInterface
     }
 
     /**
+     * @param $value
+     * @return Expr\Literal
+     */
+    public function valueAsString($value)
+    {
+        return $this->expr->literal($value);
+    }
+
+    /**
      * @param string $field
      *
      * @return string

@@ -26,6 +26,15 @@ class ExprBuilder implements ExpressionBuilderInterface
     }
 
     /**
+     * @param $value
+     * @return mixed
+     */
+    public function valueAsString($value)
+    {
+        return $value;
+    }
+
+    /**
      * @param string $field
      *
      * @return string

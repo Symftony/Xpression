@@ -24,6 +24,11 @@ class HtmlExpressionBuilderTest extends TestCase
         $this->assertEquals(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
     }
 
+    public function testValueAsString()
+    {
+        $this->assertEquals('"my_fake_data"', $this->closureExpressionBuilder->valueAsString('my_fake_data'));
+    }
+
     public function isNullDataProvider()
     {
         return array(

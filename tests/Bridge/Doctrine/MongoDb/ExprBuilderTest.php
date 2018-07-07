@@ -22,6 +22,11 @@ class ExprBuilderTest extends TestCase
         $this->exprBuilder = new ExprBuilder();
     }
 
+    public function testValueAsString()
+    {
+        $this->assertEquals('my_fake_data', $this->exprBuilder->valueAsString('my_fake_data'));
+    }
+
     public function testIsNull()
     {
         $field = 'fake_field';

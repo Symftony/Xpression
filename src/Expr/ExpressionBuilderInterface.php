@@ -12,6 +12,12 @@ interface ExpressionBuilderInterface
     public function getSupportedTokenType();
 
     /**
+     * @param $value
+     * @return mixed
+     */
+    public function valueAsString($value);
+
+    /**
      * @param string $field
      */
     public function isNull($field);

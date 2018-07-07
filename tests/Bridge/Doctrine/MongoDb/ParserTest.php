@@ -40,6 +40,10 @@ class ParserTest extends TestCase
                 array('fieldA' => 1),
             ),
             array(
+                'fieldA="string"',
+                array('fieldA' => 'string'),
+            ),
+            array(
                 'fieldA≥1',
                 array('fieldA' => array('$gte' => 1)),
             ),

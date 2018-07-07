@@ -24,6 +24,11 @@ class ExpressionBuilderAdapterTest extends TestCase
         $this->expressionBuilderAdapter = new ExpressionBuilderAdapter(new ExpressionBuilder());
     }
 
+    public function testValueAsString()
+    {
+        $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->valueAsString('my_fake_data'));
+    }
+
     public function testIsNull()
     {
         $isv0 = !defined('Doctrine\Common\Collections\Expr\Comparison::CONTAINS');

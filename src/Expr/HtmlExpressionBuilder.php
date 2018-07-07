@@ -7,14 +7,6 @@ use Symftony\Xpression\Lexer;
 class HtmlExpressionBuilder implements ExpressionBuilderInterface
 {
     /**
-     * @return int
-     */
-    public function getSupportedTokenType()
-    {
-        return Lexer::T_ALL;
-    }
-
-    /**
      * This callable is use to delegate the html generation to a third party
      * eg: $comparisonHtmlBuilder($field, $operator, $value)
      * it must return the html code
@@ -48,6 +40,23 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
                 '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
             );
         };
+    }
+
+    /**
+     * @return int
+     */
+    public function getSupportedTokenType()
+    {
+        return Lexer::T_ALL;
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    public function valueAsString($value)
+    {
+        return '"' . $value . '"';
     }
 
     /**

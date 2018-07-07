@@ -43,6 +43,10 @@ class ParserTest extends TestCase
                 new Comparison('fieldA', '=', 1),
             ),
             array(
+                'fieldA="string"',
+                new Comparison('fieldA', '=', 'string'),
+            ),
+            array(
                 'fieldA≥1',
                 new Comparison('fieldA', '>=', 1),
             ),

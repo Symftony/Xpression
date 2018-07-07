@@ -158,30 +158,41 @@ class Parser
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_INPUT_PARAMETER:
-                case Lexer::T_INTEGER:
+                    $currentTokenValue = $currentToken['value'];
                 case Lexer::T_STRING:
+                    if (!isset($currentTokenValue)) {
+                        $currentTokenValue = $this->expressionBuilder->valueAsString($currentToken['value']);
+                    }
+                case Lexer::T_INTEGER:
                 case Lexer::T_FLOAT:
+                    if (!isset($currentTokenValue)) {
+                        $currentTokenValue = $currentToken['value'];
+                    }
                     if (null === $comparisonFirstOperande) {
-                        $comparisonFirstOperande = $currentToken['value'];
+                        $comparisonFirstOperande = $currentTokenValue;
                         $expectedTokenType = Lexer::T_COMPARISON;
+                        $currentTokenValue = null;
                         break;
                     }
 
                     if (is_array($comparisonMultipleOperande)) {
-                        $comparisonMultipleOperande[] = $currentToken['value'];
+                        $comparisonMultipleOperande[] = $currentTokenValue;
                         $expectedTokenType = Lexer::T_COMMA | Lexer::T_CLOSE_SQUARE_BRACKET;
+                        $currentTokenValue = null;
                         break;
                     }
 
                     if ($contains) {
-                        $containsValue = $currentToken['value'];
+                        $containsValue = $currentTokenValue;
                         $expectedTokenType = Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
+                        $currentTokenValue = null;
                         break;
                     }
 
-                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $currentToken['value']));
+                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $currentTokenValue));
                     $comparisonFirstOperande = null;
                     $comparisonMethod = null;
+                    $currentTokenValue = null;
                     $expectedTokenType = Lexer::T_COMPOSITE | Lexer::T_CLOSE_PARENTHESIS;
                     break;
                 case Lexer::T_EQUALS:
