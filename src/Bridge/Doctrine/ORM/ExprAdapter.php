@@ -3,6 +3,7 @@
 namespace Symftony\Xpression\Bridge\Doctrine\ORM;
 
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Parameter;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 use Symftony\Xpression\Lexer;
@@ -32,9 +33,20 @@ class ExprAdapter implements ExpressionBuilderInterface
 
     /**
      * @param $value
+     * @param bool $isValue
+     *
+     * @return mixed
+     */
+    public function parameter($value, $isValue = false)
+    {
+        return $isValue ? $this->expr->literal($value) : $value;
+    }
+
+    /**
+     * @param $value
      * @return Expr\Literal
      */
-    public function valueAsString($value)
+    public function string($value)
     {
         return $this->expr->literal($value);
     }

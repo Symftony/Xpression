@@ -24,9 +24,14 @@ class ExpressionBuilderAdapterTest extends TestCase
         $this->expressionBuilderAdapter = new ExpressionBuilderAdapter(new ExpressionBuilder());
     }
 
-    public function testValueAsString()
+    public function testParameter()
     {
-        $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->valueAsString('my_fake_data'));
+        $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->parameter('my_fake_data'));
+    }
+
+    public function testString()
+    {
+        $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->string('my_fake_data'));
     }
 
     public function testIsNull()

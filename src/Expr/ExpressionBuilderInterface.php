@@ -13,9 +13,16 @@ interface ExpressionBuilderInterface
 
     /**
      * @param $value
+     * @param bool $isValue
      * @return mixed
      */
-    public function valueAsString($value);
+    public function parameter($value, $isValue = false);
+
+    /**
+     * @param $value
+     * @return mixed
+     */
+    public function string($value);
 
     /**
      * @param string $field
