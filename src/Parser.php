@@ -158,10 +158,10 @@ class Parser
                     $expectedTokenType = Lexer::T_OPERANDE;
                     break;
                 case Lexer::T_INPUT_PARAMETER:
-                    $currentTokenValue = $currentToken['value'];
+                    $currentTokenValue = $this->expressionBuilder->parameter($currentToken['value'], null !== $comparisonFirstOperande);
                 case Lexer::T_STRING:
                     if (!isset($currentTokenValue)) {
-                        $currentTokenValue = $this->expressionBuilder->valueAsString($currentToken['value']);
+                        $currentTokenValue = $this->expressionBuilder->string($currentToken['value']);
                     }
                 case Lexer::T_INTEGER:
                 case Lexer::T_FLOAT:
