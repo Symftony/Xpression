@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Symftony\Xpression\Bridge\Doctrine\Common;
+namespace Tests\Symftony\Xpression\Expr;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Expr\ClosureExpressionBuilder;
