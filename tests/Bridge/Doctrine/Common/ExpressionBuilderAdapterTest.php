@@ -7,15 +7,13 @@ use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
+use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 class ExpressionBuilderAdapterTest extends TestCase
 {
-    /**
-     * @var ExpressionBuilderAdapter
-     */
-    private $expressionBuilderAdapter;
+    private ExpressionBuilderAdapter $expressionBuilderAdapter;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
             $this->markTestSkipped('This test is run when you have "doctrine/orm" installed.');
@@ -24,17 +22,17 @@ class ExpressionBuilderAdapterTest extends TestCase
         $this->expressionBuilderAdapter = new ExpressionBuilderAdapter(new ExpressionBuilder());
     }
 
-    public function testParameter()
+    public function testParameter(): void
     {
         $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->parameter('my_fake_data'));
     }
 
-    public function testString()
+    public function testString(): void
     {
         $this->assertEquals('my_fake_data', $this->expressionBuilderAdapter->string('my_fake_data'));
     }
 
-    public function testIsNull()
+    public function testIsNull(): void
     {
         $isv0 = !defined('Doctrine\Common\Collections\Expr\Comparison::CONTAINS');
 
@@ -45,24 +43,21 @@ class ExpressionBuilderAdapterTest extends TestCase
         );
     }
 
-    public function comparisonDataProvider()
+    public function comparisonDataProvider(): array
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
-            return array();
+            return [];
         }
 
-        return array(
-            array('field', 'value'),
-        );
+        return [
+            ['field', 'value'],
+        ];
     }
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testEq($field, $value)
+    public function testEq(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '=', 'value'),
@@ -72,11 +67,8 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testNeq($field, $value)
+    public function testNeq(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '<>', 'value'),
@@ -86,11 +78,8 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testGt($field, $value)
+    public function testGt(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '>', 'value'),
@@ -100,11 +89,8 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testGte($field, $value)
+    public function testGte(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '>=', 'value'),
@@ -114,11 +100,8 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testLt($field, $value)
+    public function testLt(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '<', 'value'),
@@ -128,11 +111,8 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testLte($field, $value)
+    public function testLte(string $field, string $value): void
     {
         $this->assertEquals(
             new Comparison('field', '<=', 'value'),
@@ -142,42 +122,33 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testIn($field, $value)
+    public function testIn(string $field, string $value): void
     {
         $this->assertEquals(
-            new Comparison('field', 'IN', array('value')),
-            $this->expressionBuilderAdapter->in($field, array($value))
+            new Comparison('field', 'IN', ['value']),
+            $this->expressionBuilderAdapter->in($field, [$value])
         );
     }
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testNotIn($field, $value)
+    public function testNotIn(string $field, string $value): void
     {
         $this->assertEquals(
-            new Comparison('field', 'NIN', array('value')),
-            $this->expressionBuilderAdapter->notIn($field, array($value))
+            new Comparison('field', 'NIN', ['value']),
+            $this->expressionBuilderAdapter->notIn($field, [$value])
         );
     }
 
     /**
      * @dataProvider comparisonDataProvider
-     *
-     * @param $field
-     * @param $value
      */
-    public function testContains($field, $value)
+    public function testContains(string $field, string $value): void
     {
         if (!method_exists('Doctrine\Common\Collections\ExpressionBuilder', 'contains')) {
-            $this->expectException('\Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException');
+            $this->expectException(UnsupportedExpressionTypeException::class);
             $this->expectExceptionMessage('Unsupported expression type "contains".');
 
             $this->assertNull($this->expressionBuilderAdapter->contains($field, $value));
@@ -191,38 +162,33 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider comparisonDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException
-     *
-     * @param $field
-     * @param $value
      */
-    public function testNotContains($field, $value)
+    public function testNotContains(string $field, string $value): void
     {
+        $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expressionBuilderAdapter->notContains($field, $value);
     }
 
-    public function compositeDataProvider()
+    public function compositeDataProvider(): array
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
-            return array();
+            return [];
         }
 
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     new Comparison('fieldA', '=', 1),
-                    new Comparison('fieldB', '>', 2)
-                ),
-            ),
-        );
+                    new Comparison('fieldB', '>', 2),
+                ],
+            ],
+        ];
     }
 
     /**
      * @dataProvider compositeDataProvider
-     *
-     * @param array $expressions
      */
-    public function testAndX(array $expressions)
+    public function testAndX(array $expressions): void
     {
         $this->assertEquals(
             new CompositeExpression('AND', $expressions),
@@ -232,21 +198,17 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider compositeDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException
-     *
-     * @param array $expressions
      */
-    public function testNandX(array $expressions)
+    public function testNandX(array $expressions): void
     {
+        $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expressionBuilderAdapter->nandX($expressions);
     }
 
     /**
      * @dataProvider compositeDataProvider
-     *
-     * @param array $expressions
      */
-    public function testOrX(array $expressions)
+    public function testOrX(array $expressions): void
     {
         $this->assertEquals(
             new CompositeExpression('OR', $expressions),
@@ -256,23 +218,19 @@ class ExpressionBuilderAdapterTest extends TestCase
 
     /**
      * @dataProvider compositeDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException
-     *
-     * @param array $expressions
      */
-    public function testNorX(array $expressions)
+    public function testNorX(array $expressions): void
     {
+        $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expressionBuilderAdapter->norX($expressions);
     }
 
     /**
      * @dataProvider compositeDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException
-     *
-     * @param array $expressions
      */
-    public function testXorX(array $expressions)
+    public function testXorX(array $expressions): void
     {
+        $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expressionBuilderAdapter->xorX($expressions);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Symftony\Xpression;
 
+use Doctrine\Common\Collections\Expr\Expression;
 use Symftony\Xpression\Exception\Lexer\LexerException;
 use Symftony\Xpression\Exception\Parser\ForbiddenTokenException;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
@@ -16,38 +17,35 @@ class Parser
     /**
      * @var array
      */
-    protected $precedence = array(
+    protected array $precedence = [
         Lexer::T_AND => 15,
         Lexer::T_NOT_AND => 14,
         Lexer::T_OR => 10,
         Lexer::T_XOR => 9,
         Lexer::T_NOT_OR => 8,
-    );
+    ];
 
     /**
      * @var int Keep the lexer current index
      */
-    public $lexerIndex = 0;
+    public int $lexerIndex = 0;
 
-    /**
-     * @var Lexer
-     */
-    private $lexer;
+    private Lexer $lexer;
 
     /**
      * @var ExpressionBuilderInterface
      */
-    private $expressionBuilder;
+    private ExpressionBuilderInterface $expressionBuilder;
 
     /**
      * @var int Bitwise of all allowed operator. Default was Lexer::T_ALL
      */
-    private $allowedTokenType;
+    private int $allowedTokenType;
 
     /**
      * @var int Bitwise of ExpressionBuilder supported operator.
      */
-    private $supportedTokenType;
+    private int $supportedTokenType;
 
     /**
      * @param ExpressionBuilderInterface $expressionBuilder
@@ -58,28 +56,16 @@ class Parser
         $this->expressionBuilder = $expressionBuilder;
     }
 
-    /**
-     * @return int
-     */
-    public function getAllowedTokenType()
+    public function getAllowedTokenType(): int
     {
         return $this->allowedTokenType;
     }
 
     /**
-     * @param $input
-     * @param null $allowedTokenType
-     *
-     * @return mixed
-     *
      * @throws InvalidExpressionException
      */
-    public function parse($input, $allowedTokenType = null)
+    public function parse(string $input, ?int $allowedTokenType = null)
     {
-        if (null !== $allowedTokenType && !is_integer($allowedTokenType)) {
-            throw new \InvalidArgumentException('Allowed operator must be an integer.');
-        }
-
         $this->allowedTokenType = $allowedTokenType ?: Lexer::T_ALL;
         $this->supportedTokenType = $this->expressionBuilder->getSupportedTokenType();
 
@@ -108,7 +94,7 @@ class Parser
     {
         $expression = $previousExpression ?: null;
         $expectedTokenType = null !== $previousExpression ? Lexer::T_COMPOSITE : Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER;
-        $expressions = array();
+        $expressions = [];
         $tokenPrecedence = null;
 
         $hasOpenParenthesis = false;
@@ -188,8 +174,7 @@ class Parser
                         $currentTokenValue = null;
                         break;
                     }
-
-                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $currentTokenValue));
+                    $expression = call_user_func_array([$this->expressionBuilder, $comparisonMethod], [$comparisonFirstOperande, $currentTokenValue]);
                     $comparisonFirstOperande = null;
                     $comparisonMethod = null;
                     $currentTokenValue = null;
@@ -221,16 +206,16 @@ class Parser
                     break;
                 case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
                     $comparisonMethod = 'notIn';
-                    $comparisonMultipleOperande = array();
+                    $comparisonMultipleOperande = [];
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
                     break;
                 case Lexer::T_OPEN_SQUARE_BRACKET:
                     $comparisonMethod = 'in';
-                    $comparisonMultipleOperande = array();
+                    $comparisonMultipleOperande = [];
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
                     break;
                 case Lexer::T_CLOSE_SQUARE_BRACKET:
-                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $comparisonMultipleOperande));
+                    $expression = call_user_func_array([$this->expressionBuilder, $comparisonMethod], [$comparisonFirstOperande, $comparisonMultipleOperande]);
                     $comparisonMethod = null;
                     $comparisonFirstOperande = null;
                     $comparisonMultipleOperande = false;
@@ -247,7 +232,7 @@ class Parser
                     $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
                     break;
                 case Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET:
-                    $expression = call_user_func_array(array($this->expressionBuilder, $comparisonMethod), array($comparisonFirstOperande, $containsValue));
+                    $expression = call_user_func_array([$this->expressionBuilder, $comparisonMethod], [$comparisonFirstOperande, $containsValue]);
                     $comparisonMethod = null;
                     $comparisonFirstOperande = null;
                     $contains = false;
@@ -272,7 +257,7 @@ class Parser
                     if ($currentTokenPrecedence < $tokenPrecedence) {
                         $expressions[] = $expression;
                         $expression = null;
-                        $expressions = array($this->buildComposite($compositeOperator, $expressions));
+                        $expressions = [$this->buildComposite($compositeOperator, $expressions)];
                         $compositeOperator = $currentTokenType;
                         $tokenPrecedence = $currentTokenPrecedence;
                         $expectedTokenType = Lexer::T_OPEN_PARENTHESIS | Lexer::T_INPUT_PARAMETER;

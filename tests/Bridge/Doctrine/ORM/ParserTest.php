@@ -2,25 +2,19 @@
 
 namespace Tests\Symftony\Xpression\Bridge\Doctrine\ORM;
 
-use Doctrine\ORM\Query\AST\Literal;
 use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Query\Expr;
 use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
+use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
 class ParserTest extends TestCase
 {
-    /**
-     * @var ExprAdapter
-     */
-    private $exprAdapter;
+    private ExprAdapter $exprAdapter;
 
-    /**
-     * @var Parser
-     */
-    private $parser;
+    private Parser $parser;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
             $this->markTestSkipped('This test is run when you have "doctrine/orm" installed.');
@@ -29,179 +23,174 @@ class ParserTest extends TestCase
         $this->parser = new Parser($this->exprAdapter);
     }
 
-    public function parseSuccessDataProvider()
+    public function parseSuccessDataProvider(): array
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
-            return array();
+            return [];
         }
 
-        return array(
-            array(
+        return [
+            [
                 'fieldA=1',
                 new Expr\Comparison('fieldA', '=', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA="string"',
                 new Expr\Comparison('fieldA', '=', (new Expr())->literal('string')),
-            ),
-            array(
+            ],
+            [
                 'fieldA≥1',
                 new Expr\Comparison('fieldA', '>=', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA>=1',
                 new Expr\Comparison('fieldA', '>=', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA≤1',
                 new Expr\Comparison('fieldA', '<=', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA<=1',
                 new Expr\Comparison('fieldA', '<=', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA≠1',
                 new Expr\Comparison('fieldA', '<>', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA!=1',
                 new Expr\Comparison('fieldA', '<>', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA[1,2]',
-                new Expr\Func('fieldA IN', array(1, 2)),
-            ),
-            array(
+                new Expr\Func('fieldA IN', [1, 2]),
+            ],
+            [
                 'fieldA![1,2]',
-                new Expr\Func('fieldA NOT IN', array(1, 2)),
-            ),
-            array(
+                new Expr\Func('fieldA NOT IN', [1, 2]),
+            ],
+            [
                 'fieldA{{1}}',
                 new Expr\Comparison('fieldA', 'LIKE', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA!{{1}}',
                 new Expr\Comparison('fieldA', 'NOT LIKE', 1),
-            ),
-            array(
+            ],
+            [
                 'fieldA=1|fieldB=2|fieldC=3',
-                new Expr\Orx(array(
+                new Expr\Orx([
                     new Expr\Comparison('fieldA', '=', 1),
                     new Expr\Comparison('fieldB', '=', 2),
                     new Expr\Comparison('fieldC', '=', 3),
-                )),
-            ),
-            array(
+                ]),
+            ],
+            [
                 'fieldA=1&fieldB=2&fieldC=3',
-                new Expr\Andx(array(
+                new Expr\Andx([
                     new Expr\Comparison('fieldA', '=', 1),
                     new Expr\Comparison('fieldB', '=', 2),
                     new Expr\Comparison('fieldC', '=', 3),
-                )),
-            ),
+                ]),
+            ],
 
             // Precedences
-            array(
+            [
                 'fieldA=1|fieldB=2|fieldC=3&fieldD=4',
-                new Expr\Orx(array(
+                new Expr\Orx([
                     new Expr\Comparison('fieldA', '=', 1),
                     new Expr\Comparison('fieldB', '=', 2),
-                    new Expr\Andx(array(
+                    new Expr\Andx([
                         new Expr\Comparison('fieldC', '=', 3),
                         new Expr\Comparison('fieldD', '=', 4),
-                    )),
-                )),
-            ),
-            array(
+                    ]),
+                ]),
+            ],
+            [
                 'fieldA=1&fieldB=2&fieldC=3|fieldD=4',
-                new Expr\Orx(array(
-                    new Expr\Andx(array(
+                new Expr\Orx([
+                    new Expr\Andx([
                         new Expr\Comparison('fieldA', '=', 1),
                         new Expr\Comparison('fieldB', '=', 2),
                         new Expr\Comparison('fieldC', '=', 3),
-                    )),
+                    ]),
                     new Expr\Comparison('fieldD', '=', 4),
-                )),
-            ),
-            array(
+                ]),
+            ],
+            [
                 'fieldA=1&fieldB=2|fieldC=3&fieldD=4',
-                new Expr\Orx(array(
-                    new Expr\Andx(array(
+                new Expr\Orx([
+                    new Expr\Andx([
                         new Expr\Comparison('fieldA', '=', 1),
                         new Expr\Comparison('fieldB', '=', 2),
-                    )),
-                    new Expr\Andx(array(
+                    ]),
+                    new Expr\Andx([
                         new Expr\Comparison('fieldC', '=', 3),
                         new Expr\Comparison('fieldD', '=', 4),
-                    )),
-                )),
-            ),
+                    ]),
+                ]),
+            ],
 
             //Parenthesis
-            array(
+            [
                 '((fieldA=1))',
                 new Expr\Comparison('fieldA', '=', 1),
-            ),
-            array(
+            ],
+            [
                 '(fieldA=1|fieldB=2)&fieldC=3',
-                new Expr\Andx(array(
-                    new Expr\Orx(array(
+                new Expr\Andx([
+                    new Expr\Orx([
                         new Expr\Comparison('fieldA', '=', 1),
                         new Expr\Comparison('fieldB', '=', 2),
-                    )),
+                    ]),
                     new Expr\Comparison('fieldC', '=', 3),
-                )),
-            ),
-            array(
+                ]),
+            ],
+            [
                 'fieldA=1|(fieldB=2&fieldC=3)',
-                new Expr\Orx(array(
+                new Expr\Orx([
                     new Expr\Comparison('fieldA', '=', 1),
-                    new Expr\Andx(array(
+                    new Expr\Andx([
                         new Expr\Comparison('fieldB', '=', 2),
                         new Expr\Comparison('fieldC', '=', 3),
-                    )),
-                )),
-            ),
-        );
+                    ]),
+                ]),
+            ],
+        ];
     }
 
     /**
      * @dataProvider parseSuccessDataProvider
-     *
-     * @param $input
-     * @param $expectedExpression
      */
-    public function testParser($input, $expectedExpression)
+    public function testParser(string $input, $expectedExpression): void
     {
         $this->assertEquals($expectedExpression, $this->parser->parse($input));
     }
 
-    public function unsupportedExpressionTypeDataProvider()
+    public function unsupportedExpressionTypeDataProvider(): array
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
-            return array();
+            return [];
         }
 
-        return array(
-            array('fieldA=1!|fieldB=2!|fieldC=3'),
-            array('fieldA=1^|fieldB=2'),
-            array('fieldA=1⊕fieldB=2'),
-            array('fieldA=1!&fieldB=2!&fieldC=3'),
-            array('fieldA=1&fieldB=2&fieldC=3!&fieldD=4'),
-            array('fieldA=1|fieldB=2|fieldC=3!|fieldD=4'),
-            array('fieldA=1|fieldB=2|fieldC=3⊕fieldD=4'),
-        );
+        return [
+            ['fieldA=1!|fieldB=2!|fieldC=3'],
+            ['fieldA=1^|fieldB=2'],
+            ['fieldA=1⊕fieldB=2'],
+            ['fieldA=1!&fieldB=2!&fieldC=3'],
+            ['fieldA=1&fieldB=2&fieldC=3!&fieldD=4'],
+            ['fieldA=1|fieldB=2|fieldC=3!|fieldD=4'],
+            ['fieldA=1|fieldB=2|fieldC=3⊕fieldD=4'],
+        ];
     }
 
     /**
      * @dataProvider unsupportedExpressionTypeDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
-     *
-     * @param $input
      */
-    public function testParserThrowUnsupportedExpressionTypeException($input)
+    public function testParserThrowUnsupportedExpressionTypeException(string $input): void
     {
+        $this->expectException(InvalidExpressionException::class);
         $this->parser->parse($input);
     }
 }

@@ -18,7 +18,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
             return $object[$field];
         }
 
-        $accessors = array('get', 'is');
+        $accessors = ['get', 'is'];
 
         foreach ($accessors as $accessor) {
             $accessor .= $field;
@@ -67,7 +67,7 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
     /**
      * @return int
      */
-    public function getSupportedTokenType()
+    public function getSupportedTokenType(): int
     {
         return Lexer::T_ALL;
     }
@@ -78,25 +78,16 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
      *
      * @return mixed
      */
-    public function parameter($value, $isValue = false)
+    public function parameter($value, $isValue = false): mixed
     {
         return $value;
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function string($value)
+    public function string($value): mixed
     {
         return $value;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return callable
-     */
     public function isNull($field)
     {
         return function ($object) use ($field) {
@@ -104,90 +95,48 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function eq($field, $value)
+    public function eq(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) === $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function neq($field, $value)
+    public function neq(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) !== $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function gt($field, $value)
+    public function gt(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) > $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function gte($field, $value)
+    public function gte(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) >= $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function lt($field, $value)
+    public function lt(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) < $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function lte($field, $value)
+    public function lte(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return ClosureExpressionBuilder::getObjectFieldValue($object, $field) <= $value;
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return callable
-     */
     public function in($field, array $values)
     {
         return function ($object) use ($field, $values) {
@@ -195,12 +144,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return callable
-     */
     public function notIn($field, array $values)
     {
         return function ($object) use ($field, $values) {
@@ -208,26 +151,14 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function contains($field, $value)
+    public function contains(string $field, mixed $value)
     {
         return function ($object) use ($field, $value) {
             return false !== strpos(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
         };
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return callable
-     */
-    public function notContains($field, $value)
+    public function notContains(string $field, mixed $value)
     {
         $self = $this;
         return function ($object) use ($self, $field, $value) {
@@ -236,11 +167,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return callable
-     */
     public function andX(array $expressions)
     {
         return function ($object) use ($expressions) {
@@ -254,11 +180,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return callable
-     */
     public function nandX(array $expressions)
     {
         $self = $this;
@@ -268,11 +189,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return callable
-     */
     public function orX(array $expressions)
     {
         return function ($object) use ($expressions) {
@@ -286,11 +202,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return callable
-     */
     public function norX(array $expressions)
     {
         $self = $this;
@@ -300,11 +211,6 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return callable
-     */
     public function xorX(array $expressions)
     {
         return function ($object) use ($expressions) {

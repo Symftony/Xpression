@@ -2,8 +2,6 @@
 
 namespace Symftony\Xpression\Bridge\Doctrine\Common;
 
-use Doctrine\Common\Collections\Expr\Comparison;
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
@@ -11,151 +9,77 @@ use Symftony\Xpression\Lexer;
 
 class ExpressionBuilderAdapter implements ExpressionBuilderInterface
 {
-    /**
-     * @var ExpressionBuilder
-     */
-    private $expressionBuilder;
+    private ExpressionBuilder $expressionBuilder;
 
     public function __construct(ExpressionBuilder $expressionBuilder)
     {
         $this->expressionBuilder = $expressionBuilder;
     }
 
-    /**
-     * @return int
-     */
-    public function getSupportedTokenType()
+    public function getSupportedTokenType(): int
     {
         return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_NOT_OR - Lexer::T_XOR - Lexer::T_NOT_DOUBLE_OPEN_CURLY_BRACKET;
     }
 
-    /**
-     * @param $value
-     * @param bool $isValue
-     *
-     * @return mixed
-     */
-    public function parameter($value, $isValue = false)
+    public function parameter(mixed $value, bool $isValue = false): mixed
     {
         return $value;
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function string($value)
+    public function string($value): mixed
     {
         return $value;
     }
 
-    /**
-     * @param string $field
-     *
-     * @return Comparison
-     */
-    public function isNull($field)
+    public function isNull(string $field)
     {
         return $this->expressionBuilder->isNull($field);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function eq($field, $value)
+    public function eq(string $field, mixed $value)
     {
         return $this->expressionBuilder->eq($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function neq($field, $value)
+    public function neq(string $field, mixed $value)
     {
         return $this->expressionBuilder->neq($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function gt($field, $value)
+    public function gt(string $field, mixed $value)
     {
         return $this->expressionBuilder->gt($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function gte($field, $value)
+    public function gte(string $field, mixed $value)
     {
         return $this->expressionBuilder->gte($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function lt($field, $value)
+    public function lt(string $field, mixed $value)
     {
         return $this->expressionBuilder->lt($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
-     */
-    public function lte($field, $value)
+    public function lte(string $field, mixed $value)
     {
         return $this->expressionBuilder->lte($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return Comparison
-     */
-    public function in($field, array $values)
+    public function in(string $field, array $values)
     {
         return $this->expressionBuilder->in($field, $values);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return Comparison
-     */
-    public function notIn($field, array $values)
+    public function notIn(string $field, array $values)
     {
         return $this->expressionBuilder->notIn($field, $values);
     }
 
     /**
      * /!\ Contains operator appear only in doctrine/common v1.1 /!\
-     *
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Comparison
      */
-    public function contains($field, $value)
+    public function contains(string $field, mixed $value)
     {
         if (!method_exists($this->expressionBuilder, 'contains')) {
             throw new UnsupportedExpressionTypeException('contains');
@@ -164,54 +88,31 @@ class ExpressionBuilderAdapter implements ExpressionBuilderInterface
         return $this->expressionBuilder->contains($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function notContains($field, $value)
+    public function notContains(string $field, mixed $value)
     {
         throw new UnsupportedExpressionTypeException('notContains');
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return CompositeExpression
-     */
     public function andX(array $expressions)
     {
-        return call_user_func_array(array($this->expressionBuilder, 'andX'), $expressions);
+        return call_user_func_array([$this->expressionBuilder, 'andX'], $expressions);
     }
 
-    /**
-     * @param array $expressions
-     */
     public function nandX(array $expressions)
     {
         throw new UnsupportedExpressionTypeException('nandX');
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return CompositeExpression
-     */
     public function orX(array $expressions)
     {
-        return call_user_func_array(array($this->expressionBuilder, 'orX'), $expressions);
+        return call_user_func_array([$this->expressionBuilder, 'orX'], $expressions);
     }
 
-    /**
-     * @param array $expressions
-     */
     public function norX(array $expressions)
     {
         throw new UnsupportedExpressionTypeException('norX');
     }
 
-    /**
-     * @param array $expressions
-     */
     public function xorX(array $expressions)
     {
         throw new UnsupportedExpressionTypeException('xorX');

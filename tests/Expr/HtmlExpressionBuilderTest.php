@@ -14,7 +14,7 @@ class HtmlExpressionBuilderTest extends TestCase
      */
     private $closureExpressionBuilder;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->closureExpressionBuilder = new HtmlExpressionBuilder();
     }
@@ -37,10 +37,10 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function isNullDataProvider()
     {
-        return array(
-            array('field_null', '<div>field_null is null</div>'),
-            array('field_number_5', '<div>field_number_5 is null</div>'),
-        );
+        return [
+            ['field_null', '<div>field_null is null</div>'],
+            ['field_number_5', '<div>field_number_5 is null</div>'],
+        ];
     }
 
     /**
@@ -59,11 +59,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function eqDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 = 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 = 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 = 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 = 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 = 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 = 10</div>'],
+        ];
     }
 
     /**
@@ -83,11 +83,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function neqDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 ≠ 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 ≠ 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 ≠ 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 ≠ 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 ≠ 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 ≠ 10</div>'],
+        ];
     }
 
     /**
@@ -107,11 +107,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function gtDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 > 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 > 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 > 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 > 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 > 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 > 10</div>'],
+        ];
     }
 
     /**
@@ -131,11 +131,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function gteDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 ≥ 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 ≥ 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 ≥ 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 ≥ 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 ≥ 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 ≥ 10</div>'],
+        ];
     }
 
     /**
@@ -155,11 +155,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function ltDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 < 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 < 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 < 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 < 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 < 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 < 10</div>'],
+        ];
     }
 
     /**
@@ -179,11 +179,11 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function lteDataProvider()
     {
-        return array(
-            array('field_number_5', 1, '<div>field_number_5 ≤ 1</div>'),
-            array('field_number_5', 5, '<div>field_number_5 ≤ 5</div>'),
-            array('field_number_5', 10, '<div>field_number_5 ≤ 10</div>'),
-        );
+        return [
+            ['field_number_5', 1, '<div>field_number_5 ≤ 1</div>'],
+            ['field_number_5', 5, '<div>field_number_5 ≤ 5</div>'],
+            ['field_number_5', 10, '<div>field_number_5 ≤ 10</div>'],
+        ];
     }
 
     /**
@@ -203,10 +203,10 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function inDataProvider()
     {
-        return array(
-            array('field_number_5', array(1), '<div>field_number_5 value in 1</div>'),
-            array('field_number_5', array(1, 2, 3, 4, 5), '<div>field_number_5 value in 1, 2, 3, 4, 5</div>'),
-        );
+        return [
+            ['field_number_5', [1], '<div>field_number_5 value in 1</div>'],
+            ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value in 1, 2, 3, 4, 5</div>'],
+        ];
     }
 
     /**
@@ -226,10 +226,10 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function notInDataProvider()
     {
-        return array(
-            array('field_number_5', array(1), '<div>field_number_5 value not in 1</div>'),
-            array('field_number_5', array(1, 2, 3, 4, 5), '<div>field_number_5 value not in 1, 2, 3, 4, 5</div>'),
-        );
+        return [
+            ['field_number_5', [1], '<div>field_number_5 value not in 1</div>'],
+            ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value not in 1, 2, 3, 4, 5</div>'],
+        ];
     }
 
     /**
@@ -249,10 +249,10 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function containsDataProvider()
     {
-        return array(
-            array('field_string', 'toto', '<div>field_string contains toto</div>'),
-            array('field_string', 'fake', '<div>field_string contains fake</div>'),
-        );
+        return [
+            ['field_string', 'toto', '<div>field_string contains toto</div>'],
+            ['field_string', 'fake', '<div>field_string contains fake</div>'],
+        ];
     }
 
     /**
@@ -272,10 +272,10 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function notContainsDataProvider()
     {
-        return array(
-            array('field_string', 'toto', '<div>field_string notContains toto</div>'),
-            array('field_string', 'fake', '<div>field_string notContains fake</div>'),
-        );
+        return [
+            ['field_string', 'toto', '<div>field_string notContains toto</div>'],
+            ['field_string', 'fake', '<div>field_string notContains fake</div>'],
+        ];
     }
 
     /**
@@ -295,12 +295,12 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function andXDataProvider()
     {
-        return array(
-            array(array('false', 'false'), '<fieldset><legend>and</legend>falsefalse</fieldset>'),
-            array(array('false', 'true'), '<fieldset><legend>and</legend>falsetrue</fieldset>'),
-            array(array('true', 'false'), '<fieldset><legend>and</legend>truefalse</fieldset>'),
-            array(array('true', 'true'), '<fieldset><legend>and</legend>truetrue</fieldset>'),
-        );
+        return [
+            [['false', 'false'], '<fieldset><legend>and</legend>falsefalse</fieldset>'],
+            [['false', 'true'], '<fieldset><legend>and</legend>falsetrue</fieldset>'],
+            [['true', 'false'], '<fieldset><legend>and</legend>truefalse</fieldset>'],
+            [['true', 'true'], '<fieldset><legend>and</legend>truetrue</fieldset>'],
+        ];
     }
 
     /**
@@ -319,12 +319,12 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function nandXDataProvider()
     {
-        return array(
-            array(array('false', 'false'), '<fieldset><legend>not-and</legend>falsefalse</fieldset>'),
-            array(array('false', 'true'), '<fieldset><legend>not-and</legend>falsetrue</fieldset>'),
-            array(array('true', 'false'), '<fieldset><legend>not-and</legend>truefalse</fieldset>'),
-            array(array('true', 'true'), '<fieldset><legend>not-and</legend>truetrue</fieldset>'),
-        );
+        return [
+            [['false', 'false'], '<fieldset><legend>not-and</legend>falsefalse</fieldset>'],
+            [['false', 'true'], '<fieldset><legend>not-and</legend>falsetrue</fieldset>'],
+            [['true', 'false'], '<fieldset><legend>not-and</legend>truefalse</fieldset>'],
+            [['true', 'true'], '<fieldset><legend>not-and</legend>truetrue</fieldset>'],
+        ];
     }
 
     /**
@@ -343,12 +343,12 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function orXDataProvider()
     {
-        return array(
-            array(array('false', 'false'), '<fieldset><legend>or</legend>falsefalse</fieldset>'),
-            array(array('false', 'true'), '<fieldset><legend>or</legend>falsetrue</fieldset>'),
-            array(array('true', 'false'), '<fieldset><legend>or</legend>truefalse</fieldset>'),
-            array(array('true', 'true'), '<fieldset><legend>or</legend>truetrue</fieldset>'),
-        );
+        return [
+            [['false', 'false'], '<fieldset><legend>or</legend>falsefalse</fieldset>'],
+            [['false', 'true'], '<fieldset><legend>or</legend>falsetrue</fieldset>'],
+            [['true', 'false'], '<fieldset><legend>or</legend>truefalse</fieldset>'],
+            [['true', 'true'], '<fieldset><legend>or</legend>truetrue</fieldset>'],
+        ];
     }
 
     /**
@@ -367,12 +367,12 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function norXDataProvider()
     {
-        return array(
-            array(array('false', 'false'), '<fieldset><legend>not-or</legend>falsefalse</fieldset>'),
-            array(array('false', 'true'), '<fieldset><legend>not-or</legend>falsetrue</fieldset>'),
-            array(array('true', 'false'), '<fieldset><legend>not-or</legend>truefalse</fieldset>'),
-            array(array('true', 'true'), '<fieldset><legend>not-or</legend>truetrue</fieldset>'),
-        );
+        return [
+            [['false', 'false'], '<fieldset><legend>not-or</legend>falsefalse</fieldset>'],
+            [['false', 'true'], '<fieldset><legend>not-or</legend>falsetrue</fieldset>'],
+            [['true', 'false'], '<fieldset><legend>not-or</legend>truefalse</fieldset>'],
+            [['true', 'true'], '<fieldset><legend>not-or</legend>truetrue</fieldset>'],
+        ];
     }
 
     /**
@@ -391,30 +391,27 @@ class HtmlExpressionBuilderTest extends TestCase
 
     public function xorXDataProvider()
     {
-        return array(
-            array(array('false', 'false'), '<fieldset><legend>exclusive-or</legend>falsefalse</fieldset>'),
-            array(array('false', 'true'), '<fieldset><legend>exclusive-or</legend>falsetrue</fieldset>'),
-            array(array('true', 'false'), '<fieldset><legend>exclusive-or</legend>truefalse</fieldset>'),
-            array(array('true', 'true'), '<fieldset><legend>exclusive-or</legend>truetrue</fieldset>'),
+        return [
+            [['false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalse</fieldset>'],
+            [['false', 'true'], '<fieldset><legend>exclusive-or</legend>falsetrue</fieldset>'],
+            [['true', 'false'], '<fieldset><legend>exclusive-or</legend>truefalse</fieldset>'],
+            [['true', 'true'], '<fieldset><legend>exclusive-or</legend>truetrue</fieldset>'],
 
-            array(array('false', 'false', 'false'), '<fieldset><legend>exclusive-or</legend>falsefalsefalse</fieldset>'),
-            array(array('false', 'false', 'true'), '<fieldset><legend>exclusive-or</legend>falsefalsetrue</fieldset>'),
-            array(array('false', 'true', 'false'), '<fieldset><legend>exclusive-or</legend>falsetruefalse</fieldset>'),
-            array(array('false', 'true', 'true'), '<fieldset><legend>exclusive-or</legend>falsetruetrue</fieldset>'),
-            array(array('true', 'false', 'false'), '<fieldset><legend>exclusive-or</legend>truefalsefalse</fieldset>'),
-            array(array('true', 'false', 'true'), '<fieldset><legend>exclusive-or</legend>truefalsetrue</fieldset>'),
-            array(array('true', 'true', 'false'), '<fieldset><legend>exclusive-or</legend>truetruefalse</fieldset>'),
-            array(array('true', 'true', 'true'), '<fieldset><legend>exclusive-or</legend>truetruetrue</fieldset>'),
-        );
+            [['false', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalsefalse</fieldset>'],
+            [['false', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>falsefalsetrue</fieldset>'],
+            [['false', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>falsetruefalse</fieldset>'],
+            [['false', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>falsetruetrue</fieldset>'],
+            [['true', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>truefalsefalse</fieldset>'],
+            [['true', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>truefalsetrue</fieldset>'],
+            [['true', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>truetruefalse</fieldset>'],
+            [['true', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>truetruetrue</fieldset>'],
+        ];
     }
 
     /**
      * @dataProvider xorXDataProvider
-     *
-     * @param array $expressions
-     * @param $expectedResult
      */
-    public function testXorX(array $expressions, $expectedResult)
+    public function testXorX(array $expressions, mixed $expectedResult)
     {
         $this->assertEquals(
             $expectedResult,

@@ -4,15 +4,9 @@ namespace Symftony\Xpression\Expr;
 
 class MapperExpressionBuilder implements ExpressionBuilderInterface
 {
-    /**
-     * @var ExpressionBuilderInterface
-     */
-    private $expressionBuilder;
+    private ExpressionBuilderInterface $expressionBuilder;
 
-    /**
-     * @var array
-     */
-    private $fieldMapping;
+    private array $fieldMapping;
 
     /**
      * @param ExpressionBuilderInterface $expressionBuilder
@@ -24,17 +18,17 @@ class MapperExpressionBuilder implements ExpressionBuilderInterface
         $this->fieldMapping = $fieldMapping;
     }
 
-    public function getSupportedTokenType()
+    public function getSupportedTokenType(): int
     {
         return $this->expressionBuilder->getSupportedTokenType();
     }
 
-    public function parameter($value, $isValue = false)
+    public function parameter(mixed $value, bool $isValue = false): mixed
     {
         return $this->expressionBuilder->parameter($value, $isValue);
     }
 
-    public function string($value)
+    public function string($value): mixed
     {
         return $this->expressionBuilder->string($value);
     }
@@ -44,32 +38,32 @@ class MapperExpressionBuilder implements ExpressionBuilderInterface
         return $this->expressionBuilder->isNull($this->mapField($field));
     }
 
-    public function eq($field, $value)
+    public function eq(string $field, mixed $value)
     {
         return $this->expressionBuilder->eq($this->mapField($field), $value);
     }
 
-    public function neq($field, $value)
+    public function neq(string $field, mixed $value)
     {
         return $this->expressionBuilder->neq($this->mapField($field), $value);
     }
 
-    public function gt($field, $value)
+    public function gt(string $field, mixed $value)
     {
         return $this->expressionBuilder->gt($this->mapField($field), $value);
     }
 
-    public function gte($field, $value)
+    public function gte(string $field, mixed $value)
     {
         return $this->expressionBuilder->gte($this->mapField($field), $value);
     }
 
-    public function lt($field, $value)
+    public function lt(string $field, mixed $value)
     {
         return $this->expressionBuilder->lt($this->mapField($field), $value);
     }
 
-    public function lte($field, $value)
+    public function lte(string $field, mixed $value)
     {
         return $this->expressionBuilder->lte($this->mapField($field), $value);
     }
@@ -84,12 +78,12 @@ class MapperExpressionBuilder implements ExpressionBuilderInterface
         return $this->expressionBuilder->notIn($this->mapField($field), $values);
     }
 
-    public function contains($field, $value)
+    public function contains(string $field, mixed $value)
     {
         return $this->expressionBuilder->contains($this->mapField($field), $value);
     }
 
-    public function notContains($field, $value)
+    public function notContains(string $field, mixed $value)
     {
         return $this->expressionBuilder->notContains($this->mapField($field), $value);
     }

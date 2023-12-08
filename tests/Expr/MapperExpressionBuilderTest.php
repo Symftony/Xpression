@@ -3,36 +3,40 @@
 namespace Tests\Symftony\Xpression\Expr;
 
 use PHPUnit\Framework\TestCase;
+use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\Prophet;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Expr\MapperExpressionBuilder;
 
 class MapperExpressionBuilderTest extends TestCase
 {
-    /**
-     * @var ExpressionBuilderInterface
-     */
-    private $expressionBuilderMock;
+    private ExpressionBuilderInterface|ObjectProphecy $expressionBuilderMock;
 
-    /**
-     * @var MapperExpressionBuilder
-     */
-    private $mapperExpressionBuilder;
+    private MapperExpressionBuilder $mapperExpressionBuilder;
 
-    public function setUp()
+    private Prophet $prophet;
+
+    public function setUp(): void
     {
-        $this->expressionBuilderMock = $this->prophesize(ExpressionBuilderInterface::class);
-
+        $this->prophet = new Prophet();
+        $this->expressionBuilderMock = $this->prophet->prophesize(ExpressionBuilderInterface::class);
         $this->mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal());
     }
 
-    public function testGetSupportedTokenType()
+    protected function tearDown(): void
     {
+        $this->prophet->checkPredictions();
+    }
+
+    public function testGetSupportedTokenType(): void
+    {
+        $this->expectNotToPerformAssertions();
         $this->expressionBuilderMock->getSupportedTokenType()->shouldBeCalled();
 
         $this->mapperExpressionBuilder->getSupportedTokenType();
     }
 
-    public function testParameter()
+    public function testParameter(): void
     {
         $this->expressionBuilderMock->parameter('fake_field', false)->willReturn('fake_return')->shouldBeCalled();
 
@@ -42,7 +46,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testParameterAsValue()
+    public function testParameterAsValue(): void
     {
         $this->expressionBuilderMock->parameter('fake_field', true)->willReturn('fake_return')->shouldBeCalled();
 
@@ -52,7 +56,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testString()
+    public function testString(): void
     {
         $this->expressionBuilderMock->string('fake_field')->willReturn('fake_return')->shouldBeCalled();
 
@@ -64,12 +68,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testIsNull($fieldMapping, $field, $expectedMappedField)
+    public function testIsNull(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -83,12 +83,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testEq($fieldMapping, $field, $expectedMappedField)
+    public function testEq(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -102,12 +98,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testNeq($fieldMapping, $field, $expectedMappedField)
+    public function testNeq(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -121,12 +113,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testGt($fieldMapping, $field, $expectedMappedField)
+    public function testGt(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -140,12 +128,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testGte($fieldMapping, $field, $expectedMappedField)
+    public function testGte(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -159,12 +143,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testLt($fieldMapping, $field, $expectedMappedField)
+    public function testLt(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -178,12 +158,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testLte($fieldMapping, $field, $expectedMappedField)
+    public function testLte(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -197,12 +173,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testIn($fieldMapping, $field, $expectedMappedField)
+    public function testIn(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -216,12 +188,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testNotIn($fieldMapping, $field, $expectedMappedField)
+    public function testNotIn(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -235,12 +203,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testContains($fieldMapping, $field, $expectedMappedField)
+    public function testContains(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -254,12 +218,8 @@ class MapperExpressionBuilderTest extends TestCase
 
     /**
      * @dataProvider fieldMappingProvider
-     *
-     * @param $fieldMapping
-     * @param $field
-     * @param $expectedMappedField
      */
-    public function testNotContains($fieldMapping, $field, $expectedMappedField)
+    public function testNotContains(array $fieldMapping, mixed $field, mixed $expectedMappedField): void
     {
         $mapperExpressionBuilder = new MapperExpressionBuilder($this->expressionBuilderMock->reveal(), $fieldMapping);
 
@@ -271,33 +231,33 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function fieldMappingProvider()
+    public function fieldMappingProvider(): array
     {
-        return array(
-            array(
-                array(),
+        return [
+            [
+                [],
                 'fake_field',
                 'fake_field',
-            ),
-            array(
-                array('*' => 'fake_%s_mapping'),
-                'fake_field',
-                'fake_fake_field_mapping',
-            ),
-            array(
-                array('other' => 'fake_%s_mapping'),
-                'fake_field',
-                'fake_field',
-            ),
-            array(
-                array('fake_field' => 'fake_%s_mapping'),
+            ],
+            [
+                ['*' => 'fake_%s_mapping'],
                 'fake_field',
                 'fake_fake_field_mapping',
-            ),
-        );
+            ],
+            [
+                ['other' => 'fake_%s_mapping'],
+                'fake_field',
+                'fake_field',
+            ],
+            [
+                ['fake_field' => 'fake_%s_mapping'],
+                'fake_field',
+                'fake_fake_field_mapping',
+            ],
+        ];
     }
 
-    public function testAndX()
+    public function testAndX(): void
     {
         $this->expressionBuilderMock->andX(['fake_expression'])->willReturn('fake_return')->shouldBeCalled();
 
@@ -307,7 +267,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testNandX()
+    public function testNandX(): void
     {
         $this->expressionBuilderMock->nandX(['fake_expression'])->willReturn('fake_return')->shouldBeCalled();
 
@@ -317,7 +277,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testOrX()
+    public function testOrX(): void
     {
         $this->expressionBuilderMock->orX(['fake_expression'])->willReturn('fake_return')->shouldBeCalled();
 
@@ -327,7 +287,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testNorX()
+    public function testNorX(): void
     {
         $this->expressionBuilderMock->norX(['fake_expression'])->willReturn('fake_return')->shouldBeCalled();
 
@@ -337,7 +297,7 @@ class MapperExpressionBuilderTest extends TestCase
         );
     }
 
-    public function testXorX()
+    public function testXorX(): void
     {
         $this->expressionBuilderMock->xorX(['fake_expression'])->willReturn('fake_return')->shouldBeCalled();
 

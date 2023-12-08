@@ -25,8 +25,8 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
     private $compositeHtmlBuilder;
 
     /**
-     * @param $comparisonHtmlBuilder
-     * @param $compositeHtmlBuilder
+     * @param callable $comparisonHtmlBuilder
+     * @param callable $compositeHtmlBuilder
      */
     public function __construct(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
     {
@@ -35,208 +35,105 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
         };
         $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: function (array $expressions, $type) {
             return str_replace(
-                array('{type}', '{expressions}'),
-                array($type, implode('', $expressions)),
+                ['{type}', '{expressions}'],
+                [$type, implode('', $expressions)],
                 '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
             );
         };
     }
 
-    /**
-     * @return int
-     */
-    public function getSupportedTokenType()
+    public function getSupportedTokenType(): int
     {
         return Lexer::T_ALL;
     }
 
-    /**
-     * @param $value
-     * @param bool $isValue
-     *
-     * @return mixed
-     */
-    public function parameter($value, $isValue = false)
+    public function parameter(mixed $value, bool $isValue = false): mixed
     {
         return $value;
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function string($value)
+    public function string($value): mixed
     {
         return '"' . $value . '"';
     }
 
-    /**
-     * @param string $field
-     *
-     * @return string
-     */
     public function isNull($field)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'is', 'null'));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'is', 'null']);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function eq($field, $value)
+    public function eq(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '=', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '=', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function neq($field, $value)
+    public function neq(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '≠', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≠', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function gt($field, $value)
+    public function gt(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '>', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '>', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function gte($field, $value)
+    public function gte(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '≥', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≥', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function lt($field, $value)
+    public function lt(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '<', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '<', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function lte($field, $value)
+    public function lte(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, '≤', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≤', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return string
-     */
     public function in($field, array $values)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'value in', implode(', ', $values)));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'value in', implode(', ', $values)]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return string
-     */
     public function notIn($field, array $values)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'value not in', implode(', ', $values)));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'value not in', implode(', ', $values)]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function contains($field, $value)
+    public function contains(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'contains', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'contains', $value]);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return string
-     */
-    public function notContains($field, $value)
+    public function notContains(string $field, mixed $value)
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, array($field, 'notContains', $value));
+        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'notContains', $value]);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return string
-     */
     public function andX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'and'));
+        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'and']);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return string
-     */
     public function nandX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'not-and'));
+        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'not-and']);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return string
-     */
     public function orX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'or'));
+        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'or']);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return string
-     */
     public function norX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'not-or'));
+        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'not-or']);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return string
-     */
     public function xorX(array $expressions)
     {
-        return call_user_func_array($this->compositeHtmlBuilder, array($expressions, 'exclusive-or'));
+        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'exclusive-or']);
     }
 }
