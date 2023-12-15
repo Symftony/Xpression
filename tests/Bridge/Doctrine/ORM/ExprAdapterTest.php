@@ -1,24 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression\Bridge\Doctrine\ORM;
 
 use Doctrine\Common\Collections\Expr\Expression;
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Query\Expr;
+use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
-class ExprAdapterTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ExprAdapterTest extends TestCase
 {
-    /**
-     * @var ExprAdapter
-     */
-    private $exprAdapter;
+    private ExprAdapter $exprAdapter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
-            $this->markTestSkipped('This test is run when you have "doctrine/orm" installed.');
+            self::markTestSkipped('This test is run when you have "doctrine/orm" installed.');
         }
 
         $this->exprAdapter = new ExprAdapter(new Expr());
@@ -27,18 +31,16 @@ class ExprAdapterTest extends TestCase
     public function testIsNull(): void
     {
         $field = 'fake_field';
-        $this->assertEquals('fake_field IS NULL', $this->exprAdapter->isNull($field));
+        self::assertSame('fake_field IS NULL', $this->exprAdapter->isNull($field));
     }
 
-    public function comparisonDataProvider()
+    public static function comparisonDataProvider(): iterable
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
             return [];
         }
 
-        return [
-            ['field', 'value'],
-        ];
+        yield ['field', 'value'];
     }
 
     /**
@@ -46,7 +48,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testEq(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::EQ, $value),
             $this->exprAdapter->eq($field, $value)
         );
@@ -57,7 +59,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testNeq(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::NEQ, $value),
             $this->exprAdapter->neq($field, $value)
         );
@@ -68,7 +70,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testGt(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::GT, $value),
             $this->exprAdapter->gt($field, $value)
         );
@@ -79,7 +81,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testGte(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::GTE, $value),
             $this->exprAdapter->gte($field, $value)
         );
@@ -90,7 +92,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testLt(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::LT, $value),
             $this->exprAdapter->lt($field, $value)
         );
@@ -101,7 +103,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testLte(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison($field, Expr\Comparison::LTE, $value),
             $this->exprAdapter->lte($field, $value)
         );
@@ -112,7 +114,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testIn(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Func('field IN', ["'value'"]),
             $this->exprAdapter->in($field, [$value])
         );
@@ -123,7 +125,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testNotIn(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Func('field NOT IN', ["'value'"]),
             $this->exprAdapter->notIn($field, [$value])
         );
@@ -134,7 +136,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testContains(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison('field', 'LIKE', $value),
             $this->exprAdapter->contains($field, $value)
         );
@@ -145,40 +147,41 @@ class ExprAdapterTest extends TestCase
      */
     public function testNotContains(string $field, string $value): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Comparison('field', 'NOT LIKE', $value),
             $this->exprAdapter->notContains($field, $value)
         );
     }
 
-    public function compositeDataProvider(): array
+    public static function compositeDataProvider(): iterable
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
             return [];
         }
 
-        return [
-            [[
-                new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-            ]],
-            [[
-                new Expr\Func('field', ['value']),
-            ]],
-            [[
-                new Expr\Andx(
-                    [
-                        new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-                    ]
-                ),
-            ]],
-            [[
-                new Expr\Orx(
-                    [
-                        new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-                    ]
-                ),
-            ]],
-        ];
+        yield [[
+            new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+        ]];
+
+        yield [[
+            new Expr\Func('field', ['value']),
+        ]];
+
+        yield [[
+            new Expr\Andx(
+                [
+                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+                ]
+            ),
+        ]];
+
+        yield [[
+            new Expr\Orx(
+                [
+                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+                ]
+            ),
+        ]];
     }
 
     /**
@@ -188,7 +191,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testAndX(array $expressions): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Andx($expressions),
             $this->exprAdapter->andX($expressions)
         );
@@ -202,6 +205,7 @@ class ExprAdapterTest extends TestCase
     public function testNandX(array $expressions): void
     {
         $this->expectException(UnsupportedExpressionTypeException::class);
+        $this->expectExceptionMessage('Unsupported expression type "nandX".');
         $this->exprAdapter->nandX($expressions);
     }
 
@@ -212,7 +216,7 @@ class ExprAdapterTest extends TestCase
      */
     public function testOrX(array $expressions): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             new Expr\Orx($expressions),
             $this->exprAdapter->orX($expressions)
         );
@@ -226,6 +230,7 @@ class ExprAdapterTest extends TestCase
     public function testNorX(array $expressions): void
     {
         $this->expectException(UnsupportedExpressionTypeException::class);
+        $this->expectExceptionMessage('Unsupported expression type "norX".');
         $this->exprAdapter->norX($expressions);
     }
 
@@ -237,6 +242,7 @@ class ExprAdapterTest extends TestCase
     public function testXorX(array $expressions): void
     {
         $this->expectException(UnsupportedExpressionTypeException::class);
+        $this->expectExceptionMessage('Unsupported expression type "xorX".');
         $this->exprAdapter->xorX($expressions);
     }
 }

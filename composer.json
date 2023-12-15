@@ -1,54 +1,58 @@
 {
-  "name": "symftony/xpression",
-  "authors": [
-    {
-      "name": "Anthony",
-      "email": "symftony@gmail.com"
+    "name": "symftony/xpression",
+    "authors": [
+        {
+            "name": "Anthony",
+            "email": "symftony@gmail.com"
+        }
+    ],
+    "type": "library",
+    "description": "Xpression is a simple PHP implementation of Specification pattern",
+    "keywords": [
+        "dsl",
+        "doctrine",
+        "orm",
+        "mongodb",
+        "collections",
+        "specification",
+        "expression",
+        "parser",
+        "lexer",
+        "query",
+        "builder",
+        "query builder"
+    ],
+    "homepage": "https://github.com/symftony/Xpression",
+    "require": {
+        "php": "^8.0",
+        "doctrine/lexer": "^1.0"
+    },
+    "require-dev": {
+        "doctrine/collections": "^1.0",
+        "doctrine/orm": "^2.4.0",
+        "phpspec/prophecy": "^1.18",
+        "phpunit/phpunit": "^9.6",
+        "friendsofphp/php-cs-fixer": "^3.41",
+        "phpstan/phpstan": "^1.10"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "cs": "vendor/bin/php-cs-fixer fix",
+        "stan": "vendor/bin/phpstan analyse"
+    },
+    "suggest": {
+        "doctrine/collections": "If you want filter an ArrayCollection",
+        "doctrine/orm": "If you want filter an ORM query builder"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Symftony\\Xpression\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Symftony\\Xpression\\": "tests/"
+        }
     }
-  ],
-  "type": "library",
-  "description": "Xpression is a simple PHP implementation of Specification pattern",
-  "keywords": [
-    "dsl",
-    "doctrine",
-    "orm",
-    "mongodb",
-    "collections",
-    "specification",
-    "expression",
-    "parser",
-    "lexer",
-    "query",
-    "builder",
-    "query builder"
-  ],
-  "homepage": "https://github.com/symftony/Xpression",
-  "require": {
-    "php": "^8.0",
-    "doctrine/lexer": "^1.0"
-  },
-  "require-dev": {
-    "doctrine/collections": "^1.0",
-    "doctrine/orm": "^2.4.0",
-    "phpspec/prophecy": "^1.18",
-    "phpunit/phpunit": "^9.6"
-  },
-  "scripts": {
-    "test": "vendor/bin/phpunit"
-  },
-  "suggest": {
-    "doctrine/collections": "If you want filter an ArrayCollection",
-    "doctrine/orm": "If you want filter an ORM query builder"
-  },
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "Symftony\\Xpression\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\Symftony\\Xpression\\": "tests/"
-    }
-  }
 }

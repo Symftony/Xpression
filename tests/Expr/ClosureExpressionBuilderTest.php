@@ -1,18 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression\Expr;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Expr\ClosureExpressionBuilder;
 use Symftony\Xpression\Lexer;
 
-class ClosureExpressionBuilderTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ClosureExpressionBuilderTest extends TestCase
 {
     private array $exampleData;
 
     private ClosureExpressionBuilder $closureExpressionBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->exampleData = [
             'field_null' => null,
@@ -23,232 +30,235 @@ class ClosureExpressionBuilderTest extends TestCase
         $this->closureExpressionBuilder = new ClosureExpressionBuilder();
     }
 
-    public function getObjectFieldValueDataProvider(): array
+    public static function provideGetObjectFieldValueCases(): iterable
     {
+        yield [
+            ['fake_key' => 'fake_value'],
+            'fake_key',
+            'fake_value',
+        ];
+
+        yield [
+            new FakeClass(),
+            'property1',
+            'fake_is_property',
+        ];
+
+        yield [
+            new FakeClass(),
+            'property2',
+            'fake_get_property',
+        ];
+
+        yield [
+            new FakeClass(),
+            'callProperty',
+            'getcallProperty',
+        ];
+
+        yield [
+            new FakeClass2(),
+            '_property4',
+            'property4',
+        ];
+
+        yield [
+            new FakeArrayAccess(),
+            'callProperty',
+            'callProperty',
+        ];
+
         $object = new \stdClass();
         $object->property = 'fake_property';
         $object->_property4 = 'fake_property';
 
-        return [
-            [
-                ['fake_key' => 'fake_value'],
-                'fake_key',
-                'fake_value',
-            ],
-            [
-                new FakeClass(),
-                'property1',
-                'fake_is_property',
-            ],
-            [
-                new FakeClass(),
-                'property2',
-                'fake_get_property',
-            ],
-            [
-                new FakeClass(),
-                'callProperty',
-                'getcallProperty',
-            ],
-            [
-                new FakeArrayAccess(),
-                'callProperty',
-                'callProperty',
-            ],
-            [
-                $object,
-                'property',
-                'fake_property',
-            ],
-            [
-                new FakeClass2(),
-                '_property4',
-                'property4',
-            ],
-            [
-                $object,
-                '_property4',
-                'fake_property',
-            ],
+        yield [
+            $object,
+            'property',
+            'fake_property',
+        ];
+
+        yield [
+            $object,
+            '_property4',
+            'fake_property',
         ];
     }
 
     /**
-     * @dataProvider getObjectFieldValueDataProvider
+     * @dataProvider provideGetObjectFieldValueCases
      */
     public function testGetObjectFieldValue(mixed $object, mixed $value, mixed $expectedResult): void
     {
-        $this->assertEquals($expectedResult, ClosureExpressionBuilder::getObjectFieldValue($object, $value));
+        self::assertSame($expectedResult, ClosureExpressionBuilder::getObjectFieldValue($object, $value));
     }
 
     public function testGetSupportedTokenType(): void
     {
-        $this->assertEquals(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
+        self::assertSame(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
     }
 
     public function testParameter(): void
     {
-        $this->assertEquals('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data'));
-        $this->assertEquals('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data', true));
+        self::assertSame('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data'));
+        self::assertSame('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data', true));
     }
 
     public function testString(): void
     {
-        $this->assertEquals('my_fake_data', $this->closureExpressionBuilder->string('my_fake_data'));
+        self::assertSame('my_fake_data', $this->closureExpressionBuilder->string('my_fake_data'));
     }
 
-    public function isNullDataProvider(): array
+    public static function provideIsNullCases(): iterable
     {
-        return [
-            ['field_null', true],
-            ['field_number_5', false],
-        ];
+        yield ['field_null', true];
+
+        yield ['field_number_5', false];
     }
 
     /**
-     * @dataProvider isNullDataProvider
+     * @dataProvider provideIsNullCases
      */
     public function testIsNull(mixed $field, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->isNull($field);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function eqDataProvider(): array
+    public static function provideEqCases(): iterable
     {
-        return [
-            ['field_number_5', 1, false],
-            ['field_number_5', 5, true],
-            ['field_number_5', 10, false],
-        ];
+        yield ['field_number_5', 1, false];
+
+        yield ['field_number_5', 5, true];
+
+        yield ['field_number_5', 10, false];
     }
 
     /**
-     * @dataProvider eqDataProvider
+     * @dataProvider provideEqCases
      */
     public function testEq(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->eq($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function neqDataProvider(): array
+    public static function provideNeqCases(): iterable
     {
-        return [
-            ['field_number_5', 1, true],
-            ['field_number_5', 5, false],
-            ['field_number_5', 10, true],
-        ];
+        yield ['field_number_5', 1, true];
+
+        yield ['field_number_5', 5, false];
+
+        yield ['field_number_5', 10, true];
     }
 
     /**
-     * @dataProvider neqDataProvider
+     * @dataProvider provideNeqCases
      */
     public function testNeq(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->neq($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function gtDataProvider(): array
+    public static function provideGtCases(): iterable
     {
-        return [
-            ['field_number_5', 1, true],
-            ['field_number_5', 5, false],
-            ['field_number_5', 10, false],
-        ];
+        yield ['field_number_5', 1, true];
+
+        yield ['field_number_5', 5, false];
+
+        yield ['field_number_5', 10, false];
     }
 
     /**
-     * @dataProvider gtDataProvider
+     * @dataProvider provideGtCases
      */
     public function testGt(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->gt($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function gteDataProvider(): array
+    public static function provideGteCases(): iterable
     {
-        return [
-            ['field_number_5', 1, true],
-            ['field_number_5', 5, true],
-            ['field_number_5', 10, false],
-        ];
+        yield ['field_number_5', 1, true];
+
+        yield ['field_number_5', 5, true];
+
+        yield ['field_number_5', 10, false];
     }
 
     /**
-     * @dataProvider gteDataProvider
+     * @dataProvider provideGteCases
      */
     public function testGte(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->gte($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function ltDataProvider(): array
+    public static function provideLtCases(): iterable
     {
-        return [
-            ['field_number_5', 1, false],
-            ['field_number_5', 5, false],
-            ['field_number_5', 10, true],
-        ];
+        yield ['field_number_5', 1, false];
+
+        yield ['field_number_5', 5, false];
+
+        yield ['field_number_5', 10, true];
     }
 
     /**
-     * @dataProvider ltDataProvider
+     * @dataProvider provideLtCases
      */
     public function testLt(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->lt($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function lteDataProvider(): array
+    public static function provideLteCases(): iterable
     {
-        return [
-            ['field_number_5', 1, false],
-            ['field_number_5', 5, true],
-            ['field_number_5', 10, true],
-        ];
+        yield ['field_number_5', 1, false];
+
+        yield ['field_number_5', 5, true];
+
+        yield ['field_number_5', 10, true];
     }
 
     /**
-     * @dataProvider lteDataProvider
+     * @dataProvider provideLteCases
      */
     public function testLte(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->lte($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function inDataProvider(): array
+    public static function inDataProvider(): iterable
     {
-        return [
-            ['field_number_5', [1], false],
-            ['field_number_5', [1, 2, 3, 4, 5], true],
-        ];
+        yield ['field_number_5', [1], false];
+
+        yield ['field_number_5', [1, 2, 3, 4, 5], true];
     }
 
     /**
@@ -257,7 +267,7 @@ class ClosureExpressionBuilderTest extends TestCase
     public function testIn(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->in($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
@@ -269,18 +279,17 @@ class ClosureExpressionBuilderTest extends TestCase
     public function testNotIn(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->notIn($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             !$expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function containsDataProvider(): array
+    public static function containsDataProvider(): iterable
     {
-        return [
-            ['field_string', 'toto', false],
-            ['field_string', 'fake', true],
-        ];
+        yield ['field_string', 'toto', false];
+
+        yield ['field_string', 'fake', true];
     }
 
     /**
@@ -289,7 +298,7 @@ class ClosureExpressionBuilderTest extends TestCase
     public function testContains(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->contains($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
         );
@@ -301,20 +310,21 @@ class ClosureExpressionBuilderTest extends TestCase
     public function testNotContains(mixed $field, mixed $value, mixed $expectedResult): void
     {
         $expression = $this->closureExpressionBuilder->notContains($field, $value);
-        $this->assertEquals(
+        self::assertSame(
             !$expectedResult,
             $expression($this->exampleData)
         );
     }
 
-    public function andXDataProvider(): array
+    public static function andXDataProvider(): iterable
     {
-        return [
-            [[false, false], false],
-            [[false, true], false],
-            [[true, false], false],
-            [[true, true], true],
-        ];
+        yield [[false, false], false];
+
+        yield [[false, true], false];
+
+        yield [[true, false], false];
+
+        yield [[true, true], true];
     }
 
     /**
@@ -322,13 +332,9 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testAndX(array $expressions, mixed $expectedResult): void
     {
-        $expressionsCallable = array_map(function ($value) {
-            return function () use ($value) {
-                return $value;
-            };
-        }, $expressions);
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
         $expression = $this->closureExpressionBuilder->andX($expressionsCallable);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression('useless_data')
         );
@@ -339,26 +345,23 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testNandX(array $expressions, mixed $expectedResult): void
     {
-        $expressionsCallable = array_map(function ($value) {
-            return function () use ($value) {
-                return $value;
-            };
-        }, $expressions);
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
         $expression = $this->closureExpressionBuilder->nandX($expressionsCallable);
-        $this->assertEquals(
+        self::assertSame(
             !$expectedResult,
             $expression('useless_data')
         );
     }
 
-    public function orXDataProvider(): array
+    public static function orXDataProvider(): iterable
     {
-        return [
-            [[false, false], false],
-            [[false, true], true],
-            [[true, false], true],
-            [[true, true], true],
-        ];
+        yield [[false, false], false];
+
+        yield [[false, true], true];
+
+        yield [[true, false], true];
+
+        yield [[true, true], true];
     }
 
     /**
@@ -366,13 +369,9 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testOrX(array $expressions, mixed $expectedResult): void
     {
-        $expressionsCallable = array_map(function ($value) {
-            return function () use ($value) {
-                return $value;
-            };
-        }, $expressions);
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
         $expression = $this->closureExpressionBuilder->orX($expressionsCallable);
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
             $expression('useless_data')
         );
@@ -383,49 +382,49 @@ class ClosureExpressionBuilderTest extends TestCase
      */
     public function testNorX(array $expressions, mixed $expectedResult): void
     {
-        $expressionsCallable = array_map(function ($value) {
-            return function () use ($value) {
-                return $value;
-            };
-        }, $expressions);
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
         $expression = $this->closureExpressionBuilder->norX($expressionsCallable);
-        $this->assertEquals(
+        self::assertSame(
             !$expectedResult,
             $expression('useless_data')
         );
     }
 
-    public function xorXDataProvider(): array
+    public static function provideXorXCases(): iterable
     {
-        return [
-            [[false, false], false],
-            [[false, true], true],
-            [[true, false], true],
-            [[true, true], false],
+        yield [[false, false], false];
 
-            [[false, false, false], false],
-            [[false, false, true], true],
-            [[false, true, false], true],
-            [[false, true, true], false],
-            [[true, false, false], true],
-            [[true, false, true], false],
-            [[true, true, false], false],
-            [[true, true, true], true],
-        ];
+        yield [[false, true], true];
+
+        yield [[true, false], true];
+
+        yield [[true, true], false];
+
+        yield [[false, false, false], false];
+
+        yield [[false, false, true], true];
+
+        yield [[false, true, false], true];
+
+        yield [[false, true, true], false];
+
+        yield [[true, false, false], true];
+
+        yield [[true, false, true], false];
+
+        yield [[true, true, false], false];
+
+        yield [[true, true, true], true];
     }
 
     /**
-     * @dataProvider xorXDataProvider
+     * @dataProvider provideXorXCases
      */
     public function testXorX(array $expressions, mixed $expectedResult): void
     {
-        $expressionsCallable = array_map(function ($value) {
-            return function () use ($value) {
-                return $value;
-            };
-        }, $expressions);
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
         $expression = $this->closureExpressionBuilder->xorX($expressionsCallable);
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             $expression('useless_data')
         );
@@ -434,6 +433,11 @@ class ClosureExpressionBuilderTest extends TestCase
 
 class FakeClass
 {
+    public function __call($name, $arguments)
+    {
+        return $name.implode(', ', $arguments);
+    }
+
     public function isProperty1()
     {
         return 'fake_is_property';
@@ -452,11 +456,6 @@ class FakeClass
     public function getPROPERTY4()
     {
         return 'property4';
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $name . implode(', ', $arguments);
     }
 }
 
@@ -485,11 +484,7 @@ class FakeArrayAccess implements \ArrayAccess
         return $offset;
     }
 
-    public function offsetSet($offset, $value): void
-    {
-    }
+    public function offsetSet($offset, $value): void {}
 
-    public function offsetUnset($offset): void
-    {
-    }
+    public function offsetUnset($offset): void {}
 }

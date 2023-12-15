@@ -1,63 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression\Expr;
 
 use PHPUnit\Framework\TestCase;
-use Symftony\Xpression\Expr\ClosureExpressionBuilder;
 use Symftony\Xpression\Expr\HtmlExpressionBuilder;
 use Symftony\Xpression\Lexer;
 
-class HtmlExpressionBuilderTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class HtmlExpressionBuilderTest extends TestCase
 {
-    /**
-     * @var ClosureExpressionBuilder
-     */
-    private $closureExpressionBuilder;
+    private HtmlExpressionBuilder $htmlExpressionBuilder;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $this->closureExpressionBuilder = new HtmlExpressionBuilder();
+        $this->htmlExpressionBuilder = new HtmlExpressionBuilder();
     }
 
-    public function testGetSupportedTokenType()
+    public function testGetSupportedTokenType(): void
     {
-        $this->assertEquals(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
+        self::assertSame(Lexer::T_ALL, $this->htmlExpressionBuilder->getSupportedTokenType());
     }
 
-    public function testParameter()
+    public function testParameter(): void
     {
-        $this->assertEquals('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data'));
-        $this->assertEquals('my_fake_data', $this->closureExpressionBuilder->parameter('my_fake_data', true));
+        self::assertSame('my_fake_data', $this->htmlExpressionBuilder->parameter('my_fake_data'));
+        self::assertSame('my_fake_data', $this->htmlExpressionBuilder->parameter('my_fake_data', true));
     }
 
-    public function testString()
+    public function testString(): void
     {
-        $this->assertEquals('"my_fake_data"', $this->closureExpressionBuilder->string('my_fake_data'));
+        self::assertSame('"my_fake_data"', $this->htmlExpressionBuilder->string('my_fake_data'));
     }
 
-    public function isNullDataProvider()
+    public static function provideIsNullCases(): iterable
     {
-        return [
-            ['field_null', '<div>field_null is null</div>'],
-            ['field_number_5', '<div>field_number_5 is null</div>'],
-        ];
+        yield ['field_null', '<div>field_null is null</div>'];
+
+        yield ['field_number_5', '<div>field_number_5 is null</div>'];
     }
 
     /**
-     * @dataProvider isNullDataProvider
-     *
-     * @param $field
-     * @param $expectedResult
+     * @dataProvider provideIsNullCases
      */
-    public function testIsNull($field, $expectedResult)
+    public function testIsNull(string $field, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->isNull($field)
+            $this->htmlExpressionBuilder->isNull($field)
         );
     }
 
-    public function eqDataProvider()
+    public static function provideEqCases(): iterable
     {
         return [
             ['field_number_5', 1, '<div>field_number_5 = 1</div>'],
@@ -67,210 +66,175 @@ class HtmlExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider eqDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideEqCases
      */
-    public function testEq($field, $value, $expectedResult)
+    public function testEq(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->eq($field, $value)
+            $this->htmlExpressionBuilder->eq($field, $value)
         );
     }
 
-    public function neqDataProvider()
+    public static function provideNeqCases(): iterable
     {
-        return [
-            ['field_number_5', 1, '<div>field_number_5 ≠ 1</div>'],
-            ['field_number_5', 5, '<div>field_number_5 ≠ 5</div>'],
-            ['field_number_5', 10, '<div>field_number_5 ≠ 10</div>'],
-        ];
+        yield ['field_number_5', 1, '<div>field_number_5 ≠ 1</div>'];
+
+        yield ['field_number_5', 5, '<div>field_number_5 ≠ 5</div>'];
+
+        yield ['field_number_5', 10, '<div>field_number_5 ≠ 10</div>'];
     }
 
     /**
-     * @dataProvider neqDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideNeqCases
      */
-    public function testNeq($field, $value, $expectedResult)
+    public function testNeq(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->neq($field, $value)
+            $this->htmlExpressionBuilder->neq($field, $value)
         );
     }
 
-    public function gtDataProvider()
+    public static function provideGtCases(): iterable
     {
-        return [
-            ['field_number_5', 1, '<div>field_number_5 > 1</div>'],
-            ['field_number_5', 5, '<div>field_number_5 > 5</div>'],
-            ['field_number_5', 10, '<div>field_number_5 > 10</div>'],
-        ];
+        yield ['field_number_5', 1, '<div>field_number_5 > 1</div>'];
+
+        yield ['field_number_5', 5, '<div>field_number_5 > 5</div>'];
+
+        yield ['field_number_5', 10, '<div>field_number_5 > 10</div>'];
     }
 
     /**
-     * @dataProvider gtDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideGtCases
      */
-    public function testGt($field, $value, $expectedResult)
+    public function testGt(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->gt($field, $value)
+            $this->htmlExpressionBuilder->gt($field, $value)
         );
     }
 
-    public function gteDataProvider()
+    public static function provideGteCases(): iterable
     {
-        return [
-            ['field_number_5', 1, '<div>field_number_5 ≥ 1</div>'],
-            ['field_number_5', 5, '<div>field_number_5 ≥ 5</div>'],
-            ['field_number_5', 10, '<div>field_number_5 ≥ 10</div>'],
-        ];
+        yield ['field_number_5', 1, '<div>field_number_5 ≥ 1</div>'];
+
+        yield ['field_number_5', 5, '<div>field_number_5 ≥ 5</div>'];
+
+        yield ['field_number_5', 10, '<div>field_number_5 ≥ 10</div>'];
     }
 
     /**
-     * @dataProvider gteDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideGteCases
      */
-    public function testGte($field, $value, $expectedResult)
+    public function testGte(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->gte($field, $value)
+            $this->htmlExpressionBuilder->gte($field, $value)
         );
     }
 
-    public function ltDataProvider()
+    public static function provideLtCases(): iterable
     {
-        return [
-            ['field_number_5', 1, '<div>field_number_5 < 1</div>'],
-            ['field_number_5', 5, '<div>field_number_5 < 5</div>'],
-            ['field_number_5', 10, '<div>field_number_5 < 10</div>'],
-        ];
+        yield ['field_number_5', 1, '<div>field_number_5 < 1</div>'];
+
+        yield ['field_number_5', 5, '<div>field_number_5 < 5</div>'];
+
+        yield ['field_number_5', 10, '<div>field_number_5 < 10</div>'];
     }
 
     /**
-     * @dataProvider ltDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideLtCases
      */
-    public function testLt($field, $value, $expectedResult)
+    public function testLt(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->lt($field, $value)
+            $this->htmlExpressionBuilder->lt($field, $value)
         );
     }
 
-    public function lteDataProvider()
+    public static function provideLteCases(): iterable
     {
-        return [
-            ['field_number_5', 1, '<div>field_number_5 ≤ 1</div>'],
-            ['field_number_5', 5, '<div>field_number_5 ≤ 5</div>'],
-            ['field_number_5', 10, '<div>field_number_5 ≤ 10</div>'],
-        ];
+        yield ['field_number_5', 1, '<div>field_number_5 ≤ 1</div>'];
+
+        yield ['field_number_5', 5, '<div>field_number_5 ≤ 5</div>'];
+
+        yield ['field_number_5', 10, '<div>field_number_5 ≤ 10</div>'];
     }
 
     /**
-     * @dataProvider lteDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideLteCases
      */
-    public function testLte($field, $value, $expectedResult)
+    public function testLte(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->lte($field, $value)
+            $this->htmlExpressionBuilder->lte($field, $value)
         );
     }
 
-    public function inDataProvider()
+    public static function provideInCases(): iterable
     {
-        return [
-            ['field_number_5', [1], '<div>field_number_5 value in 1</div>'],
-            ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value in 1, 2, 3, 4, 5</div>'],
-        ];
+        yield ['field_number_5', [1], '<div>field_number_5 value in 1</div>'];
+
+        yield ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value in 1, 2, 3, 4, 5</div>'];
     }
 
     /**
-     * @dataProvider inDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideInCases
      */
-    public function testIn($field, $value, $expectedResult)
+    public function testIn(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->in($field, $value)
+            $this->htmlExpressionBuilder->in($field, $value)
         );
     }
 
-    public function notInDataProvider()
+    public static function provideNotInCases(): iterable
     {
-        return [
-            ['field_number_5', [1], '<div>field_number_5 value not in 1</div>'],
-            ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value not in 1, 2, 3, 4, 5</div>'],
-        ];
+        yield ['field_number_5', [1], '<div>field_number_5 value not in 1</div>'];
+
+        yield ['field_number_5', [1, 2, 3, 4, 5], '<div>field_number_5 value not in 1, 2, 3, 4, 5</div>'];
     }
 
     /**
-     * @dataProvider notInDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideNotInCases
      */
-    public function testNotIn($field, $value, $expectedResult)
+    public function testNotIn(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->notIn($field, $value)
+            $this->htmlExpressionBuilder->notIn($field, $value)
         );
     }
 
-    public function containsDataProvider()
+    public static function provideContainsCases(): iterable
     {
-        return [
-            ['field_string', 'toto', '<div>field_string contains toto</div>'],
-            ['field_string', 'fake', '<div>field_string contains fake</div>'],
-        ];
+        yield ['field_string', 'toto', '<div>field_string contains toto</div>'];
+
+        yield ['field_string', 'fake', '<div>field_string contains fake</div>'];
     }
 
     /**
-     * @dataProvider containsDataProvider
+     * @dataProvider provideContainsCases
      *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @param mixed $field
+     * @param mixed $value
+     * @param mixed $expectedResult
      */
-    public function testContains($field, $value, $expectedResult)
+    public function testContains($field, $value, $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->contains($field, $value)
+            $this->htmlExpressionBuilder->contains($field, $value)
         );
     }
 
-    public function notContainsDataProvider()
+    public static function provideNotContainsCases(): iterable
     {
         return [
             ['field_string', 'toto', '<div>field_string notContains toto</div>'],
@@ -279,143 +243,139 @@ class HtmlExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider notContainsDataProvider
-     *
-     * @param $field
-     * @param $value
-     * @param $expectedResult
+     * @dataProvider provideNotContainsCases
      */
-    public function testNotContains($field, $value, $expectedResult)
+    public function testNotContains(string $field, mixed $value, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->notContains($field, $value)
+            $this->htmlExpressionBuilder->notContains($field, $value)
         );
     }
 
-    public function andXDataProvider()
+    public static function provideAndXCases(): iterable
     {
-        return [
-            [['false', 'false'], '<fieldset><legend>and</legend>falsefalse</fieldset>'],
-            [['false', 'true'], '<fieldset><legend>and</legend>falsetrue</fieldset>'],
-            [['true', 'false'], '<fieldset><legend>and</legend>truefalse</fieldset>'],
-            [['true', 'true'], '<fieldset><legend>and</legend>truetrue</fieldset>'],
-        ];
+        yield [['false', 'false'], '<fieldset><legend>and</legend>falsefalse</fieldset>'];
+
+        yield [['false', 'true'], '<fieldset><legend>and</legend>falsetrue</fieldset>'];
+
+        yield [['true', 'false'], '<fieldset><legend>and</legend>truefalse</fieldset>'];
+
+        yield [['true', 'true'], '<fieldset><legend>and</legend>truetrue</fieldset>'];
     }
 
     /**
-     * @dataProvider andXDataProvider
-     *
-     * @param array $expressions
-     * @param $expectedResult
+     * @dataProvider provideAndXCases
      */
-    public function testAndX(array $expressions, $expectedResult)
+    public function testAndX(array $expressions, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->andX($expressions)
+            $this->htmlExpressionBuilder->andX($expressions)
         );
     }
 
-    public function nandXDataProvider()
+    public static function provideNandXCases(): iterable
     {
-        return [
-            [['false', 'false'], '<fieldset><legend>not-and</legend>falsefalse</fieldset>'],
-            [['false', 'true'], '<fieldset><legend>not-and</legend>falsetrue</fieldset>'],
-            [['true', 'false'], '<fieldset><legend>not-and</legend>truefalse</fieldset>'],
-            [['true', 'true'], '<fieldset><legend>not-and</legend>truetrue</fieldset>'],
-        ];
+        yield [['false', 'false'], '<fieldset><legend>not-and</legend>falsefalse</fieldset>'];
+
+        yield [['false', 'true'], '<fieldset><legend>not-and</legend>falsetrue</fieldset>'];
+
+        yield [['true', 'false'], '<fieldset><legend>not-and</legend>truefalse</fieldset>'];
+
+        yield [['true', 'true'], '<fieldset><legend>not-and</legend>truetrue</fieldset>'];
     }
 
     /**
-     * @dataProvider nandXDataProvider
-     *
-     * @param array $expressions
-     * @param $expectedResult
+     * @dataProvider provideNandXCases
      */
-    public function testNandX(array $expressions, $expectedResult)
+    public function testNandX(array $expressions, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->nandX($expressions)
+            $this->htmlExpressionBuilder->nandX($expressions)
         );
     }
 
-    public function orXDataProvider()
+    public static function provideOrXCases(): iterable
     {
-        return [
-            [['false', 'false'], '<fieldset><legend>or</legend>falsefalse</fieldset>'],
-            [['false', 'true'], '<fieldset><legend>or</legend>falsetrue</fieldset>'],
-            [['true', 'false'], '<fieldset><legend>or</legend>truefalse</fieldset>'],
-            [['true', 'true'], '<fieldset><legend>or</legend>truetrue</fieldset>'],
-        ];
+        yield [['false', 'false'], '<fieldset><legend>or</legend>falsefalse</fieldset>'];
+
+        yield [['false', 'true'], '<fieldset><legend>or</legend>falsetrue</fieldset>'];
+
+        yield [['true', 'false'], '<fieldset><legend>or</legend>truefalse</fieldset>'];
+
+        yield [['true', 'true'], '<fieldset><legend>or</legend>truetrue</fieldset>'];
     }
 
     /**
-     * @dataProvider orXDataProvider
-     *
-     * @param array $expressions
-     * @param $expectedResult
+     * @dataProvider provideOrXCases
      */
-    public function testOrX(array $expressions, $expectedResult)
+    public function testOrX(array $expressions, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->orX($expressions)
+            $this->htmlExpressionBuilder->orX($expressions)
         );
     }
 
-    public function norXDataProvider()
+    public static function provideNorXCases(): iterable
     {
-        return [
-            [['false', 'false'], '<fieldset><legend>not-or</legend>falsefalse</fieldset>'],
-            [['false', 'true'], '<fieldset><legend>not-or</legend>falsetrue</fieldset>'],
-            [['true', 'false'], '<fieldset><legend>not-or</legend>truefalse</fieldset>'],
-            [['true', 'true'], '<fieldset><legend>not-or</legend>truetrue</fieldset>'],
-        ];
+        yield [['false', 'false'], '<fieldset><legend>not-or</legend>falsefalse</fieldset>'];
+
+        yield [['false', 'true'], '<fieldset><legend>not-or</legend>falsetrue</fieldset>'];
+
+        yield [['true', 'false'], '<fieldset><legend>not-or</legend>truefalse</fieldset>'];
+
+        yield [['true', 'true'], '<fieldset><legend>not-or</legend>truetrue</fieldset>'];
     }
 
     /**
-     * @dataProvider norXDataProvider
-     *
-     * @param array $expressions
-     * @param $expectedResult
+     * @dataProvider provideNorXCases
      */
-    public function testNorX(array $expressions, $expectedResult)
+    public function testNorX(array $expressions, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->norX($expressions)
+            $this->htmlExpressionBuilder->norX($expressions)
         );
     }
 
-    public function xorXDataProvider()
+    public static function provideXorXCases(): iterable
     {
-        return [
-            [['false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalse</fieldset>'],
-            [['false', 'true'], '<fieldset><legend>exclusive-or</legend>falsetrue</fieldset>'],
-            [['true', 'false'], '<fieldset><legend>exclusive-or</legend>truefalse</fieldset>'],
-            [['true', 'true'], '<fieldset><legend>exclusive-or</legend>truetrue</fieldset>'],
+        yield [['false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalse</fieldset>'];
 
-            [['false', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalsefalse</fieldset>'],
-            [['false', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>falsefalsetrue</fieldset>'],
-            [['false', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>falsetruefalse</fieldset>'],
-            [['false', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>falsetruetrue</fieldset>'],
-            [['true', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>truefalsefalse</fieldset>'],
-            [['true', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>truefalsetrue</fieldset>'],
-            [['true', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>truetruefalse</fieldset>'],
-            [['true', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>truetruetrue</fieldset>'],
-        ];
+        yield [['false', 'true'], '<fieldset><legend>exclusive-or</legend>falsetrue</fieldset>'];
+
+        yield [['true', 'false'], '<fieldset><legend>exclusive-or</legend>truefalse</fieldset>'];
+
+        yield [['true', 'true'], '<fieldset><legend>exclusive-or</legend>truetrue</fieldset>'];
+
+        yield [['false', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>falsefalsefalse</fieldset>'];
+
+        yield [['false', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>falsefalsetrue</fieldset>'];
+
+        yield [['false', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>falsetruefalse</fieldset>'];
+
+        yield [['false', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>falsetruetrue</fieldset>'];
+
+        yield [['true', 'false', 'false'], '<fieldset><legend>exclusive-or</legend>truefalsefalse</fieldset>'];
+
+        yield [['true', 'false', 'true'], '<fieldset><legend>exclusive-or</legend>truefalsetrue</fieldset>'];
+
+        yield [['true', 'true', 'false'], '<fieldset><legend>exclusive-or</legend>truetruefalse</fieldset>'];
+
+        yield [['true', 'true', 'true'], '<fieldset><legend>exclusive-or</legend>truetruetrue</fieldset>'];
     }
 
     /**
-     * @dataProvider xorXDataProvider
+     * @dataProvider provideXorXCases
      */
-    public function testXorX(array $expressions, mixed $expectedResult)
+    public function testXorX(array $expressions, string $expectedResult): void
     {
-        $this->assertEquals(
+        self::assertSame(
             $expectedResult,
-            $this->closureExpressionBuilder->xorX($expressions)
+            $this->htmlExpressionBuilder->xorX($expressions)
         );
     }
 }

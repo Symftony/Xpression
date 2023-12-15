@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Exception\Parser;
 
 class UnsupportedTokenTypeException extends TokenException
 {
     /**
-     * @var string
+     * @param string[] $token
+     * @param string[] $supportedTokenTypes
      */
-    private $supportedTokenTypes;
-
-    /**
-     * @param array $token
-     * @param array $supportedTokenTypes
-     * @param int $message
-     * @param int $code
-     * @param \Exception|null $previous
-     */
-    public function __construct(array $token, $supportedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
-    {
+    public function __construct(
+        array $token,
+        private array $supportedTokenTypes,
+        ?string $message = null,
+        int $code = 0,
+        \Exception $previous = null,
+    ) {
         $defaultMessage = sprintf(
             'Unsupported token "%s". Supported was %s.',
             $token['value'],
@@ -25,14 +24,12 @@ class UnsupportedTokenTypeException extends TokenException
         );
 
         parent::__construct($token, $message ?: $defaultMessage, $code, $previous);
-
-        $this->supportedTokenTypes = $supportedTokenTypes;
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getSupportedTokenTypes()
+    public function getSupportedTokenTypes(): array
     {
         return $this->supportedTokenTypes;
     }

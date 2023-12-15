@@ -1,17 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression\Bridge\Doctrine\Common;
 
-use Doctrine\Common\Collections\Expr\Expression;
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
-class ParserTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+final class ParserTest extends TestCase
 {
     /**
      * @var ExpressionBuilderAdapter
@@ -23,16 +30,16 @@ class ParserTest extends TestCase
      */
     private $parser;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
-            $this->markTestSkipped('This test is run when you have "doctrine/collection" installed.');
+            self::markTestSkipped('This test is run when you have "doctrine/collection" installed.');
         }
         $this->expressionBuilderAdapter = new ExpressionBuilderAdapter(new ExpressionBuilder());
         $this->parser = new Parser($this->expressionBuilderAdapter);
     }
 
-    public function parseSuccessDataProvider(): array
+    public static function provideParserCases(): iterable
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
             return [];
@@ -133,7 +140,7 @@ class ParserTest extends TestCase
                 ]),
             ],
 
-            //Parenthesis
+            // Parenthesis
             [
                 '((fieldA=1))',
                 new Comparison('fieldA', '=', 1),
@@ -162,14 +169,14 @@ class ParserTest extends TestCase
     }
 
     /**
-     * @dataProvider parseSuccessDataProvider
+     * @dataProvider provideParserCases
      */
     public function testParser(string $input, Expression $expectedExpression): void
     {
-        $this->assertEquals($expectedExpression, $this->parser->parse($input));
+        self::assertEquals($expectedExpression, $this->parser->parse($input));
     }
 
-    public function unsupportedExpressionTypeDataProvider(): array
+    public static function provideParserThrowUnsupportedExpressionTypeExceptionCases(): iterable
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
             return [];
@@ -188,7 +195,7 @@ class ParserTest extends TestCase
     }
 
     /**
-     * @dataProvider unsupportedExpressionTypeDataProvider
+     * @dataProvider provideParserThrowUnsupportedExpressionTypeExceptionCases
      */
     public function testParserThrowUnsupportedExpressionTypeException(string $input): void
     {

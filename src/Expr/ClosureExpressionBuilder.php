@@ -1,20 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Expr;
 
 use Symftony\Xpression\Lexer;
 
 class ClosureExpressionBuilder implements ExpressionBuilderInterface
 {
-    /**
-     * @param $object
-     * @param $field
-     *
-     * @return mixed
-     */
-    public static function getObjectFieldValue($object, $field)
+    public static function getObjectFieldValue(mixed $object, mixed $field): mixed
     {
-        if (is_array($object)) {
+        if (\is_array($object)) {
             return $object[$field];
         }
 
@@ -27,149 +23,117 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
                 continue;
             }
 
-            return $object->$accessor();
+            return $object->{$accessor}();
         }
 
         // __call should be triggered for get.
-        $accessor = $accessors[0] . $field;
+        $accessor = $accessors[0].$field;
 
         if (method_exists($object, '__call')) {
-            return $object->$accessor();
+            return $object->{$accessor}();
         }
 
         if ($object instanceof \ArrayAccess) {
             return $object[$field];
         }
 
-        if (isset($object->$field)) {
-            return $object->$field;
+        if (isset($object->{$field})) {
+            return $object->{$field};
         }
 
         // camelcase field name to support different variable naming conventions
-        $ccField = preg_replace_callback('/_(.?)/', function ($matches) {
-            return strtoupper($matches[1]);
-        }, $field);
+        $ccField = preg_replace_callback('/_(.?)/', static fn ($matches) => strtoupper($matches[1]), $field);
 
         foreach ($accessors as $accessor) {
             $accessor .= $ccField;
-
 
             if (!method_exists($object, $accessor)) {
                 continue;
             }
 
-            return $object->$accessor();
+            return $object->{$accessor}();
         }
 
-        return $object->$field;
+        return $object->{$field};
     }
 
-    /**
-     * @return int
-     */
     public function getSupportedTokenType(): int
     {
         return Lexer::T_ALL;
     }
 
     /**
-     * @param $value
-     * @param bool $isValue
-     *
-     * @return mixed
+     * @param bool  $isValue
+     * @param mixed $value
      */
     public function parameter($value, $isValue = false): mixed
     {
         return $value;
     }
 
-    public function string($value): mixed
+    public function string(mixed $value): mixed
     {
         return $value;
     }
 
-    public function isNull($field)
+    public function isNull(string $field): mixed
     {
-        return function ($object) use ($field) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) === null;
-        };
+        return static fn ($object) => null === ClosureExpressionBuilder::getObjectFieldValue($object, $field);
     }
 
-    public function eq(string $field, mixed $value)
+    public function eq(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) === $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) === $value;
     }
 
-    public function neq(string $field, mixed $value)
+    public function neq(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) !== $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) !== $value;
     }
 
-    public function gt(string $field, mixed $value)
+    public function gt(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) > $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) > $value;
     }
 
-    public function gte(string $field, mixed $value)
+    public function gte(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) >= $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) >= $value;
     }
 
-    public function lt(string $field, mixed $value)
+    public function lt(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) < $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) < $value;
     }
 
-    public function lte(string $field, mixed $value)
+    public function lte(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return ClosureExpressionBuilder::getObjectFieldValue($object, $field) <= $value;
-        };
+        return static fn ($object) => ClosureExpressionBuilder::getObjectFieldValue($object, $field) <= $value;
     }
 
-    public function in($field, array $values)
+    public function in(string $field, array $values): mixed
     {
-        return function ($object) use ($field, $values) {
-            return in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values);
-        };
+        return static fn ($object) => \in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values, true);
     }
 
-    public function notIn($field, array $values)
+    public function notIn(string $field, array $values): mixed
     {
-        return function ($object) use ($field, $values) {
-            return !in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values);
-        };
+        return static fn ($object) => !\in_array(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $values, true);
     }
 
-    public function contains(string $field, mixed $value)
+    public function contains(string $field, mixed $value): mixed
     {
-        return function ($object) use ($field, $value) {
-            return false !== strpos(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
-        };
+        return static fn ($object) => str_contains(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
     }
 
-    public function notContains(string $field, mixed $value)
+    public function notContains(string $field, mixed $value): mixed
     {
-        $self = $this;
-        return function ($object) use ($self, $field, $value) {
-            $contains = $self->contains($field, $value);
-            return !$contains($object);
-        };
+        return static fn ($object) => !str_contains(ClosureExpressionBuilder::getObjectFieldValue($object, $field), $value);
     }
 
-    public function andX(array $expressions)
+    public function andX(array $expressions): mixed
     {
-        return function ($object) use ($expressions) {
+        return static function ($object) use ($expressions) {
             foreach ($expressions as $expression) {
                 if (!$expression($object)) {
                     return false;
@@ -180,18 +144,16 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    public function nandX(array $expressions)
+    public function nandX(array $expressions): mixed
     {
         $self = $this;
-        return function ($object) use ($self, $expressions) {
-            $andX = $self->andX($expressions);
-            return !$andX($object);
-        };
+
+        return static fn ($object) => !$self->andX($expressions)($object);
     }
 
-    public function orX(array $expressions)
+    public function orX(array $expressions): mixed
     {
-        return function ($object) use ($expressions) {
+        return static function ($object) use ($expressions) {
             foreach ($expressions as $expression) {
                 if ($expression($object)) {
                     return true;
@@ -202,27 +164,26 @@ class ClosureExpressionBuilder implements ExpressionBuilderInterface
         };
     }
 
-    public function norX(array $expressions)
+    public function norX(array $expressions): mixed
     {
         $self = $this;
-        return function ($object) use ($self, $expressions) {
-            $orX = $self->orX($expressions);
-            return !$orX($object);
-        };
+
+        return static fn ($object) => !$self->orX($expressions)($object);
     }
 
-    public function xorX(array $expressions)
+    public function xorX(array $expressions): mixed
     {
-        return function ($object) use ($expressions) {
+        return static function ($object) use ($expressions) {
             $result = 0;
             foreach ($expressions as $expression) {
                 if ($expression($object)) {
-                    $result++;
+                    ++$result;
                 }
             }
 
-            $countExpressions = count($expressions);
-            return $result === 1 | (2 < $countExpressions & $result === $countExpressions);
+            $countExpressions = \count($expressions);
+
+            return 1 === $result | (2 < $countExpressions & $result === $countExpressions);
         };
     }
 }

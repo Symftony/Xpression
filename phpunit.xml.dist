@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          backupGlobals="false"
          colors="true"
-         bootstrap="vendor/autoload.php"
-         convertNoticesToExceptions="true"
->
-  <coverage>
-    <include>
-      <directory>src</directory>
-    </include>
-    <exclude>
-      <directory>src/Exception</directory>
-    </exclude>
-  </coverage>
+         bootstrap="vendor/autoload.php">
+  <coverage/>
   <php>
     <ini name="error_reporting" value="-1"/>
   </php>
@@ -23,4 +14,12 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory>src</directory>
+    </include>
+    <exclude>
+      <directory>src/Exception</directory>
+    </exclude>
+  </source>
 </phpunit>

@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Exception\Parser;
 
 class UnexpectedTokenException extends TokenException
 {
     /**
-     * @var string
+     * @param string[] $token
+     * @param string[] $expectedTokenTypes
      */
-    private $expectedTokenTypes;
-
-    /**
-     * @param array $token
-     * @param array $expectedTokenTypes
-     * @param int $message
-     * @param int $code
-     * @param \Exception|null $previous
-     */
-    public function __construct(array $token, $expectedTokenTypes, $message = null, $code = 0, \Exception $previous = null)
-    {
+    public function __construct(
+        array $token,
+        private array $expectedTokenTypes,
+        ?string $message = null,
+        int $code = 0,
+        \Exception $previous = null,
+    ) {
         $defaultMessage = sprintf(
             'Unexpected token "%s". Expected was %s.',
             $token['value'],
@@ -25,14 +24,12 @@ class UnexpectedTokenException extends TokenException
         );
 
         parent::__construct($token, $message ?: $defaultMessage, $code, $previous);
-
-        $this->expectedTokenTypes = $expectedTokenTypes;
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getExpectedTokenTypes()
+    public function getExpectedTokenTypes(): array
     {
         return $this->expectedTokenTypes;
     }

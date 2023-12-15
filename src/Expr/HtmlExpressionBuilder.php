@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Expr;
 
 use Symftony\Xpression\Lexer;
@@ -9,7 +11,7 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
     /**
      * This callable is use to delegate the html generation to a third party
      * eg: $comparisonHtmlBuilder($field, $operator, $value)
-     * it must return the html code
+     * it must return the html code.
      *
      * @var callable
      */
@@ -18,28 +20,20 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
     /**
      * This callable is use to delegate the html generation to a third party
      * eg: $compositeHtmlBuilder(array $expressions, $type)
-     * it must return the html code
+     * it must return the html code.
      *
      * @var callable
      */
     private $compositeHtmlBuilder;
 
-    /**
-     * @param callable $comparisonHtmlBuilder
-     * @param callable $compositeHtmlBuilder
-     */
     public function __construct(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
     {
-        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: function ($field, $operator, $value) {
-            return sprintf('<div>%s %s %s</div>', $field, $operator, $value);
-        };
-        $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: function (array $expressions, $type) {
-            return str_replace(
-                ['{type}', '{expressions}'],
-                [$type, implode('', $expressions)],
-                '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
-            );
-        };
+        $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: static fn ($field, $operator, $value) => sprintf('<div>%s %s %s</div>', $field, $operator, $value);
+        $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: static fn (array $expressions, $type) => str_replace(
+            ['{type}', '{expressions}'],
+            [$type, implode('', $expressions)],
+            '<fieldset><legend>{type}</legend>{expressions}</fieldset>'
+        );
     }
 
     public function getSupportedTokenType(): int
@@ -52,88 +46,88 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
         return $value;
     }
 
-    public function string($value): mixed
+    public function string(mixed $value): mixed
     {
-        return '"' . $value . '"';
+        return '"'.$value.'"';
     }
 
-    public function isNull($field)
+    public function isNull(string $field): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'is', 'null']);
+        return ($this->comparisonHtmlBuilder)($field, 'is', 'null');
     }
 
-    public function eq(string $field, mixed $value)
+    public function eq(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '=', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '=', $value);
     }
 
-    public function neq(string $field, mixed $value)
+    public function neq(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≠', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '≠', $value);
     }
 
-    public function gt(string $field, mixed $value)
+    public function gt(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '>', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '>', $value);
     }
 
-    public function gte(string $field, mixed $value)
+    public function gte(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≥', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '≥', $value);
     }
 
-    public function lt(string $field, mixed $value)
+    public function lt(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '<', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '<', $value);
     }
 
-    public function lte(string $field, mixed $value)
+    public function lte(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, '≤', $value]);
+        return ($this->comparisonHtmlBuilder)($field, '≤', $value);
     }
 
-    public function in($field, array $values)
+    public function in(string $field, array $values): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'value in', implode(', ', $values)]);
+        return ($this->comparisonHtmlBuilder)($field, 'value in', implode(', ', $values));
     }
 
-    public function notIn($field, array $values)
+    public function notIn(string $field, array $values): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'value not in', implode(', ', $values)]);
+        return ($this->comparisonHtmlBuilder)($field, 'value not in', implode(', ', $values));
     }
 
-    public function contains(string $field, mixed $value)
+    public function contains(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'contains', $value]);
+        return ($this->comparisonHtmlBuilder)($field, 'contains', $value);
     }
 
-    public function notContains(string $field, mixed $value)
+    public function notContains(string $field, mixed $value): mixed
     {
-        return call_user_func_array($this->comparisonHtmlBuilder, [$field, 'notContains', $value]);
+        return ($this->comparisonHtmlBuilder)($field, 'notContains', $value);
     }
 
-    public function andX(array $expressions)
+    public function andX(array $expressions): mixed
     {
-        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'and']);
+        return ($this->compositeHtmlBuilder)($expressions, 'and');
     }
 
-    public function nandX(array $expressions)
+    public function nandX(array $expressions): mixed
     {
-        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'not-and']);
+        return ($this->compositeHtmlBuilder)($expressions, 'not-and');
     }
 
-    public function orX(array $expressions)
+    public function orX(array $expressions): mixed
     {
-        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'or']);
+        return ($this->compositeHtmlBuilder)($expressions, 'or');
     }
 
-    public function norX(array $expressions)
+    public function norX(array $expressions): mixed
     {
-        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'not-or']);
+        return ($this->compositeHtmlBuilder)($expressions, 'not-or');
     }
 
-    public function xorX(array $expressions)
+    public function xorX(array $expressions): mixed
     {
-        return call_user_func_array($this->compositeHtmlBuilder, [$expressions, 'exclusive-or']);
+        return ($this->compositeHtmlBuilder)($expressions, 'exclusive-or');
     }
 }
