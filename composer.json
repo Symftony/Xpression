@@ -35,11 +35,6 @@
         "friendsofphp/php-cs-fixer": "^3.41",
         "phpstan/phpstan": "^1.10"
     },
-    "scripts": {
-        "test": "vendor/bin/phpunit",
-        "cs": "vendor/bin/php-cs-fixer fix",
-        "stan": "vendor/bin/phpstan analyse"
-    },
     "suggest": {
         "doctrine/collections": "If you want filter an ArrayCollection",
         "doctrine/orm": "If you want filter an ORM query builder"
