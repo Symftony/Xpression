@@ -7,7 +7,7 @@ test:
 	vendor/bin/phpunit
 
 cs:
-	vendor/bin/php-cs-fixer fix
+	vendor/bin/php-cs-fixer fix -vvv
 
 analyse:
 	vendor/bin/phpstan

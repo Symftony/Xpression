@@ -184,21 +184,21 @@ class Lexer extends AbstractLexer
 
                 break;
 
-            // Recognize numeric values
+                // Recognize numeric values
             case is_numeric($value):
                 if (str_contains($value, '.') || false !== stripos($value, 'e')) {
-                    $value = (float)$value;
+                    $value = (float) $value;
                     $type = self::T_FLOAT;
 
                     break;
                 }
 
-                $value = (int)$value;
+                $value = (int) $value;
                 $type = self::T_INTEGER;
 
                 break;
 
-            // Recognize quoted strings
+                // Recognize quoted strings
             case '"' === $value[0]:
                 $value = str_replace('""', '"', substr($value, 1, \strlen($value) - 2));
 
@@ -218,7 +218,7 @@ class Lexer extends AbstractLexer
 
                 break;
 
-            // Comparison operator
+                // Comparison operator
             case '=' === $value:
                 $type = self::T_EQUALS;
 
@@ -255,7 +255,7 @@ class Lexer extends AbstractLexer
 
                 break;
 
-            // Composite operator
+                // Composite operator
             case '&' === $value:
                 $type = self::T_AND;
 
@@ -283,7 +283,7 @@ class Lexer extends AbstractLexer
 
                 break;
 
-            // Brace
+                // Brace
             case '(' === $value:
                 $type = self::T_OPEN_PARENTHESIS;
 
@@ -324,7 +324,7 @@ class Lexer extends AbstractLexer
 
                 break;
 
-            // Default
+                // Default
             default:
                 throw new UnknownTokenTypeException($value);
         }

@@ -15,7 +15,7 @@ return (new PhpCsFixer\Config())
         '@PHP74Migration:risky' => true,
         '@PHPUnit100Migration:risky' => true,
         '@PhpCsFixer' => true,
-        '@PhpCsFixer:risky' => true,
+        '@PhpCsFixer:risky' => false,
         'yoda_style' => true,
         'general_phpdoc_annotation_remove' => ['annotations' => ['expectedDeprecation']], // one should use PHPUnit built-in method instead
         'modernize_strpos' => true, // needs PHP 8+ or polyfill
