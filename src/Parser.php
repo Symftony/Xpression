@@ -136,7 +136,7 @@ class Parser
                     break;
 
                 case Lexer::T_COMMA:
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
@@ -188,51 +188,51 @@ class Parser
 
                 case Lexer::T_EQUALS:
                     $comparisonMethod = 'eq';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_NOT_EQUALS:
                     $comparisonMethod = 'neq';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_GREATER_THAN:
                     $comparisonMethod = 'gt';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_GREATER_THAN_EQUALS:
                     $comparisonMethod = 'gte';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_LOWER_THAN:
                     $comparisonMethod = 'lt';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_LOWER_THAN_EQUALS:
                     $comparisonMethod = 'lte';
-                    $expectedTokenType = Lexer::T_OPERANDE;
+                    $expectedTokenType = Lexer::T_OPERAND;
 
                     break;
 
                 case Lexer::T_NOT_OPEN_SQUARE_BRACKET:
                     $comparisonMethod = 'notIn';
                     $comparisonMultipleOperande = [];
-                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
+                    $expectedTokenType = Lexer::T_OPERAND | Lexer::T_CLOSE_SQUARE_BRACKET;
 
                     break;
 
                 case Lexer::T_OPEN_SQUARE_BRACKET:
                     $comparisonMethod = 'in';
                     $comparisonMultipleOperande = [];
-                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_CLOSE_SQUARE_BRACKET;
+                    $expectedTokenType = Lexer::T_OPERAND | Lexer::T_CLOSE_SQUARE_BRACKET;
 
                     break;
 
@@ -248,14 +248,14 @@ class Parser
                 case Lexer::T_DOUBLE_OPEN_CURLY_BRACKET:
                     $comparisonMethod = 'contains';
                     $contains = true;
-                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
+                    $expectedTokenType = Lexer::T_OPERAND | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
 
                     break;
 
                 case Lexer::T_NOT_DOUBLE_OPEN_CURLY_BRACKET:
                     $comparisonMethod = 'notContains';
                     $contains = true;
-                    $expectedTokenType = Lexer::T_OPERANDE | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
+                    $expectedTokenType = Lexer::T_OPERAND | Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET;
 
                     break;
 
