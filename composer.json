@@ -25,11 +25,11 @@
     "homepage": "https://github.com/symftony/Xpression",
     "require": {
         "php": "^8.0",
-        "doctrine/lexer": "^1.0"
+        "doctrine/lexer": "^1.2.1"
     },
     "require-dev": {
-        "doctrine/collections": "^1.0",
-        "doctrine/orm": "^2.4.0",
+        "doctrine/collections": "^1.8.0",
+        "doctrine/orm": "^2.8.0",
         "phpspec/prophecy": "^1.18",
         "phpunit/phpunit": "^9.6",
         "friendsofphp/php-cs-fixer": "^3.41",
