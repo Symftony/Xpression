@@ -11,9 +11,7 @@ use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Expr\MapperExpressionBuilder;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Expr\MapperExpressionBuilder
  */
 final class MapperExpressionBuilderTest extends TestCase
 {

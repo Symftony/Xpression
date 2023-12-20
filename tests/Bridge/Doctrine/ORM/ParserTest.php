@@ -11,9 +11,8 @@ use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Parser
+ * @covers \Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter
  */
 final class ParserTest extends TestCase
 {

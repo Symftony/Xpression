@@ -12,9 +12,7 @@ use Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter
  */
 final class ExpressionBuilderAdapterTest extends TestCase
 {

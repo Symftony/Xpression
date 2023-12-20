@@ -10,9 +10,8 @@ use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Parser
+ * @covers \Symftony\Xpression\Bridge\MongoDB\ExprBuilder
  */
 final class ParserTest extends TestCase
 {
@@ -202,10 +201,8 @@ final class ParserTest extends TestCase
 
     /**
      * @dataProvider provideParserCases
-     *
-     * @param mixed $expectedExpression
      */
-    public function testParser(string $input, $expectedExpression): void
+    public function testParser(string $input, array $expectedExpression): void
     {
         self::assertSame($expectedExpression, $this->parser->parse($input));
     }

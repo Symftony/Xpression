@@ -10,9 +10,7 @@ use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 use Symftony\Xpression\Lexer;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Bridge\MongoDB\ExprBuilder
  */
 final class ExprBuilderTest extends TestCase
 {

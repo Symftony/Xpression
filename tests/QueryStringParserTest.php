@@ -8,9 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\QueryStringParser;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\QueryStringParser
  */
 final class QueryStringParserTest extends TestCase
 {

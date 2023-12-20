@@ -9,9 +9,7 @@ use Symftony\Xpression\Expr\ClosureExpressionBuilder;
 use Symftony\Xpression\Lexer;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Expr\ClosureExpressionBuilder
  */
 final class ClosureExpressionBuilderTest extends TestCase
 {

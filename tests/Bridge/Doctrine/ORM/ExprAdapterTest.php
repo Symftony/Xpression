@@ -11,9 +11,7 @@ use Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter
  */
 final class ExprAdapterTest extends TestCase
 {

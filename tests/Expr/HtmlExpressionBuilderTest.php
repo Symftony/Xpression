@@ -9,9 +9,7 @@ use Symftony\Xpression\Expr\HtmlExpressionBuilder;
 use Symftony\Xpression\Lexer;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Expr\HtmlExpressionBuilder
  */
 final class HtmlExpressionBuilderTest extends TestCase
 {

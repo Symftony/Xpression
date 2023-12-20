@@ -9,9 +9,7 @@ use Symftony\Xpression\Exception\Lexer\UnknownTokenTypeException;
 use Symftony\Xpression\Lexer;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Lexer
  */
 final class LexerTest extends TestCase
 {
@@ -30,6 +28,15 @@ final class LexerTest extends TestCase
                 ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0],
                 ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1],
                 ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 2],
+            ],
+        ];
+
+        yield [
+            'a=1.5',
+            [
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1],
+                ['value' => 1.5, 'type' => Lexer::T_FLOAT, 'position' => 2],
             ],
         ];
 
@@ -202,6 +209,63 @@ final class LexerTest extends TestCase
                 ['value' => '}}', 'type' => Lexer::T_DOUBLE_CLOSE_CURLY_BRACKET, 'position' => 5],
             ],
         ];
+
+        yield [
+            '(a=1)',
+            [
+                ['value' => '(', 'type' => Lexer::T_OPEN_PARENTHESIS, 'position' => 0],
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 1],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 2],
+                ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 3],
+                ['value' => ')', 'type' => Lexer::T_CLOSE_PARENTHESIS, 'position' => 4],
+            ],
+        ];
+        yield [
+            '(a=1)',
+            [
+                ['value' => '(', 'type' => Lexer::T_OPEN_PARENTHESIS, 'position' => 0],
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 1],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 2],
+                ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 3],
+                ['value' => ')', 'type' => Lexer::T_CLOSE_PARENTHESIS, 'position' => 4],
+            ],
+        ];
+        yield [
+            'a=1&b=2',
+            [
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1],
+                ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 2],
+                ['value' => '&', 'type' => Lexer::T_AND, 'position' => 3],
+                ['value' => 'b', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 4],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 5],
+                ['value' => 2, 'type' => Lexer::T_INTEGER, 'position' => 6],
+            ],
+        ];
+        yield [
+            'a=1!&b=2',
+            [
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1],
+                ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 2],
+                ['value' => '!&', 'type' => Lexer::T_NOT_AND, 'position' => 3],
+                ['value' => 'b', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 5],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 6],
+                ['value' => 2, 'type' => Lexer::T_INTEGER, 'position' => 7],
+            ],
+        ];
+        yield [
+            'a=1⊕b=2',
+            [
+                ['value' => 'a', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 0],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 1],
+                ['value' => 1, 'type' => Lexer::T_INTEGER, 'position' => 2],
+                ['value' => '⊕', 'type' => Lexer::T_XOR, 'position' => 3],
+                ['value' => 'b', 'type' => Lexer::T_INPUT_PARAMETER, 'position' => 6],
+                ['value' => '=', 'type' => Lexer::T_EQUALS, 'position' => 7],
+                ['value' => 2, 'type' => Lexer::T_INTEGER, 'position' => 8],
+            ],
+        ];
     }
 
     /**
@@ -243,5 +307,31 @@ final class LexerTest extends TestCase
         $this->expectException(UnknownTokenTypeException::class);
         $this->expectExceptionMessageMatches('/Unknown token type ".+"\./');
         $this->lexer->setInput($input);
+    }
+
+    public static function getTokenSyntaxDataProvider(): iterable
+    {
+        yield [
+            Lexer::T_NONE,
+            []
+        ];
+
+        yield [
+            Lexer::T_ALL,
+            [',', 'simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\'', '=', '≠ or !=', '>', '≥ or >=', '<', '≤ or <=', '&', '!&', '|', '!|', '⊕ or ^|', '(', ')', '[', '![', ']', '{{', '!{{', '}}']
+        ];
+
+        yield [
+            Lexer::T_OPERAND,
+            ['simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\'']
+        ];
+    }
+
+    /**
+     * @dataProvider getTokenSyntaxDataProvider
+     */
+    public function testGetTokenSyntax(mixed $tokenType, array $expectedTokenSyntax)
+    {
+        $this->assertSame($expectedTokenSyntax, Lexer::getTokenSyntax($tokenType));
     }
 }

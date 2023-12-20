@@ -9,15 +9,14 @@ use Doctrine\Common\Collections\Expr\Expression;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
+use Symftony\Xpression\Exception\Parser\ForbiddenTokenException;
 use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
 
 /**
- * @internal
- *
- * @coversNothing
+ * @covers \Symftony\Xpression\Parser
  */
 final class ParserTest extends TestCase
 {
@@ -438,5 +437,20 @@ final class ParserTest extends TestCase
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_NONE)->shouldBeCalled();
 
         $this->parser->parse('fieldA=1');
+    }
+
+    public function testTokenPrecedenceError(): void
+    {
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
+        $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL)->shouldBeCalled();
+        try {
+            $this->parser->parse('a&b', Lexer::T_NONE);
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(ForbiddenTokenException::class, $e->getPrevious());
+            $this->assertEquals('Forbidden token "a". Allowed was .', $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
     }
 }
