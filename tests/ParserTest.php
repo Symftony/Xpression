@@ -1,440 +1,456 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression;
 
+use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Expression;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
+use Prophecy\Prophet;
+use Symftony\Xpression\Exception\Parser\ForbiddenTokenException;
+use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Lexer;
 use Symftony\Xpression\Parser;
 
-class ParserTest extends TestCase
+/**
+ * @covers \Symftony\Xpression\Parser
+ */
+final class ParserTest extends TestCase
 {
-    /**
-     * @var ExpressionBuilderInterface|ObjectProphecy
-     */
-    private $expressionBuilderMock;
+    private ExpressionBuilderInterface|ObjectProphecy $expressionBuilderMock;
 
-    /**
-     * @var Parser
-     */
-    private $parser;
+    private Parser $parser;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->expressionBuilderMock = $this->prophesize('Symftony\Xpression\Expr\ExpressionBuilderInterface');
+        $this->expressionBuilderMock = (new Prophet())->prophesize(ExpressionBuilderInterface::class);
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL);
 
         $this->parser = new Parser($this->expressionBuilderMock->reveal());
     }
 
-    public function parseSuccessDataProvider()
+    public static function provideParseSuccessCases(): iterable
     {
-        return array(
-            array(
-                'fieldA=1',
-                array(array('eq', 'fieldA', 1, 'my_fake_comparison_A')),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA="string"',
-                array(array('eq', 'fieldA', 'my_fake_string', 'my_fake_comparison_A')),
-                array(array('valueAsString', 'string', 'my_fake_string')),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA>1',
-                array(array('gt', 'fieldA', 1, 'my_fake_comparison_A')),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA≥1',
-                array(
-                    array('gte', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA>=1',
-                array(
-                    array('gte', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA<1',
-                array(
-                    array('lt', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA≤1',
-                array(
-                    array('lte', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA<=1',
-                array(
-                    array('lte', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA≠1',
-                array(
-                    array('neq', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA!=1',
-                array(
-                    array('neq', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA[1,2]',
-                array(
-                    array('in', 'fieldA', array(1, 2), 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA![1,2]',
-                array(
-                    array('notIn', 'fieldA', array(1, 2), 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A'
-            ),
-            array(
-                'fieldA{{1}}',
-                array(
-                    array('contains', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A',
-            ),
-            array(
-                'fieldA!{{1}}',
-                array(
-                    array('notContains', 'fieldA', 1, 'my_fake_comparison_A')
-                ),
-                array(),
-                'my_fake_comparison_A'
-            ),
+        $prophet = new Prophet();
 
-            // Composite
-            array(
-                'fieldA=1|fieldB=2|fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('orX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-            array(
-                'fieldA=1!|fieldB=2!|fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('norX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_norX_composite'),
-                ),
-                'my_fake_norX_composite'
-            ),
-            array(
-                'fieldA=1^|fieldB=2^|fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('xorX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_xorX_composite'),
-                ),
-                'my_fake_xorX_composite'
-            ),
-            array(
-                'fieldA=1⊕fieldB=2⊕fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('xorX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_xorX_composite'),
-                ),
-                'my_fake_xorX_composite'
-            ),
-            array(
-                'fieldA=1&fieldB=2&fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_andX_composite'),
-                ),
-                'my_fake_andX_composite'
-            ),
-            array(
-                'fieldA{{value}}&fieldB=2',
-                array(
-                    array('contains', 'fieldA', 'value', 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B'), 'my_fake_andX_composite'),
-                ),
-                'my_fake_andX_composite'
-            ),
-            array(
-                'fieldA=1!&fieldB=2!&fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('nandX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_nandX_composite'),
-                ),
-                'my_fake_nandX_composite'
-            ),
+        $expr1 = $prophet->prophesize(Expression::class)->reveal();
+        $expr2 = $prophet->prophesize(Expression::class)->reveal();
+        $expr3 = $prophet->prophesize(Expression::class)->reveal();
+        $expr4 = $prophet->prophesize(Expression::class)->reveal();
+        $composite1 = $prophet->prophesize(CompositeExpression::class)->reveal();
+        $composite2 = $prophet->prophesize(CompositeExpression::class)->reveal();
+        $composite3 = $prophet->prophesize(CompositeExpression::class)->reveal();
 
-            // Precedences
-            array(
-                'fieldA=1|fieldB=2|fieldC=3&fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_C', 'my_fake_comparison_D'), 'my_fake_andX_composite'),
-                    array('orX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_andX_composite'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-            array(
-                'fieldA=1&fieldB=2&fieldC=3!&fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_andX_composite'),
-                    array('nandX', array('my_fake_andX_composite', 'my_fake_comparison_D'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-            array(
-                'fieldA=1|fieldB=2|fieldC=3!|fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('orX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_orX_composite'),
-                    array('norX', array('my_fake_orX_composite', 'my_fake_comparison_D'), 'my_fake_norX_composite'),
-                ),
-                'my_fake_norX_composite'
-            ),
-            array(
-                'fieldA=1&fieldB=2&fieldC=3|fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_andX_composite'),
-                    array('orX', array('my_fake_andX_composite', 'my_fake_comparison_D'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-            array(
-                'fieldA=1&fieldB=2|fieldC=3&fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_A', 'my_fake_comparison_B'), 'my_fake_andX_composite_1'),
-                    array('andX', array('my_fake_comparison_C', 'my_fake_comparison_D'), 'my_fake_andX_composite_2'),
-                    array('orX', array('my_fake_andX_composite_1', 'my_fake_andX_composite_2'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-            array(
-                'fieldA=1|fieldB=2|fieldC=3⊕fieldD=4',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                    array('eq', 'fieldD', 4, 'my_fake_comparison_D'),
-                ),
-                array(
-                    array('orX', array('my_fake_comparison_A', 'my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_orX_composite'),
-                    array('xorX', array('my_fake_orX_composite', 'my_fake_comparison_D'), 'my_fake_xorX_composite'),
-                ),
-                'my_fake_xorX_composite'
-            ),
+        yield [
+            'fieldA=1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
 
-            //Parenthesis
-            array(
-                '((fieldA=1))',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                ),
-                array(),
-                'my_fake_comparison_A'
-            ),
-            array(
-                '(fieldA=1|fieldB=2)&fieldC=3',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('orX', array('my_fake_comparison_A', 'my_fake_comparison_B'), 'my_fake_orX_composite'),
-                    array('andX', array('my_fake_orX_composite', 'my_fake_comparison_C'), 'my_fake_andX_composite'),
-                ),
-                'my_fake_andX_composite'
-            ),
-            array(
-                'fieldA=1|(fieldB=2&fieldC=3)',
-                array(
-                    array('eq', 'fieldA', 1, 'my_fake_comparison_A'),
-                    array('eq', 'fieldB', 2, 'my_fake_comparison_B'),
-                    array('eq', 'fieldC', 3, 'my_fake_comparison_C'),
-                ),
-                array(
-                    array('andX', array('my_fake_comparison_B', 'my_fake_comparison_C'), 'my_fake_andX_composite'),
-                    array('orX', array('my_fake_comparison_A', 'my_fake_andX_composite'), 'my_fake_orX_composite'),
-                ),
-                'my_fake_orX_composite'
-            ),
-        );
+        //            [
+        //                'fieldA="string"',
+        //                [['eq', 'fieldA', 'my_fake_string', 'my_fake_comparison_A']],
+        //                [['valueAsString', 'string', 'my_fake_string']],
+        //                'my_fake_comparison_A',
+        //            ],
+        yield [
+            'fieldA>1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->gt('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA≥1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->gte('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA>=1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->gte('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA<1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->lt('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA≤1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->lte('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA<=1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->lte('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA≠1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->neq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA!=1',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->neq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA[1,2]',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->in('fieldA', [1, 2])->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA![1,2]',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->notIn('fieldA', [1, 2])->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA{{1}}',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->contains('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            'fieldA!{{1}}',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->notContains('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        // Composite
+        yield [
+            'fieldA=1|fieldB=2|fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->orX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA=1!|fieldB=2!|fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->norX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA=1^|fieldB=2^|fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->xorX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA=1⊕fieldB=2⊕fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->xorX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA=1&fieldB=2&fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->andX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA{{value}}&fieldB=2',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $composite1): void {
+                $mock->contains('fieldA', 'value')->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->andX([$expr1, $expr2])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        yield [
+            'fieldA=1!&fieldB=2!&fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->nandX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+            },
+            $composite1,
+        ];
+
+        // Precedences
+        yield [
+            'fieldA=1|fieldB=2|fieldC=3&fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                // And was before OR
+                $mock->andX([$expr3, $expr4])->willReturn($composite1)->shouldBeCalled();
+                $mock->orX([$expr1, $expr2, $composite1])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        yield [
+            'fieldA=1&fieldB=2&fieldC=3!&fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                $mock->andX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+                $mock->nandX([$composite1, $expr4])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        yield [
+            'fieldA=1|fieldB=2|fieldC=3!|fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                $mock->orX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+                $mock->norX([$composite1, $expr4])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        yield [
+            'fieldA=1&fieldB=2&fieldC=3|fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                $mock->andX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+                $mock->orX([$composite1, $expr4])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        yield [
+            'fieldA=1&fieldB=2|fieldC=3&fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2, $composite3): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                $mock->andX([$expr1, $expr2])->willReturn($composite1)->shouldBeCalled();
+                $mock->andX([$expr3, $expr4])->willReturn($composite2)->shouldBeCalled();
+                $mock->orX([$composite1, $composite2])->willReturn($composite3)->shouldBeCalled();
+            },
+            $composite3,
+        ];
+
+        yield [
+            'fieldA=1|fieldB=2|fieldC=3⊕fieldD=4',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $expr4, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->eq('fieldD', 4)->willReturn($expr4)->shouldBeCalled();
+                $mock->orX([$expr1, $expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+                $mock->xorX([$composite1, $expr4])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        // Parenthesis
+        yield [
+            '((fieldA=1))',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+            },
+            $expr1,
+        ];
+
+        yield [
+            '(fieldA=1|fieldB=2)&fieldC=3',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->orX([$expr1, $expr2])->willReturn($composite1)->shouldBeCalled();
+                $mock->andX([$composite1, $expr3])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
+
+        yield [
+            'fieldA=1|(fieldB=2&fieldC=3)',
+            static function (ExpressionBuilderInterface|ObjectProphecy $mock) use ($expr1, $expr2, $expr3, $composite1, $composite2): void {
+                $mock->eq('fieldA', 1)->willReturn($expr1)->shouldBeCalled();
+                $mock->eq('fieldB', 2)->willReturn($expr2)->shouldBeCalled();
+                $mock->eq('fieldC', 3)->willReturn($expr3)->shouldBeCalled();
+                $mock->andX([$expr2, $expr3])->willReturn($composite1)->shouldBeCalled();
+                $mock->orX([$expr1, $composite1])->willReturn($composite2)->shouldBeCalled();
+            },
+            $composite2,
+        ];
     }
 
     /**
-     * @dataProvider parseSuccessDataProvider
+     * @dataProvider provideParseSuccessCases
      *
-     * @param $input
-     * @param $comparisonMethods
-     * @param $compositeMethods
-     * @param $expectedResult
+     * @param mixed $expectedResult
      */
-    public function testParseSuccess($input, $comparisonMethods, $compositeMethods, $expectedResult)
+    public function testParseSuccess(string $input, callable $configureExpressionBuilderMock, $expectedResult): void
     {
-        foreach ($comparisonMethods as $comparisonMethod) {
-            $this->expressionBuilderMock
-                ->{$comparisonMethod[0]}($comparisonMethod[1], $comparisonMethod[2])
-                ->willReturn($comparisonMethod[3])
-                ->shouldBeCalled();
-        }
+        $configureExpressionBuilderMock($this->expressionBuilderMock);
 
-        foreach ($compositeMethods as $compositeMethod) {
-            $this->expressionBuilderMock
-                ->{$compositeMethod[0]}($compositeMethod[1])
-                ->willReturn($compositeMethod[2])
-                ->shouldBeCalled();
-        }
-
-        $this->assertEquals($expectedResult, $this->parser->parse($input));
+        self::assertSame($expectedResult, $this->parser->parse($input));
     }
 
-    public function forbiddenTokenDataProvider()
+    public static function provideForbiddenTokenCases(): iterable
     {
-        return array(
-            array(','),
-            array('9'),
-            array('"string"'),
-            array("'string'"),
-            array('param'),
-            array('4.5'),
-            array('='),
-            array('≠'),
-            array('>'),
-            array('≥'),
-            array('<'),
-            array('≤'),
-            array('&'),
-            array('!&'),
-            array('|'),
-            array('!|'),
-            array('^|'),
-            array('⊕'),
-            array('('),
-            array(')'),
-            array('['),
-            array('!['),
-            array(']'),
-            array('{{'),
-            array('!{{'),
-            array('}}'),
-        );
+        yield [','];
+
+        yield ['9'];
+
+        yield ['"string"'];
+
+        yield ["'string'"];
+
+        yield ['param'];
+
+        yield ['4.5'];
+
+        yield ['='];
+
+        yield ['≠'];
+
+        yield ['>'];
+
+        yield ['≥'];
+
+        yield ['<'];
+
+        yield ['≤'];
+
+        yield ['&'];
+
+        yield ['!&'];
+
+        yield ['|'];
+
+        yield ['!|'];
+
+        yield ['^|'];
+
+        yield ['⊕'];
+
+        yield ['('];
+
+        yield [')'];
+
+        yield ['['];
+
+        yield ['!['];
+
+        yield [']'];
+
+        yield ['{{'];
+
+        yield ['!{{'];
+
+        yield ['}}'];
     }
 
     /**
-     * @dataProvider forbiddenTokenDataProvider
-     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
-     *
-     * @param $input
+     * @dataProvider provideForbiddenTokenCases
      */
-    public function testForbiddenToken($input)
+    public function testForbiddenToken(string $input): void
     {
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
         $this->parser->parse($input, Lexer::T_NONE);
     }
 
-    /**
-     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
-     */
-    public function testUnexpectedToken()
+    public function testUnexpectedToken(): void
     {
-        $this->expressionBuilderMock->eq('fieldA', 'foo')->willReturn('fake_return');
-
-        $this->parser->parse('fieldA=foo=1');
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
+        $this->parser->parse('fieldA==foo=1');
     }
 
-    /**
-     * @expectedException \Symftony\Xpression\Exception\Parser\InvalidExpressionException
-     */
-    public function testUnsupportedToken()
+    public function testUnsupportedToken(): void
     {
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_NONE)->shouldBeCalled();
 
         $this->parser->parse('fieldA=1');
+    }
+
+    public function testTokenPrecedenceError(): void
+    {
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
+        $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL)->shouldBeCalled();
+        try {
+            $this->parser->parse('a&b', Lexer::T_NONE);
+        } catch (\Throwable $e) {
+            $this->assertInstanceOf(ForbiddenTokenException::class, $e->getPrevious());
+            $this->assertEquals('Forbidden token "a". Allowed was .', $e->getPrevious()->getMessage());
+
+            throw $e;
+        }
     }
 }

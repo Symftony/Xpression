@@ -1,216 +1,114 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Bridge\Doctrine\ORM;
 
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Parameter;
-use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
+use Symftony\Xpression\Expr\ExpressionBuilderInterface;
 use Symftony\Xpression\Lexer;
 
 class ExprAdapter implements ExpressionBuilderInterface
 {
-    /**
-     * @var Expr
-     */
-    private $expr;
+    private Expr $expr;
 
-    /**
-     * @param Expr $expr
-     */
     public function __construct(Expr $expr)
     {
         $this->expr = $expr;
     }
 
-    /**
-     * @return int
-     */
-    public function getSupportedTokenType()
+    public function getSupportedTokenType(): int
     {
         return Lexer::T_ALL - Lexer::T_NOT_AND - Lexer::T_NOT_OR - Lexer::T_XOR;
     }
 
-    /**
-     * @param $value
-     * @param bool $isValue
-     *
-     * @return mixed
-     */
-    public function parameter($value, $isValue = false)
+    public function parameter(mixed $value, bool $isValue = false): mixed
     {
         return $isValue ? $this->expr->literal($value) : $value;
     }
 
-    /**
-     * @param $value
-     * @return Expr\Literal
-     */
-    public function string($value)
+    public function string(mixed $value): mixed
     {
         return $this->expr->literal($value);
     }
 
-    /**
-     * @param string $field
-     *
-     * @return string
-     */
-    public function isNull($field)
+    public function isNull(string $field): mixed
     {
         return $this->expr->isNull($field);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function eq($field, $value)
+    public function eq(string $field, mixed $value): mixed
     {
         return $this->expr->eq($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function neq($field, $value)
+    public function neq(string $field, mixed $value): mixed
     {
         return $this->expr->neq($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function gt($field, $value)
+    public function gt(string $field, mixed $value): mixed
     {
         return $this->expr->gt($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function gte($field, $value)
+    public function gte(string $field, mixed $value): mixed
     {
         return $this->expr->gte($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function lt($field, $value)
+    public function lt(string $field, mixed $value): mixed
     {
         return $this->expr->lt($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function lte($field, $value)
+    public function lte(string $field, mixed $value): mixed
     {
         return $this->expr->lte($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return Expr\Func
-     */
-    public function in($field, array $values)
+    public function in(string $field, array $values): mixed
     {
         return $this->expr->in($field, $values);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     *
-     * @return Expr\Func
-     */
-    public function notIn($field, array $values)
+    public function notIn(string $field, array $values): mixed
     {
         return $this->expr->notIn($field, $values);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function contains($field, $value)
+    public function contains(string $field, mixed $value): mixed
     {
         return $this->expr->like($field, $value);
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     *
-     * @return Expr\Comparison
-     */
-    public function notContains($field, $value)
+    public function notContains(string $field, mixed $value): mixed
     {
         return $this->expr->notLike($field, $value);
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return Expr\Andx
-     */
-    public function andX(array $expressions)
+    public function andX(array $expressions): mixed
     {
-        return call_user_func_array(array($this->expr, 'andX'), $expressions);
+        return $this->expr->andX(...$expressions);
     }
 
-    /**
-     * @param array $expressions
-     */
-    public function nandX(array $expressions)
+    public function nandX(array $expressions): mixed
     {
         throw new UnsupportedExpressionTypeException('nandX');
     }
 
-    /**
-     * @param array $expressions
-     *
-     * @return Expr\Orx
-     */
-    public function orX(array $expressions)
+    public function orX(array $expressions): mixed
     {
-        return call_user_func_array(array($this->expr, 'orX'), $expressions);
+        return $this->expr->orX(...$expressions);
     }
 
-    /**
-     * @param array $expressions
-     */
-    public function norX(array $expressions)
+    public function norX(array $expressions): mixed
     {
         throw new UnsupportedExpressionTypeException('norX');
     }
 
-    /**
-     * @param array $expressions
-     */
-    public function xorX(array $expressions)
+    public function xorX(array $expressions): mixed
     {
         throw new UnsupportedExpressionTypeException('xorX');
     }

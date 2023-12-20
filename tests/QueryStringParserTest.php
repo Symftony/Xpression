@@ -1,205 +1,224 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Symftony\Xpression;
 
 use PHPUnit\Framework\TestCase;
 use Symftony\Xpression\QueryStringParser;
 
-class QueryStringParserTest extends TestCase
+/**
+ * @covers \Symftony\Xpression\QueryStringParser
+ */
+final class QueryStringParserTest extends TestCase
 {
-    public function parseDataProvider()
+    public static function provideParseCases(): iterable
     {
-        return array(
-            // Default querystring
-            array(
-                'param-A',
-                'param-A',
-                array(
-                    'param-A' => '',
-                )
-            ),
-            array(
-                'param-A=',
-                'param-A=',
-                array(
-                    'param-A' => '',
-                )
-            ),
-            array(
-                'param-A=valueA',
-                'param-A=valueA',
-                array(
-                    'param-A' => 'valueA',
-                )
-            ),
-            array(
-                'param-A[]=valueA',
-                'param-A[]=valueA',
-                array(
-                    'param-A' => array('valueA'),
-                )
-            ),
-            array(
-                'param-A[subA]=valueA',
-                'param-A[subA]=valueA',
-                array(
-                    'param-A' => array('subA' => 'valueA'),
-                )
-            ),
-            array(
-                'param-A&param-B',
-                'param-A&param-B',
-                array(
-                    'param-A' => '',
-                    'param-B' => '',
-                )
-            ),
-            array(
-                'param-A=&param-B',
-                'param-A=&param-B',
-                array(
-                    'param-A' => '',
-                    'param-B' => '',
-                )
-            ),
-            array(
-                'param-A=valueA&param-B',
-                'param-A=valueA&param-B',
-                array(
-                    'param-A' => 'valueA',
-                    'param-B' => '',
-                )
-            ),
-            array(
-                'param-A[]=valueA&param-B',
-                'param-A[]=valueA&param-B',
-                array(
-                    'param-A' => array('valueA'),
-                    'param-B' => '',
-                )
-            ),
-            array(
-                'param-A[subA]=valueA&param-B',
-                'param-A[subA]=valueA&param-B',
-                array(
-                    'param-A' => array('subA' => 'valueA'),
-                    'param-B' => '',
-                )
-            ),
+        // Default querystring
+        yield [
+            'param-A',
+            'param-A',
+            [
+                'param-A' => '',
+            ],
+        ];
 
-            // With Xpression
-            array(
-                'query{{valueA}}',
-                'query{{valueA}}',
-                array(
-                    'query{{valueA}}' => '',
-                )
-            ),
-            array(
-                'query={price{{test}}&price=6}',
-                'query=price%7B%7Btest%7D%7D%26price%3D6',
-                array(
-                    'query' => 'price{{test}}&price=6',
-                )
-            ),
-            array(
-                'query={name{{test 2}}}',
-                'query=name%7B%7Btest+2%7D%7D',
-                array(
-                    'query' => 'name{{test 2}}',
-                )
-            ),
-            array(
-                'query={valueA}',
-                'query=valueA',
-                array(
-                    'query' => 'valueA',
-                )
-            ),
-            array(
-                'query[]={valueA}',
-                'query[]=valueA',
-                array(
-                    'query' => array('valueA'),
-                )
-            ),
-            array(
-                'query[subA]={valueA}',
-                'query[subA]=valueA',
-                array(
-                    'query' => array('subA' => 'valueA'),
-                )
-            ),
-            array(
-                'query-A={valueA}&query-B={valueB}',
-                'query-A=valueA&query-B=valueB',
-                array(
-                    'query-A' => 'valueA',
-                    'query-B' => 'valueB',
-                )
-            ),
-            array(
-                'query-A[]={valueA1}&query-A[]={valueA2}&query-B={valueB}',
-                'query-A[]=valueA1&query-A[]=valueA2&query-B=valueB',
-                array(
-                    'query-A' => array('valueA1', 'valueA2'),
-                    'query-B' => 'valueB',
-                )
-            ),
-            array(
-                'query-A[subA]={valueA}&query-B={valueB}',
-                'query-A[subA]=valueA&query-B=valueB',
-                array(
-                    'query-A' => array('subA' => 'valueA'),
-                    'query-B' => 'valueB',
-                )
-            ),
+        yield [
+            'param-A=',
+            'param-A=',
+            [
+                'param-A' => '',
+            ],
+        ];
 
-            // Fail
-            array(
-                'query-A=valueA}',
-                'query-A=valueA}',
-                array(
-                    'query-A' => 'valueA}',
-                )
-            ),
-            array(
-                'query-A={valueA',
-                'query-A={valueA',
-                array(
-                    'query-A' => '{valueA',
-                )
-            ),
-            array(
-                'query-A={}valueA',
-                'query-A={}valueA',
-                array(
-                    'query-A' => '{}valueA',
-                )
-            ),
-            array(
-                'query-A={{valueA}}',
-                'query-A={{valueA}}',
-                array(
-                    'query-A' => '{{valueA}}',
-                )
-            ),
-        );
+        yield [
+            'param-A=valueA',
+            'param-A=valueA',
+            [
+                'param-A' => 'valueA',
+            ],
+        ];
+
+        yield [
+            'param-A[]=valueA',
+            'param-A[]=valueA',
+            [
+                'param-A' => ['valueA'],
+            ],
+        ];
+
+        yield [
+            'param-A[subA]=valueA',
+            'param-A[subA]=valueA',
+            [
+                'param-A' => ['subA' => 'valueA'],
+            ],
+        ];
+
+        yield [
+            'param-A&param-B',
+            'param-A&param-B',
+            [
+                'param-A' => '',
+                'param-B' => '',
+            ],
+        ];
+
+        yield [
+            'param-A=&param-B',
+            'param-A=&param-B',
+            [
+                'param-A' => '',
+                'param-B' => '',
+            ],
+        ];
+
+        yield [
+            'param-A=valueA&param-B',
+            'param-A=valueA&param-B',
+            [
+                'param-A' => 'valueA',
+                'param-B' => '',
+            ],
+        ];
+
+        yield [
+            'param-A[]=valueA&param-B',
+            'param-A[]=valueA&param-B',
+            [
+                'param-A' => ['valueA'],
+                'param-B' => '',
+            ],
+        ];
+
+        yield [
+            'param-A[subA]=valueA&param-B',
+            'param-A[subA]=valueA&param-B',
+            [
+                'param-A' => ['subA' => 'valueA'],
+                'param-B' => '',
+            ],
+        ];
+
+        // With Xpression
+        yield [
+            'query{{valueA}}',
+            'query{{valueA}}',
+            [
+                'query{{valueA}}' => '',
+            ],
+        ];
+
+        yield [
+            'query={price{{test}}&price=6}',
+            'query=price%7B%7Btest%7D%7D%26price%3D6',
+            [
+                'query' => 'price{{test}}&price=6',
+            ],
+        ];
+
+        yield [
+            'query={name{{test 2}}}',
+            'query=name%7B%7Btest+2%7D%7D',
+            [
+                'query' => 'name{{test 2}}',
+            ],
+        ];
+
+        yield [
+            'query={valueA}',
+            'query=valueA',
+            [
+                'query' => 'valueA',
+            ],
+        ];
+
+        yield [
+            'query[]={valueA}',
+            'query[]=valueA',
+            [
+                'query' => ['valueA'],
+            ],
+        ];
+
+        yield [
+            'query[subA]={valueA}',
+            'query[subA]=valueA',
+            [
+                'query' => ['subA' => 'valueA'],
+            ],
+        ];
+
+        yield [
+            'query-A={valueA}&query-B={valueB}',
+            'query-A=valueA&query-B=valueB',
+            [
+                'query-A' => 'valueA',
+                'query-B' => 'valueB',
+            ],
+        ];
+
+        yield [
+            'query-A[]={valueA1}&query-A[]={valueA2}&query-B={valueB}',
+            'query-A[]=valueA1&query-A[]=valueA2&query-B=valueB',
+            [
+                'query-A' => ['valueA1', 'valueA2'],
+                'query-B' => 'valueB',
+            ],
+        ];
+
+        yield [
+            'query-A[subA]={valueA}&query-B={valueB}',
+            'query-A[subA]=valueA&query-B=valueB',
+            [
+                'query-A' => ['subA' => 'valueA'],
+                'query-B' => 'valueB',
+            ],
+        ];
+
+        // Fail
+        yield [
+            'query-A=valueA}',
+            'query-A=valueA}',
+            [
+                'query-A' => 'valueA}',
+            ],
+        ];
+
+        yield [
+            'query-A={valueA',
+            'query-A={valueA',
+            [
+                'query-A' => '{valueA',
+            ],
+        ];
+
+        yield [
+            'query-A={}valueA',
+            'query-A={}valueA',
+            [
+                'query-A' => '{}valueA',
+            ],
+        ];
+
+        yield [
+            'query-A={{valueA}}',
+            'query-A={{valueA}}',
+            [
+                'query-A' => '{{valueA}}',
+            ],
+        ];
     }
 
     /**
-     * @dataProvider parseDataProvider
-     *
-     * @param $queryString
-     * @param $expectedQueryString
-     * @param $expectedGET
+     * @dataProvider provideParseCases
      */
-    public function testParse($queryString, $expectedQueryString, $expectedGET)
+    public function testParse(string $queryString, string $expectedQueryString, array $expectedGET): void
     {
         $_SERVER['QUERY_STRING'] = $queryString;
         QueryStringParser::correctServerQueryString();
 
-        $this->assertEquals($expectedQueryString, $_SERVER['QUERY_STRING']);
-        $this->assertEquals($expectedGET, $_GET);
+        self::assertSame($expectedQueryString, $_SERVER['QUERY_STRING']);
+        self::assertSame($expectedGET, $_GET);
     }
 }
