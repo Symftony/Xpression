@@ -33,7 +33,8 @@
         "phpspec/prophecy": "^1.18",
         "phpunit/phpunit": "^9.6",
         "friendsofphp/php-cs-fixer": "^3.41",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "phpmetrics/phpmetrics": "^2.8"
     },
     "suggest": {
         "doctrine/collections": "If you want filter an ArrayCollection",

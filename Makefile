@@ -9,5 +9,6 @@ test:
 cs:
 	vendor/bin/php-cs-fixer fix -vvv
 
-analyse:
+analyse: test
+	vendor/bin/phpmetrics --junit --report-html=docs/phpmetrics/index.html src
 	vendor/bin/phpstan
