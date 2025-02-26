@@ -18,9 +18,6 @@
         </testsuite>
     </testsuites>
 
-    <logging>
-        <junit outputFile="junit.xml"/>
-    </logging>
     <coverage cacheDirectory=".phpunit.cache/code-coverage"
               processUncoveredFiles="true">
         <include>
