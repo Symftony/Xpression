@@ -14,8 +14,10 @@ use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
 /**
- * @covers \Symftony\Xpression\Parser
  * @covers \Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter
+ * @covers \Symftony\Xpression\Parser
+ *
+ * @internal
  */
 final class ParserTest extends TestCase
 {
@@ -36,6 +38,14 @@ final class ParserTest extends TestCase
         }
         $this->expressionBuilderAdapter = new ExpressionBuilderAdapter(new ExpressionBuilder());
         $this->parser = new Parser($this->expressionBuilderAdapter);
+    }
+
+    /**
+     * @dataProvider provideParserCases
+     */
+    public function testParser(string $input, Expression $expectedExpression): void
+    {
+        self::assertEquals($expectedExpression, $this->parser->parse($input));
     }
 
     public static function provideParserCases(): iterable
@@ -168,11 +178,12 @@ final class ParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideParserCases
+     * @dataProvider provideParserThrowUnsupportedExpressionTypeExceptionCases
      */
-    public function testParser(string $input, Expression $expectedExpression): void
+    public function testParserThrowUnsupportedExpressionTypeException(string $input): void
     {
-        self::assertEquals($expectedExpression, $this->parser->parse($input));
+        $this->expectException(InvalidExpressionException::class);
+        $this->parser->parse($input);
     }
 
     public static function provideParserThrowUnsupportedExpressionTypeExceptionCases(): iterable
@@ -191,14 +202,5 @@ final class ParserTest extends TestCase
             ['fieldA=1|fieldB=2|fieldC=3!|fieldD=4'],
             ['fieldA!{{1}}'],
         ];
-    }
-
-    /**
-     * @dataProvider provideParserThrowUnsupportedExpressionTypeExceptionCases
-     */
-    public function testParserThrowUnsupportedExpressionTypeException(string $input): void
-    {
-        $this->expectException(InvalidExpressionException::class);
-        $this->parser->parse($input);
     }
 }

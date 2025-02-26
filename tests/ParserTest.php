@@ -17,6 +17,8 @@ use Symftony\Xpression\Parser;
 
 /**
  * @covers \Symftony\Xpression\Parser
+ *
+ * @internal
  */
 final class ParserTest extends TestCase
 {
@@ -30,6 +32,18 @@ final class ParserTest extends TestCase
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL);
 
         $this->parser = new Parser($this->expressionBuilderMock->reveal());
+    }
+
+    /**
+     * @dataProvider provideParseSuccessCases
+     *
+     * @param mixed $expectedResult
+     */
+    public function testParseSuccess(string $input, callable $configureExpressionBuilderMock, $expectedResult): void
+    {
+        $configureExpressionBuilderMock($this->expressionBuilderMock);
+
+        self::assertSame($expectedResult, $this->parser->parse($input));
     }
 
     public static function provideParseSuccessCases(): iterable
@@ -347,15 +361,13 @@ final class ParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideParseSuccessCases
-     *
-     * @param mixed $expectedResult
+     * @dataProvider provideForbiddenTokenCases
      */
-    public function testParseSuccess(string $input, callable $configureExpressionBuilderMock, $expectedResult): void
+    public function testForbiddenToken(string $input): void
     {
-        $configureExpressionBuilderMock($this->expressionBuilderMock);
-
-        self::assertSame($expectedResult, $this->parser->parse($input));
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
+        $this->parser->parse($input, Lexer::T_NONE);
     }
 
     public static function provideForbiddenTokenCases(): iterable
@@ -413,16 +425,6 @@ final class ParserTest extends TestCase
         yield ['}}'];
     }
 
-    /**
-     * @dataProvider provideForbiddenTokenCases
-     */
-    public function testForbiddenToken(string $input): void
-    {
-        $this->expectException(InvalidExpressionException::class);
-        $this->expectExceptionMessage('Invalid expression.');
-        $this->parser->parse($input, Lexer::T_NONE);
-    }
-
     public function testUnexpectedToken(): void
     {
         $this->expectException(InvalidExpressionException::class);
@@ -444,6 +446,7 @@ final class ParserTest extends TestCase
         $this->expectException(InvalidExpressionException::class);
         $this->expectExceptionMessage('Invalid expression.');
         $this->expressionBuilderMock->getSupportedTokenType()->willReturn(Lexer::T_ALL)->shouldBeCalled();
+
         try {
             $this->parser->parse('a&b', Lexer::T_NONE);
         } catch (\Throwable $e) {

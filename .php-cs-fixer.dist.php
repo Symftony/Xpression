@@ -1,14 +1,16 @@
 <?php
 
 declare(strict_types=1);
+use PhpCsFixer\Config;
+use PhpCsFixer\Finder;
 
-$finder = (new PhpCsFixer\Finder())
+$finder = (new Finder())
     ->ignoreDotFiles(false)
     ->ignoreVCSIgnored(true)
     ->in(__DIR__)
 ;
 
-return (new PhpCsFixer\Config())
+return (new Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PHP74Migration' => true,

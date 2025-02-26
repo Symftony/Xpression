@@ -13,6 +13,8 @@ use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 /**
  * @covers \Symftony\Xpression\Bridge\Doctrine\Common\ExpressionBuilderAdapter
+ *
+ * @internal
  */
 final class ExpressionBuilderAdapterTest extends TestCase
 {
@@ -46,15 +48,6 @@ final class ExpressionBuilderAdapterTest extends TestCase
             new Comparison('fake_field', $isv0 ? 'IS' : '=', null),
             $this->expressionBuilderAdapter->isNull($field)
         );
-    }
-
-    public static function comparisonDataProvider(): iterable
-    {
-        if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
-            return [];
-        }
-
-        yield ['field', 'value'];
     }
 
     /**
@@ -174,18 +167,13 @@ final class ExpressionBuilderAdapterTest extends TestCase
         $this->expressionBuilderAdapter->notContains($field, $value);
     }
 
-    public static function compositeDataProvider(): iterable
+    public static function comparisonDataProvider(): iterable
     {
         if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
             return [];
         }
 
-        yield [
-            [
-                new Comparison('fieldA', '=', 1),
-                new Comparison('fieldB', '>', 2),
-            ],
-        ];
+        yield ['field', 'value'];
     }
 
     /**
@@ -238,5 +226,19 @@ final class ExpressionBuilderAdapterTest extends TestCase
         $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expectExceptionMessage('Unsupported expression type "xorX".');
         $this->expressionBuilderAdapter->xorX($expressions);
+    }
+
+    public static function compositeDataProvider(): iterable
+    {
+        if (!class_exists('Doctrine\Common\Collections\ExpressionBuilder')) {
+            return [];
+        }
+
+        yield [
+            [
+                new Comparison('fieldA', '=', 1),
+                new Comparison('fieldB', '>', 2),
+            ],
+        ];
     }
 }

@@ -15,7 +15,7 @@ class UnsupportedTokenTypeException extends TokenException
         private array $supportedTokenTypes,
         ?string $message = null,
         int $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
     ) {
         $defaultMessage = sprintf(
             'Unsupported token "%s". Supported was %s.',

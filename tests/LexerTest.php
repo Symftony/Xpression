@@ -10,6 +10,8 @@ use Symftony\Xpression\Lexer;
 
 /**
  * @covers \Symftony\Xpression\Lexer
+ *
+ * @internal
  */
 final class LexerTest extends TestCase
 {
@@ -18,6 +20,22 @@ final class LexerTest extends TestCase
     protected function setUp(): void
     {
         $this->lexer = new Lexer();
+    }
+
+    /**
+     * @dataProvider provideSetInputSuccessCases
+     */
+    public function testSetInputSuccess(string $input, array $expectedTokens): void
+    {
+        $this->lexer->setInput($input);
+        $this->lexer->moveNext();
+        $this->lexer->moveNext();
+        $i = 0;
+        while ($currentToken = $this->lexer->token) {
+            self::assertSame($expectedTokens[$i], $currentToken);
+            $this->lexer->moveNext();
+            ++$i;
+        }
     }
 
     public static function provideSetInputSuccessCases(): iterable
@@ -220,6 +238,7 @@ final class LexerTest extends TestCase
                 ['value' => ')', 'type' => Lexer::T_CLOSE_PARENTHESIS, 'position' => 4],
             ],
         ];
+
         yield [
             '(a=1)',
             [
@@ -230,6 +249,7 @@ final class LexerTest extends TestCase
                 ['value' => ')', 'type' => Lexer::T_CLOSE_PARENTHESIS, 'position' => 4],
             ],
         ];
+
         yield [
             'a=1&b=2',
             [
@@ -242,6 +262,7 @@ final class LexerTest extends TestCase
                 ['value' => 2, 'type' => Lexer::T_INTEGER, 'position' => 6],
             ],
         ];
+
         yield [
             'a=1!&b=2',
             [
@@ -254,6 +275,7 @@ final class LexerTest extends TestCase
                 ['value' => 2, 'type' => Lexer::T_INTEGER, 'position' => 7],
             ],
         ];
+
         yield [
             'a=1⊕b=2',
             [
@@ -269,19 +291,13 @@ final class LexerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideSetInputSuccessCases
+     * @dataProvider provideUnexpectedValueExceptionCases
      */
-    public function testSetInputSuccess(string $input, array $expectedTokens): void
+    public function testUnexpectedValueException(string $input): void
     {
+        $this->expectException(UnknownTokenTypeException::class);
+        $this->expectExceptionMessageMatches('/Unknown token type ".+"\./');
         $this->lexer->setInput($input);
-        $this->lexer->moveNext();
-        $this->lexer->moveNext();
-        $i = 0;
-        while ($currentToken = $this->lexer->token) {
-            self::assertSame($expectedTokens[$i], $currentToken);
-            $this->lexer->moveNext();
-            ++$i;
-        }
     }
 
     public static function provideUnexpectedValueExceptionCases(): iterable
@@ -300,38 +316,28 @@ final class LexerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideUnexpectedValueExceptionCases
+     * @dataProvider getTokenSyntaxDataProvider
      */
-    public function testUnexpectedValueException(string $input): void
+    public function testGetTokenSyntax(mixed $tokenType, array $expectedTokenSyntax): void
     {
-        $this->expectException(UnknownTokenTypeException::class);
-        $this->expectExceptionMessageMatches('/Unknown token type ".+"\./');
-        $this->lexer->setInput($input);
+        $this->assertSame($expectedTokenSyntax, Lexer::getTokenSyntax($tokenType));
     }
 
     public static function getTokenSyntaxDataProvider(): iterable
     {
         yield [
             Lexer::T_NONE,
-            []
+            [],
         ];
 
         yield [
             Lexer::T_ALL,
-            [',', 'simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\'', '=', '≠ or !=', '>', '≥ or >=', '<', '≤ or <=', '&', '!&', '|', '!|', '⊕ or ^|', '(', ')', '[', '![', ']', '{{', '!{{', '}}']
+            [',', 'simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\'', '=', '≠ or !=', '>', '≥ or >=', '<', '≤ or <=', '&', '!&', '|', '!|', '⊕ or ^|', '(', ')', '[', '![', ']', '{{', '!{{', '}}'],
         ];
 
         yield [
             Lexer::T_OPERAND,
-            ['simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\'']
+            ['simple float', 'simple integer', '/[a-z_][a-z0-9_]*/', '"value" or \'value\''],
         ];
-    }
-
-    /**
-     * @dataProvider getTokenSyntaxDataProvider
-     */
-    public function testGetTokenSyntax(mixed $tokenType, array $expectedTokenSyntax)
-    {
-        $this->assertSame($expectedTokenSyntax, Lexer::getTokenSyntax($tokenType));
     }
 }

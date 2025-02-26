@@ -15,7 +15,7 @@ class UnexpectedTokenException extends TokenException
         private array $expectedTokenTypes,
         ?string $message = null,
         int $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
     ) {
         $defaultMessage = sprintf(
             'Unexpected token "%s". Expected was %s.',

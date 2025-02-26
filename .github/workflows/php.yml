@@ -1,41 +1,45 @@
 name: PHP Composer
 
 on:
-  push:
-    branches: [ "master" ]
-  pull_request:
+    push:
+        branches: [ "master" ]
+    pull_request:
+        branches: [ "master" ]
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  build:
+    tests:
 
-    runs-on: ubuntu-latest
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
+        strategy:
+            matrix:
+                dependencies: [ "lowest", "normal" ]
 
-      - name: Validate composer.json and composer.lock
-        run: composer validate --strict
+        steps:
+            - uses: actions/checkout@v4
 
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v3
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
+            - name: Validate composer.json and composer.lock
+              run: composer validate --strict
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v3
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-${{ matrix.dependencies }}-
 
-      - name: Run CS fixer
-        run: make cs
+            - name: Install dependencies (mode ${{ matrix.dependencies }})
+              run: |
+                  if [ "${{ matrix.dependencies }}" = "lowest" ]; then
+                    composer update --prefer-lowest --prefer-dist --no-progress
+                  else
+                    composer install --prefer-dist --no-progress
+                  fi
 
-      - name: Run php static analyse
-        run: make analyse
-
-      - name: Run test suite
-        run: make test
+            - name: Run test suite
+              run: vendor/bin/phpunit

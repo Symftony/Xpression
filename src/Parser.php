@@ -138,13 +138,13 @@ class Parser
                 case Lexer::T_INPUT_PARAMETER:
                     $currentTokenValue = $this->expressionBuilder->parameter($currentToken['value'], null !== $comparisonFirstOperande);
 
-                // no break
+                    // no break
                 case Lexer::T_STRING:
                     if (!isset($currentTokenValue)) {
                         $currentTokenValue = $this->expressionBuilder->string($currentToken['value']);
                     }
 
-                // no break
+                    // no break
                 case Lexer::T_INTEGER:
                 case Lexer::T_FLOAT:
                     if (!isset($currentTokenValue)) {

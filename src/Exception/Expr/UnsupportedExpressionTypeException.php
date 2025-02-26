@@ -9,7 +9,7 @@ class UnsupportedExpressionTypeException extends \LogicException
     public function __construct(
         private string $expressionType,
         int $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
     ) {
         parent::__construct(sprintf('Unsupported expression type "%s".', $expressionType), $code, $previous);
     }

@@ -10,8 +10,10 @@ use Symftony\Xpression\Exception\Parser\InvalidExpressionException;
 use Symftony\Xpression\Parser;
 
 /**
- * @covers \Symftony\Xpression\Parser
  * @covers \Symftony\Xpression\Bridge\MongoDB\ExprBuilder
+ * @covers \Symftony\Xpression\Parser
+ *
+ * @internal
  */
 final class ParserTest extends TestCase
 {
@@ -23,6 +25,14 @@ final class ParserTest extends TestCase
     {
         $this->exprBuilder = new ExprBuilder();
         $this->parser = new Parser($this->exprBuilder);
+    }
+
+    /**
+     * @dataProvider provideParserCases
+     */
+    public function testParser(string $input, array $expectedExpression): void
+    {
+        self::assertSame($expectedExpression, $this->parser->parse($input));
     }
 
     public static function provideParserCases(): iterable
@@ -200,11 +210,13 @@ final class ParserTest extends TestCase
     }
 
     /**
-     * @dataProvider provideParserCases
+     * @dataProvider provideParserThrowUnsupportedExpressionTypeExceptionCases
      */
-    public function testParser(string $input, array $expectedExpression): void
+    public function testParserThrowUnsupportedExpressionTypeException(string $input): void
     {
-        self::assertSame($expectedExpression, $this->parser->parse($input));
+        $this->expectException(InvalidExpressionException::class);
+        $this->expectExceptionMessage('Invalid expression.');
+        $this->parser->parse($input);
     }
 
     public static function provideParserThrowUnsupportedExpressionTypeExceptionCases(): iterable
@@ -214,15 +226,5 @@ final class ParserTest extends TestCase
         yield ['fieldA=1⊕fieldB=2'];
 
         yield ['fieldA=1|fieldB=2|fieldC=3⊕fieldD=4'];
-    }
-
-    /**
-     * @dataProvider provideParserThrowUnsupportedExpressionTypeExceptionCases
-     */
-    public function testParserThrowUnsupportedExpressionTypeException(string $input): void
-    {
-        $this->expectException(InvalidExpressionException::class);
-        $this->expectExceptionMessage('Invalid expression.');
-        $this->parser->parse($input);
     }
 }

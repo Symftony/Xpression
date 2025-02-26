@@ -26,7 +26,7 @@ class HtmlExpressionBuilder implements ExpressionBuilderInterface
      */
     private $compositeHtmlBuilder;
 
-    public function __construct(callable $comparisonHtmlBuilder = null, callable $compositeHtmlBuilder = null)
+    public function __construct(?callable $comparisonHtmlBuilder = null, ?callable $compositeHtmlBuilder = null)
     {
         $this->comparisonHtmlBuilder = $comparisonHtmlBuilder ?: static fn ($field, $operator, $value) => sprintf('<div>%s %s %s</div>', $field, $operator, $value);
         $this->compositeHtmlBuilder = $compositeHtmlBuilder ?: static fn (array $expressions, $type) => str_replace(

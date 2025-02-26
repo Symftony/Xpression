@@ -12,6 +12,8 @@ use Symftony\Xpression\Exception\Expr\UnsupportedExpressionTypeException;
 
 /**
  * @covers \Symftony\Xpression\Bridge\Doctrine\ORM\ExprAdapter
+ *
+ * @internal
  */
 final class ExprAdapterTest extends TestCase
 {
@@ -30,15 +32,6 @@ final class ExprAdapterTest extends TestCase
     {
         $field = 'fake_field';
         self::assertSame('fake_field IS NULL', $this->exprAdapter->isNull($field));
-    }
-
-    public static function comparisonDataProvider(): iterable
-    {
-        if (!class_exists('Doctrine\ORM\Query\Expr')) {
-            return [];
-        }
-
-        yield ['field', 'value'];
     }
 
     /**
@@ -151,35 +144,13 @@ final class ExprAdapterTest extends TestCase
         );
     }
 
-    public static function compositeDataProvider(): iterable
+    public static function comparisonDataProvider(): iterable
     {
         if (!class_exists('Doctrine\ORM\Query\Expr')) {
             return [];
         }
 
-        yield [[
-            new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-        ]];
-
-        yield [[
-            new Expr\Func('field', ['value']),
-        ]];
-
-        yield [[
-            new Expr\Andx(
-                [
-                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-                ]
-            ),
-        ]];
-
-        yield [[
-            new Expr\Orx(
-                [
-                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
-                ]
-            ),
-        ]];
+        yield ['field', 'value'];
     }
 
     /**
@@ -242,5 +213,36 @@ final class ExprAdapterTest extends TestCase
         $this->expectException(UnsupportedExpressionTypeException::class);
         $this->expectExceptionMessage('Unsupported expression type "xorX".');
         $this->exprAdapter->xorX($expressions);
+    }
+
+    public static function compositeDataProvider(): iterable
+    {
+        if (!class_exists('Doctrine\ORM\Query\Expr')) {
+            return [];
+        }
+
+        yield [[
+            new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+        ]];
+
+        yield [[
+            new Expr\Func('field', ['value']),
+        ]];
+
+        yield [[
+            new Expr\Andx(
+                [
+                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+                ]
+            ),
+        ]];
+
+        yield [[
+            new Expr\Orx(
+                [
+                    new Expr\Comparison('field', Expr\Comparison::EQ, 'value'),
+                ]
+            ),
+        ]];
     }
 }

@@ -11,6 +11,8 @@ use Symftony\Xpression\Lexer;
 
 /**
  * @covers \Symftony\Xpression\Bridge\MongoDB\ExprBuilder
+ *
+ * @internal
  */
 final class ExprBuilderTest extends TestCase
 {

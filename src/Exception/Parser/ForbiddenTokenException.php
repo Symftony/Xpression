@@ -15,7 +15,7 @@ class ForbiddenTokenException extends TokenException
         private array $allowedTokenTypes,
         ?string $message = null,
         int $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
     ) {
         $defaultMessage = sprintf(
             'Forbidden token "%s". Allowed was %s.',

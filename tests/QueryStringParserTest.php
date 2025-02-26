@@ -9,9 +9,23 @@ use Symftony\Xpression\QueryStringParser;
 
 /**
  * @covers \Symftony\Xpression\QueryStringParser
+ *
+ * @internal
  */
 final class QueryStringParserTest extends TestCase
 {
+    /**
+     * @dataProvider provideParseCases
+     */
+    public function testParse(string $queryString, string $expectedQueryString, array $expectedGET): void
+    {
+        $_SERVER['QUERY_STRING'] = $queryString;
+        QueryStringParser::correctServerQueryString();
+
+        self::assertSame($expectedQueryString, $_SERVER['QUERY_STRING']);
+        self::assertSame($expectedGET, $_GET);
+    }
+
     public static function provideParseCases(): iterable
     {
         // Default querystring
@@ -208,17 +222,5 @@ final class QueryStringParserTest extends TestCase
                 'query-A' => '{{valueA}}',
             ],
         ];
-    }
-
-    /**
-     * @dataProvider provideParseCases
-     */
-    public function testParse(string $queryString, string $expectedQueryString, array $expectedGET): void
-    {
-        $_SERVER['QUERY_STRING'] = $queryString;
-        QueryStringParser::correctServerQueryString();
-
-        self::assertSame($expectedQueryString, $_SERVER['QUERY_STRING']);
-        self::assertSame($expectedGET, $_GET);
     }
 }

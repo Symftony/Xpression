@@ -10,7 +10,7 @@ class InvalidExpressionException extends \RuntimeException
         private string $input,
         string $message = '',
         int $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
     ) {
         parent::__construct('' !== $message ? $message : 'Invalid expression.', $code, $previous);
     }

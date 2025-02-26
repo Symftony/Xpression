@@ -10,6 +10,8 @@ use Symftony\Xpression\Lexer;
 
 /**
  * @covers \Symftony\Xpression\Expr\ClosureExpressionBuilder
+ *
+ * @internal
  */
 final class ClosureExpressionBuilderTest extends TestCase
 {
@@ -26,6 +28,14 @@ final class ClosureExpressionBuilderTest extends TestCase
             'field_string' => 'my_fake_string',
         ];
         $this->closureExpressionBuilder = new ClosureExpressionBuilder();
+    }
+
+    /**
+     * @dataProvider provideGetObjectFieldValueCases
+     */
+    public function testGetObjectFieldValue(mixed $object, mixed $value, mixed $expectedResult): void
+    {
+        self::assertSame($expectedResult, ClosureExpressionBuilder::getObjectFieldValue($object, $value));
     }
 
     public static function provideGetObjectFieldValueCases(): iterable
@@ -83,14 +93,6 @@ final class ClosureExpressionBuilderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideGetObjectFieldValueCases
-     */
-    public function testGetObjectFieldValue(mixed $object, mixed $value, mixed $expectedResult): void
-    {
-        self::assertSame($expectedResult, ClosureExpressionBuilder::getObjectFieldValue($object, $value));
-    }
-
     public function testGetSupportedTokenType(): void
     {
         self::assertSame(Lexer::T_ALL, $this->closureExpressionBuilder->getSupportedTokenType());
@@ -107,6 +109,18 @@ final class ClosureExpressionBuilderTest extends TestCase
         self::assertSame('my_fake_data', $this->closureExpressionBuilder->string('my_fake_data'));
     }
 
+    /**
+     * @dataProvider provideIsNullCases
+     */
+    public function testIsNull(mixed $field, mixed $expectedResult): void
+    {
+        $expression = $this->closureExpressionBuilder->isNull($field);
+        self::assertSame(
+            $expectedResult,
+            $expression($this->exampleData)
+        );
+    }
+
     public static function provideIsNullCases(): iterable
     {
         yield ['field_null', true];
@@ -115,11 +129,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideIsNullCases
+     * @dataProvider provideEqCases
      */
-    public function testIsNull(mixed $field, mixed $expectedResult): void
+    public function testEq(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->isNull($field);
+        $expression = $this->closureExpressionBuilder->eq($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -136,11 +150,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideEqCases
+     * @dataProvider provideNeqCases
      */
-    public function testEq(mixed $field, mixed $value, mixed $expectedResult): void
+    public function testNeq(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->eq($field, $value);
+        $expression = $this->closureExpressionBuilder->neq($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -157,11 +171,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideNeqCases
+     * @dataProvider provideGtCases
      */
-    public function testNeq(mixed $field, mixed $value, mixed $expectedResult): void
+    public function testGt(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->neq($field, $value);
+        $expression = $this->closureExpressionBuilder->gt($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -178,11 +192,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideGtCases
+     * @dataProvider provideGteCases
      */
-    public function testGt(mixed $field, mixed $value, mixed $expectedResult): void
+    public function testGte(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->gt($field, $value);
+        $expression = $this->closureExpressionBuilder->gte($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -199,11 +213,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideGteCases
+     * @dataProvider provideLtCases
      */
-    public function testGte(mixed $field, mixed $value, mixed $expectedResult): void
+    public function testLt(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->gte($field, $value);
+        $expression = $this->closureExpressionBuilder->lt($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -220,11 +234,11 @@ final class ClosureExpressionBuilderTest extends TestCase
     }
 
     /**
-     * @dataProvider provideLtCases
+     * @dataProvider provideLteCases
      */
-    public function testLt(mixed $field, mixed $value, mixed $expectedResult): void
+    public function testLte(mixed $field, mixed $value, mixed $expectedResult): void
     {
-        $expression = $this->closureExpressionBuilder->lt($field, $value);
+        $expression = $this->closureExpressionBuilder->lte($field, $value);
         self::assertSame(
             $expectedResult,
             $expression($this->exampleData)
@@ -238,25 +252,6 @@ final class ClosureExpressionBuilderTest extends TestCase
         yield ['field_number_5', 5, true];
 
         yield ['field_number_5', 10, true];
-    }
-
-    /**
-     * @dataProvider provideLteCases
-     */
-    public function testLte(mixed $field, mixed $value, mixed $expectedResult): void
-    {
-        $expression = $this->closureExpressionBuilder->lte($field, $value);
-        self::assertSame(
-            $expectedResult,
-            $expression($this->exampleData)
-        );
-    }
-
-    public static function inDataProvider(): iterable
-    {
-        yield ['field_number_5', [1], false];
-
-        yield ['field_number_5', [1, 2, 3, 4, 5], true];
     }
 
     /**
@@ -283,11 +278,11 @@ final class ClosureExpressionBuilderTest extends TestCase
         );
     }
 
-    public static function containsDataProvider(): iterable
+    public static function inDataProvider(): iterable
     {
-        yield ['field_string', 'toto', false];
+        yield ['field_number_5', [1], false];
 
-        yield ['field_string', 'fake', true];
+        yield ['field_number_5', [1, 2, 3, 4, 5], true];
     }
 
     /**
@@ -314,15 +309,11 @@ final class ClosureExpressionBuilderTest extends TestCase
         );
     }
 
-    public static function andXDataProvider(): iterable
+    public static function containsDataProvider(): iterable
     {
-        yield [[false, false], false];
+        yield ['field_string', 'toto', false];
 
-        yield [[false, true], false];
-
-        yield [[true, false], false];
-
-        yield [[true, true], true];
+        yield ['field_string', 'fake', true];
     }
 
     /**
@@ -351,13 +342,13 @@ final class ClosureExpressionBuilderTest extends TestCase
         );
     }
 
-    public static function orXDataProvider(): iterable
+    public static function andXDataProvider(): iterable
     {
         yield [[false, false], false];
 
-        yield [[false, true], true];
+        yield [[false, true], false];
 
-        yield [[true, false], true];
+        yield [[true, false], false];
 
         yield [[true, true], true];
     }
@@ -388,6 +379,30 @@ final class ClosureExpressionBuilderTest extends TestCase
         );
     }
 
+    public static function orXDataProvider(): iterable
+    {
+        yield [[false, false], false];
+
+        yield [[false, true], true];
+
+        yield [[true, false], true];
+
+        yield [[true, true], true];
+    }
+
+    /**
+     * @dataProvider provideXorXCases
+     */
+    public function testXorX(array $expressions, mixed $expectedResult): void
+    {
+        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
+        $expression = $this->closureExpressionBuilder->xorX($expressionsCallable);
+        self::assertEquals(
+            $expectedResult,
+            $expression('useless_data')
+        );
+    }
+
     public static function provideXorXCases(): iterable
     {
         yield [[false, false], false];
@@ -413,19 +428,6 @@ final class ClosureExpressionBuilderTest extends TestCase
         yield [[true, true, false], false];
 
         yield [[true, true, true], true];
-    }
-
-    /**
-     * @dataProvider provideXorXCases
-     */
-    public function testXorX(array $expressions, mixed $expectedResult): void
-    {
-        $expressionsCallable = array_map(static fn ($value) => static fn () => $value, $expressions);
-        $expression = $this->closureExpressionBuilder->xorX($expressionsCallable);
-        self::assertEquals(
-            $expectedResult,
-            $expression('useless_data')
-        );
     }
 }
 
