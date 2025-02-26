@@ -1,0 +1,64 @@
+name: PHP Composer
+
+on:
+    push:
+        branches: [ "master" ]
+    pull_request:
+        branches: [ "master" ]
+
+permissions:
+    contents: read
+
+jobs:
+    tests:
+
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                dependencies: [ "lowest", "normal" ]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate --strict
+
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v3
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ matrix.dependencies }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-${{ matrix.dependencies }}-
+
+            - name: Install dependencies (mode ${{ matrix.dependencies }})
+              run: |
+                  if [ "${{ matrix.dependencies }}" = "lowest" ]; then
+                    composer update --prefer-lowest --prefer-dist --no-progress
+                  else
+                    composer install --prefer-dist --no-progress
+                  fi
+
+            - name: Enable Xdebug
+              run: echo "XDEBUG_MODE=coverage" >> $GITHUB_ENV
+
+            - name: Run test suite
+              run: vendor/bin/phpunit --coverage-clover coverage.xml --log-junit junit.xml
+
+            - name: Upload test results to Codecov
+              if: ${{ !cancelled() && matrix.dependencies == 'normal' }}
+              uses: codecov/test-results-action@v1
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  fail_ci_if_error: true
+
+            - name: Upload coverage to Codecov
+              if: ${{ !cancelled() && matrix.dependencies == 'normal' }}
+              uses: codecov/codecov-action@v5
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  files: coverage.xml
+                  flags: php
+                  fail_ci_if_error: true

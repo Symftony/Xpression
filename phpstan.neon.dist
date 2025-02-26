@@ -1,0 +1,8 @@
+parameters:
+    level: 6
+    paths:
+        - src
+    ignoreErrors:
+        - '/Method .*::(in|notIn|andX|nandX|orX|norX|xorX)\(\) has parameter .* with no value type specified in iterable type array\./'
+        - '/Method Symftony\\Xpression\\Parser::getNextToken\(\) return type has no value type specified in iterable type array\./'
+        - '/Method Symftony\\Xpression\\Lexer::get(Non)?CatchablePatterns\(\) return type has no value type specified in iterable type array\./'

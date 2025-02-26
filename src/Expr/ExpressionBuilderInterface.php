@@ -1,116 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Symftony\Xpression\Expr;
 
 interface ExpressionBuilderInterface
 {
     /**
-     * Must return all supported token type
-     *
-     * @return int
+     * Must return all supported token type.
      */
-    public function getSupportedTokenType();
+    public function getSupportedTokenType(): int;
 
-    /**
-     * @param $value
-     * @param bool $isValue
-     * @return mixed
-     */
-    public function parameter($value, $isValue = false);
+    public function parameter(mixed $value, bool $isValue = false): mixed;
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function string($value);
+    public function string(mixed $value): mixed;
 
-    /**
-     * @param string $field
-     */
-    public function isNull($field);
+    public function isNull(string $field): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function eq($field, $value);
+    public function eq(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function neq($field, $value);
+    public function neq(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function gt($field, $value);
+    public function gt(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function gte($field, $value);
+    public function gte(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function lt($field, $value);
+    public function lt(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function lte($field, $value);
+    public function lte(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     */
-    public function in($field, array $values);
+    public function in(string $field, array $values): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $values
-     */
-    public function notIn($field, array $values);
+    public function notIn(string $field, array $values): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function contains($field, $value);
+    public function contains(string $field, mixed $value): mixed;
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     */
-    public function notContains($field, $value);
+    public function notContains(string $field, mixed $value): mixed;
 
-    /**
-     * @param array $expressions
-     */
-    public function andX(array $expressions);
+    public function andX(array $expressions): mixed;
 
-    /**
-     * @param array $expressions
-     */
-    public function nandX(array $expressions);
+    public function nandX(array $expressions): mixed;
 
-    /**
-     * @param array $expressions
-     */
-    public function orX(array $expressions);
+    public function orX(array $expressions): mixed;
 
-    /**
-     * @param array $expressions
-     */
-    public function norX(array $expressions);
+    public function norX(array $expressions): mixed;
 
-    /**
-     * @param array $expressions
-     */
-    public function xorX(array $expressions);
+    public function xorX(array $expressions): mixed;
 }
