@@ -42,11 +42,18 @@ jobs:
                   fi
 
             - name: Run test suite
-              run: vendor/bin/phpunit --coverage-clover coverage.xml
+              run: vendor/bin/phpunit --coverage-clover coverage.xml --log-junit junit.xml
+
+            - name: Upload test results to Codecov
+              if: ${{ !cancelled() && matrix.dependencies == 'normal' }}
+              uses: codecov/test-results-action@v1
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  fail_ci_if_error: true
 
             - name: Upload coverage to Codecov
-              if: matrix.dependencies == 'normal'
-              uses: codecov/codecov-action@v4
+              if: ${{ !cancelled() && matrix.dependencies == 'normal' }}
+              uses: codecov/codecov-action@v5
               with:
                   token: ${{ secrets.CODECOV_TOKEN }}
                   files: coverage.xml
