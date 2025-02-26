@@ -41,6 +41,9 @@ jobs:
                     composer install --prefer-dist --no-progress
                   fi
 
+            - name: Enable Xdebug
+              run: echo "XDEBUG_MODE=coverage" >> $GITHUB_ENV
+
             - name: Run test suite
               run: vendor/bin/phpunit --coverage-clover coverage.xml --log-junit junit.xml
 
