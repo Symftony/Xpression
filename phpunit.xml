@@ -29,9 +29,5 @@
         <exclude>
             <directory>src/Exception</directory>
         </exclude>
-<!--        <report>-->
-<!--            <html outputDirectory="docs/coverage"/>-->
-<!--            <clover outputFile="clover.xml"/>-->
-<!--        </report>-->
     </coverage>
 </phpunit>

@@ -42,4 +42,13 @@ jobs:
                   fi
 
             - name: Run test suite
-              run: vendor/bin/phpunit
+              run: vendor/bin/phpunit --coverage-clover coverage.xml
+
+            - name: Upload coverage to Codecov
+              if: matrix.dependencies == 'normal'
+              uses: codecov/codecov-action@v4
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+                  files: coverage.xml
+                  flags: php
+                  fail_ci_if_error: true
