@@ -31,8 +31,7 @@ $products = array(
     array('id' => 10, 'constructor' => 'Mitsubishi', 'model' => 'Eclipse', 'year' => 2001, 'price' => 8),
 );
 
-function readCsv($file)
-{
+$readCsv = function ($file) {
     $rows = array();
     $header = null;
     foreach (preg_split('/\r?\n/', trim(file_get_contents($file))) as $line) {
@@ -51,29 +50,35 @@ function readCsv($file)
     }
 
     return $rows;
-}
+};
+
+// An empty expression means no filter: every row matches.
+$parse = function ($builder) use ($query) {
+    return '' === $query ? null : (new Parser($builder))->parse($query);
+};
 
 $result = array();
 try {
-    $result['html'] = (new Parser(new HtmlExpressionBuilder()))->parse($query);
+    $result['html'] = '' === $query ? '' : $parse(new HtmlExpressionBuilder());
 
     switch ($mode) {
         case 'array':
-            $filter = (new Parser(new ClosureExpressionBuilder()))->parse($query);
-            $result['rows'] = array_values(array_filter($products, $filter));
+            $filter = $parse(new ClosureExpressionBuilder());
+            $result['rows'] = $filter ? array_values(array_filter($products, $filter)) : $products;
             break;
         case 'csv':
-            $filter = (new Parser(new ClosureExpressionBuilder()))->parse($query);
-            $result['rows'] = array_values(array_filter(readCsv('/app/data.csv'), $filter));
+            $filter = $parse(new ClosureExpressionBuilder());
+            $rows = $readCsv('/app/data.csv');
+            $result['rows'] = $filter ? array_values(array_filter($rows, $filter)) : $rows;
             break;
         case 'collection':
-            $expression = (new Parser(new ExpressionBuilderAdapter(new ExpressionBuilder())))->parse($query);
+            $expression = $parse(new ExpressionBuilderAdapter(new ExpressionBuilder()));
             $result['rows'] = array_values(
                 (new ArrayCollection($products))->matching(new Criteria($expression))->toArray()
             );
             break;
         case 'orm':
-            $expression = (new Parser(new ExprAdapter(new Expr())))->parse($query);
+            $expression = $parse(new ExprAdapter(new Expr()));
             $result['dql'] = (string) $expression;
             if (!extension_loaded('pdo_sqlite')) {
                 $result['sqlError'] = 'pdo_sqlite is not available in this runtime.';
@@ -85,7 +90,10 @@ try {
                 foreach ($products as $product) {
                     $conn->insert('product', $product);
                 }
-                $qb = $conn->createQueryBuilder()->select('*')->from('product')->where($expression);
+                $qb = $conn->createQueryBuilder()->select('*')->from('product');
+                if (null !== $expression) {
+                    $qb->where($expression);
+                }
                 $result['sql'] = $qb->getSQL();
                 $result['rows'] = $qb->executeQuery()->fetchAllAssociative();
             } catch (\Throwable $e) {

@@ -62,7 +62,7 @@ foreach (json_decode(file_get_contents('/bundle.json'), true) as $path => $code)
     @mkdir(dirname($file), 0777, true);
     file_put_contents($file, $code);
 }`);
-const script = await (await fetch('run.php')).text();
+const script = await (await fetch('run.php.txt')).text();
 $('csv').value = await (await fetch('products.csv')).text();
 
 async function update() {

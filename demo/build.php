@@ -4,9 +4,11 @@ $out = rtrim(isset($argv[1]) ? $argv[1] : '_site', '/');
 $root = dirname(__DIR__);
 
 @mkdir($out, 0777, true);
-foreach (array('index.html', 'run.php', 'products.csv') as $file) {
+foreach (array('index.html', 'products.csv') as $file) {
     copy(__DIR__ . '/' . $file, $out . '/' . $file);
 }
+// Served as plain text: the page fetches it and runs it in php-wasm (a PHP dev server must not execute it).
+copy(__DIR__ . '/run.php', $out . '/run.php.txt');
 file_put_contents($out . '/.nojekyll', '');
 
 $files = array();
