@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Xpression demo</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; }
+  textarea { width: 100%; box-sizing: border-box; font-family: monospace; }
+  input { width: 100%; box-sizing: border-box; font: inherit; font-family: monospace; padding: .5rem; }
+  table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+  th, td { border: 1px solid #8884; padding: .25rem .5rem; text-align: left; }
+  fieldset { margin: .25rem 0; }
+  #status, #error { color: #888; } #error { color: #c00; }
+</style>
+</head>
+<body>
+<h1>Xpression</h1>
+<p>Query parsing runs <strong>in your browser</strong> with PHP compiled to WebAssembly (<a href="https://github.com/seanmorris/php-wasm">php-wasm</a>).</p>
+<p>
+  <label>Mode
+    <select id="mode">
+      <option value="array">Array (closure)</option>
+      <option value="collection">Doctrine ArrayCollection</option>
+      <option value="orm">Doctrine ORM expr + DBAL on SQLite</option>
+      <option value="csv">CSV</option>
+    </select>
+  </label>
+</p>
+<input id="query" value="constructor='Ford'|(price&lt;5&amp;year&gt;=1999)" spellcheck="false" autocomplete="off">
+<p id="status">Loading PHP…</p>
+<p id="error"></p>
+<div id="csv-box" hidden>
+  <h2>CSV data</h2>
+  <textarea id="csv" rows="6" spellcheck="false"></textarea>
+</div>
+<div id="dql-box" hidden>
+  <h2>Expression</h2>
+  <pre id="dql"></pre>
+  <h2>SQL (DBAL, SQLite in WebAssembly)</h2>
+  <pre id="sql"></pre>
+</div>
+<h2>Parsed expression</h2>
+<div id="html"></div>
+<div id="rows"></div>
+<script type="module">
+const PHP_WASM = 'https://cdn.jsdelivr.net/npm/php-wasm@0.2.0/PhpWeb.mjs';
+const $ = id => document.getElementById(id);
+
+const { PhpWeb } = await import(PHP_WASM);
+const sqlite = await import('https://cdn.jsdelivr.net/npm/php-wasm-sqlite@0.2.0/index.mjs');
+const php = new PhpWeb({ sharedLibs: [sqlite] });
+let out = '';
+php.addEventListener('output', e => out += e.detail.join(''));
+php.addEventListener('error', e => console.error(e.detail.join('')));
+
+await php.writeFile('/bundle.json', await (await fetch('bundle.json')).text());
+await php.mkdir('/app');
+await php.run(`<?php
+foreach (json_decode(file_get_contents('/bundle.json'), true) as $path => $code) {
+    $file = '/app/' . $path;
+    @mkdir(dirname($file), 0777, true);
+    file_put_contents($file, $code);
+}`);
+const script = await (await fetch('run.php')).text();
+$('csv').value = await (await fetch('products.csv')).text();
+
+async function update() {
+  out = '';
+  const mode = $('mode').value;
+  $('csv-box').hidden = mode !== 'csv';
+  $('dql-box').hidden = mode !== 'orm';
+  await php.writeFile('/app/query.txt', $('query').value);
+  await php.writeFile('/app/mode.txt', mode);
+  await php.writeFile('/app/data.csv', $('csv').value);
+  await php.run(script);
+  let r;
+  try { r = JSON.parse(out); } catch { r = { error: out }; }
+  $('error').textContent = r.error || r.sqlError || '';
+  $('html').innerHTML = $('rows').innerHTML = $('dql').textContent = $('sql').textContent = '';
+  if (r.error) return;
+  $('html').innerHTML = r.html;
+  $('dql').textContent = r.dql || '';
+  $('sql').textContent = r.sql || '';
+  if (!r.rows) return;
+  const esc = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const cols = r.rows.length ? Object.keys(r.rows[0]) : [];
+  $('rows').innerHTML = '<h2>Matching rows</h2>' + (r.rows.length
+    ? '<table><tr>' + cols.map(c => `<th>${esc(c)}</th>`).join('') + '</tr>'
+      + r.rows.map(row => '<tr>' + cols.map(c => `<td>${esc(row[c])}</td>`).join('') + '</tr>').join('') + '</table>'
+    : '<p>No match.</p>');
+}
+
+let timer;
+for (const id of ['query', 'mode', 'csv']) $(id).addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 200); });
+$('status').textContent = 'Ready.';
+await update();
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+name: Demo (GitHub Pages)
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install dependencies (library + demo extras)
+        run: |
+          composer config platform-check false
+          composer install --no-dev --prefer-dist --no-progress
+          composer require --update-no-dev --prefer-dist --no-progress --optimize-autoloader doctrine/collections:^1.0 doctrine/orm:^2.4
+
+      - name: Build demo site
+        run: php demo/build.php _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

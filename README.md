@@ -13,7 +13,11 @@
 
 ## Demo
 
-You can try this library on [Demo Xpression](http://symftony-xpression.herokuapp.com/)
+You can try this library on [Demo Xpression](https://symftony.github.io/Xpression/).
+
+Examples: array (closure), Doctrine ArrayCollection, Doctrine ORM + DBAL (real SQLite in WebAssembly) and CSV.
+
+It runs entirely in your browser: PHP is executed as WebAssembly with [php-wasm](https://github.com/seanmorris/php-wasm), and the page is built and deployed to GitHub Pages by `.github/workflows/pages.yml` (sources in `demo/`).
 
 ## Installation
 
