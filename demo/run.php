@@ -59,7 +59,19 @@ $parse = function ($builder) use ($query) {
 
 $result = array();
 try {
-    $result['html'] = '' === $query ? '' : $parse(new HtmlExpressionBuilder());
+    // The default HtmlExpressionBuilder templates do not escape: escape everything before it reaches innerHTML.
+    $e = function ($value) {
+        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    };
+    $htmlBuilder = new HtmlExpressionBuilder(
+        function ($field, $operator, $value) use ($e) {
+            return sprintf('<div>%s %s %s</div>', $e($field), $e($operator), $e($value));
+        },
+        function (array $expressions, $type) use ($e) {
+            return '<fieldset><legend>' . $e($type) . '</legend>' . implode('', $expressions) . '</fieldset>';
+        }
+    );
+    $result['html'] = '' === $query ? '' : $parse($htmlBuilder);
 
     switch ($mode) {
         case 'array':

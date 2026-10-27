@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -32,9 +30,9 @@ jobs:
           composer require --update-no-dev --prefer-dist --no-progress --optimize-autoloader doctrine/collections:^1.0 doctrine/orm:^2.4
 
       - name: Build demo site
-        run: php demo/build.php _site
-
-      - uses: actions/configure-pages@v5
+        run: |
+          php demo/build.php _site
+          sh demo/fetch-js.sh _site
 
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -43,6 +41,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

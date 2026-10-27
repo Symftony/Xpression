@@ -17,7 +17,9 @@ You can try this library on [Demo Xpression](https://symftony.github.io/Xpressio
 
 Examples: array (closure), Doctrine ArrayCollection, Doctrine ORM + DBAL (real SQLite in WebAssembly) and CSV.
 
-It runs entirely in your browser: PHP is executed as WebAssembly with [php-wasm](https://github.com/seanmorris/php-wasm), and the page is built and deployed to GitHub Pages by `.github/workflows/pages.yml` (sources in `demo/`).
+It runs entirely in your browser: PHP is executed as WebAssembly with [php-wasm](https://github.com/seanmorris/php-wasm) (self-hosted, pinned and checksum-verified by `demo/fetch-js.sh`, no CDN at runtime). The page is built and deployed to GitHub Pages by `.github/workflows/pages.yml` (sources in `demo/`, excluded from the Composer dist).
+
+The ORM example runs the generated expression on a real SQLite (in WebAssembly) through Doctrine DBAL. It is a demo: `ExprAdapter` inlines values in the SQL and does not check field names, so with a real database use bound parameters and an allow-list of fields.
 
 ## Installation
 
