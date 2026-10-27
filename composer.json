@@ -8,7 +8,7 @@
   ],
   "type": "library",
   "description": "Xpression is a simple PHP implementation of Specification pattern",
-  "keywords": ["dzuycgzjcvzuyxvzsl", "doctrine", "orm", "mongodb", "collections", "specification", "expression", "parser", "lexer", "query", "builder", "query builder"],
+  "keywords": ["dsl", "doctrine", "orm", "mongodb", "collections", "specification", "expression", "parser", "lexer", "query", "builder", "query builder"],
   "homepage": "https://github.com/symftony/Xpression",
   "require": {
     "php": ">=5.3",
